@@ -1,11 +1,13 @@
-
-
-import prisma from '@/lib/prisma';
+import { auth } from '@/auth';
+import { getUsersWithDrizzle } from '@/lib/req';
 import React from 'react'
 
 const Users = async () => {
 
-  const users = await prisma.user.findMany();
+  const users = await getUsersWithDrizzle();
+  const session = await auth();
+  console.log('session : ', session);
+  // console.log('users : ', users);
   return (
     <div>
       {users && users.map(user => {

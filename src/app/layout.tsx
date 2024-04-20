@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import Link from "next/link";
 import Categories from "@/components/navbar/Categories";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,13 +20,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Navbar />
-        <Categories/>
-        <main className=" m-auto text-center max-w-screen-lg">
-          {children}
-        </main>
-      </body>
+      <SessionProvider>
+        <body className={inter.className}>
+          <Navbar />
+          <Categories/>
+          <main className=" m-auto text-center max-w-screen-lg  mt-4 flex justify-center items-center">
+            {children}
+          </main>
+        </body>
+      </SessionProvider>
     </html>
   );
 }

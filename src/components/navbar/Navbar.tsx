@@ -20,10 +20,10 @@ import {
 } from "lucide-react";
 import NavItem from "./NavItem";
 import Link from "next/link";
-import { categories } from "./Categories";
 import Menu from "./Menu";
 import Image from "next/image";
 import hat from "public/hat.svg";
+import SellButton from "../sell-button/SellButton";
 
 export const navItems = [
   {
@@ -75,7 +75,7 @@ const Navbar = () => {
             src={hat}
             height={25}
             width={25}
-            className="absolute right-[-15px] top-[-5px] "
+            className="absolute right-[-15px] top-[-5px] animate-bounce "
           />
         </NavbarBrand>
       </NavbarContent>
@@ -84,14 +84,7 @@ const Navbar = () => {
 
       <div className="hidden md:flex w-[50%] gap-2 justify-between">
         {!isSearchFocus && (
-          <Button
-            as={Link}
-            href="/deposer-une-annonce"
-            className=" bg-orange-500 text-white font-semibold min-w-fit"
-            startContent={<SquarePlus size={18} />}
-          >
-            Déposer une annonce
-          </Button>
+          <SellButton/>
         )}
         <Input
           onFocus={() => setIsSearchFocus(true)}

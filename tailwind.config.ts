@@ -14,8 +14,9 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "bg_login": "url('/images/bg_login.png')"
       },
-    },
+    }
   },
   plugins: [nextui()],
   darkMode: "class"

@@ -2,9 +2,9 @@
 import { NavbarMenu, NavbarMenuItem, Divider } from "@nextui-org/react";
 import Link from "next/link";
 import React, { FC } from "react";
-import { categories } from "./Categories";
 import { navItems } from "./Navbar";
 import { SquarePlus } from "lucide-react";
+import { categoriesList } from "@/interfaces/IProducts";
 
 interface IProps {
   setIsOpenMenu: (arg: boolean) => void;
@@ -37,14 +37,14 @@ const Menu: FC<IProps> = ({ setIsOpenMenu }) => {
         </NavbarMenuItem>
       ))}
       <Divider />
-      {Object.entries(categories).map(([key, value], index) => (
+      {Object.entries(categoriesList).map(([key, value], index) => (
         <NavbarMenuItem key={index}>
           <Link
             onClick={() => setIsOpenMenu(false)}
             href={key}
             className="relative text-sm nav_item pb-1"
           >
-            {value}
+            {value.label}
           </Link>
         </NavbarMenuItem>
       ))}

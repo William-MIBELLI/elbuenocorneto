@@ -1,0 +1,63 @@
+{
+  "products": {
+    "electronique": [
+      {
+        "username": "JeanMichel",
+        "rating": 4.5,
+        "rateNumber": 12,
+        "imageUrl": "/images/iphone.jpg",
+        "title": "Iphone 13 Bon état",
+        "price": 450,
+        "delivery": true,
+        "location": "Carcassonne",
+        "postal": 11000,
+        "createdAt": "Aujourd'hui à 15:23"
+      },
+      {
+        "username": "JeanMichel",
+        "rating": 4.5,
+        "rateNumber": 12,
+        "imageUrl": "/images/iphone.jpg",
+        "title": "Iphone 13 Bon état",
+        "price": 450,
+        "delivery": true,
+        "location": "Carcassonne",
+        "postal": 11000,
+        "createdAt": "Aujourd'hui à 15:23"
+      },
+      {
+        "username": "JeanMichel",
+        "rating": 4.5,
+        "rateNumber": 12,
+        "imageUrl": "/images/iphone.jpg",
+        "title": "Iphone 13 Bon état",
+        "price": 450,
+        "delivery": true,
+        "location": "Carcassonne",
+        "postal": 11000,
+        "createdAt": "Aujourd'hui à 15:23"
+      },
+      {
+        "username": "JeanMichel",
+        "rating": 4.5,
+        "rateNumber": 12,
+        "imageUrl": "/images/iphone.jpg",
+        "title": "Iphone 13 Bon état",
+        "price": 450,
+        "delivery": true,
+        "location": "Carcassonne",
+        "postal": 11000,
+        "createdAt": "Aujourd'hui à 15:23"
+      }
+    ],
+    "immobilier": [],
+    "vehicule": [],
+    "vacance": [],
+    "job": [],
+    "mode": [],
+    "jardin": [],
+    "famille": [],
+    "loisir": [],
+    "autre": []
+  }
+}
