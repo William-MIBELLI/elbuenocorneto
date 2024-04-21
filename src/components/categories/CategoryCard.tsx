@@ -1,6 +1,7 @@
 import { ICategory } from "@/interfaces/IProducts";
 import { Card, CardFooter, Button } from "@nextui-org/react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { FC } from "react";
 
 interface IProps {
@@ -8,10 +9,10 @@ interface IProps {
 }
 
 const CategoryCard: FC<IProps> = ({ category }) => {
-  const { imageUrl, label } = category;
+  const { imageUrl, label, target } = category;
 
   return (
-    <Card isFooterBlurred radius="lg" className="border-none min-w-40  bg-blue-300">
+    <Card as={Link} href={target}  isFooterBlurred radius="lg" className="border-none min-w-40  bg-blue-300">
       <Image
         alt={label}
         className="object-fit"

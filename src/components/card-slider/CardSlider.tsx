@@ -12,13 +12,13 @@ interface IProps {
 const CardSlider: FC<IProps> = async ({ category }) => {
   
   const productsList = await getLastProductsByCategory(category);
-  const { label } = categoriesList[category];
+  const { label, target } = categoriesList[category];
 
   return (
     <div className="w-full">
       <div className="flex justify-between">
         <h3 className=" font-semibold">{label}</h3>
-        <Link className="flex items-center gap-2" href={"/electronique"}>
+        <Link className="flex items-center gap-2" href={target}>
           <p className="text-xs font-semibold">Voir plus d'annonce</p>
           <MoveRight size={18} />
         </Link>

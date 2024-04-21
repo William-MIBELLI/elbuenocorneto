@@ -5,6 +5,7 @@ import Image from "next/image";
 import React, { FC, useRef } from "react";
 import iphone from "public/images/iphone.jpg";
 import { IProduct } from "@/interfaces/IProducts";
+import Link from "next/link";
 
 interface IProps {
   product: IProduct;
@@ -22,11 +23,13 @@ const ProductCard: FC<IProps> = ({ product }) => {
     rating,
     title,
     username,
+    id = 'FEREG'
   } = product;
   const cardRef = useRef(null);
 
   return (
-    <div
+    <Link
+      href={`/product/${id}`}
       ref={cardRef}
       className=" py-2 px-4 rounded-lg flex flex-col gap-2  min-w-[224px]"
     >
@@ -42,7 +45,7 @@ const ProductCard: FC<IProps> = ({ product }) => {
         <p className="text-xs">({rateNumber})</p>
       </div>
       <div className="flex flex-col items-start font-semibold text-sm">
-        <Image src={imageUrl} alt="iphone" className="max-w-48 rounded-lg" width={224} height={200} />
+        <Image src={imageUrl[0]} alt="iphone" className="max-w-48 rounded-lg" width={224} height={200} />
         <p>{title}</p>
         <p>{price}€</p>
         {delivery && (
@@ -58,7 +61,7 @@ const ProductCard: FC<IProps> = ({ product }) => {
         </div>
         <Heart />
       </div>
-    </div>
+    </Link>
   );
 };
 

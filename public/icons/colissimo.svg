@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="24" viewBox="0 0 21 24">
+    <style type="text/css">
+      .colissimo_icon_gradient{fill:url(#colissimo_icon_gradient);}
+    </style>
+    <linearGradient id="colissimo_icon_gradient" x1="12.608%" x2="86.28%" y1="75.139%" y2="23.876%">
+        <stop offset="0%" stop-color="#EC6608"/>
+        <stop offset="19%" stop-color="#ED6C08"/>
+        <stop offset="44%" stop-color="#F07C08"/>
+        <stop offset="72%" stop-color="#F59707"/>
+        <stop offset="100%" stop-color="#FBBA07"/>
+    </linearGradient>
+    <path class="colissimo_icon_gradient" d="M14.589 10.711c-.11.056-.242.053-.35-.006l-.569-.332c-.05-.032-.091-.075-.12-.127l-.006-.01c-.034-.052-.054-.112-.058-.175l-.014-.65c.001-.12.065-.233.168-.3l6.828-3.902L10.884.085c-.243-.113-.525-.113-.768 0L.53 5.21l10.737 6.131c.106.063.172.173.176.294v8.945c-.007.122-.076.233-.183.294l-.577.315c-.054.026-.114.04-.174.038h-.01c-.064.003-.128-.01-.185-.038l-.58-.315c-.106-.062-.173-.172-.179-.294v-7.974c-.007-.063-.042-.12-.095-.157L0 7.048v10.579c0 .237.17.528.379.648l9.743 5.636c.238.119.519.119.757 0l9.744-5.636c.207-.12.377-.411.377-.648V7.047l-6.411 3.664z"/>
+</svg>

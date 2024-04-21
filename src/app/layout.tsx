@@ -21,12 +21,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <SessionProvider>
-        <body className={inter.className}>
+        <body className={`${inter.className} bg-white`}>
           <Navbar />
           <Categories/>
-          <main className=" m-auto text-center max-w-screen-lg  mt-4 flex justify-center items-center">
+          <main className="bg-white m-auto text-center max-w-screen-lg  mt-4 flex justify-center items-center">
             {children}
           </main>
+          <div className="w-full h-96 bg-yellow-200">
+            JE SUIS LE FOOTER
+          </div>
         </body>
       </SessionProvider>
     </html>

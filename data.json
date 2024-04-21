@@ -1,63 +1,114 @@
 {
-  "products": {
-    "electronique": [
-      {
-        "username": "JeanMichel",
-        "rating": 4.5,
-        "rateNumber": 12,
-        "imageUrl": "/images/iphone.jpg",
-        "title": "Iphone 13 Bon état",
-        "price": 450,
-        "delivery": true,
-        "location": "Carcassonne",
-        "postal": 11000,
-        "createdAt": "Aujourd'hui à 15:23"
-      },
-      {
-        "username": "JeanMichel",
-        "rating": 4.5,
-        "rateNumber": 12,
-        "imageUrl": "/images/iphone.jpg",
-        "title": "Iphone 13 Bon état",
-        "price": 450,
-        "delivery": true,
-        "location": "Carcassonne",
-        "postal": 11000,
-        "createdAt": "Aujourd'hui à 15:23"
-      },
-      {
-        "username": "JeanMichel",
-        "rating": 4.5,
-        "rateNumber": 12,
-        "imageUrl": "/images/iphone.jpg",
-        "title": "Iphone 13 Bon état",
-        "price": 450,
-        "delivery": true,
-        "location": "Carcassonne",
-        "postal": 11000,
-        "createdAt": "Aujourd'hui à 15:23"
-      },
-      {
-        "username": "JeanMichel",
-        "rating": 4.5,
-        "rateNumber": 12,
-        "imageUrl": "/images/iphone.jpg",
-        "title": "Iphone 13 Bon état",
-        "price": 450,
-        "delivery": true,
-        "location": "Carcassonne",
-        "postal": 11000,
-        "createdAt": "Aujourd'hui à 15:23"
-      }
-    ],
-    "immobilier": [],
-    "vehicule": [],
-    "vacance": [],
-    "job": [],
-    "mode": [],
-    "jardin": [],
-    "famille": [],
-    "loisir": [],
-    "autre": []
-  }
+  "products": [
+    {
+      "username": "JeanMichel",
+      "rating": 4.5,
+      "rateNumber": 12,
+      "imageUrl": ["/images/iphone.jpg"],
+      "title": "Iphone 13 Bon état",
+      "price": 450,
+      "delivery": [ 
+        "colissimo"
+      ],
+      "location": "Carcassonne",
+      "postal": 11000,
+      "createdAt": "Aujourd'hui à 15:23",
+      "id": "1",
+      "category": "electronique",
+      "description": "Vends iPhone 13 en excellent état à 450€ !\nOffrez-vous la qualité Apple à prix doux.\nCet iPhone 13 d'occasion est en parfait état de fonctionnement et esthétique.\nProfitez d'un design élégant, d'un écran époustouflant et d'une performance remarquable, le tout à un prix abordable.\nNe ratez pas cette opportunité, contactez-moi rapidement avant qu'il ne soit trop tard !"
+    },
+    {
+      "username": "JeanMichel",
+      "rating": 4.5,
+      "rateNumber": 12,
+      "imageUrl": [
+        "/images/iphone.jpg",
+        "/images/iphone.jpg",
+        "/images/iphone.jpg"
+      ],
+      "title": "Iphone 13 Bon état",
+      "price": 450,
+      "delivery": [ 
+        "colissimo",
+        "laposte",
+        "mondialrelay",
+        "chronopost"
+      ],
+      "location": "Carcassonne",
+      "postal": 11000,
+      "createdAt": "Aujourd'hui à 15:23",
+      "id": "2",
+      "category": "electronique",
+      "description": "Vends iPhone 13 en excellent état à 450€ !\nOffrez-vous la qualité Apple à prix doux.\nCet iPhone 13 d'occasion est en parfait état de fonctionnement et esthétique.\nProfitez d'un design élégant, d'un écran époustouflant et d'une performance remarquable, le tout à un prix abordable.\nNe ratez pas cette opportunité, contactez-moi rapidement avant qu'il ne soit trop tard !"
+    },
+    {
+      "username": "JeanMichel",
+      "rating": 4.5,
+      "rateNumber": 12,
+      "imageUrl": ["/images/iphone.jpg"],
+      "title": "Iphone 13 Bon état",
+      "price": 450,
+      "delivery": [],
+      "location": "Carcassonne",
+      "postal": 11000,
+      "createdAt": "Aujourd'hui à 15:23",
+      "id": "3",
+      "category": "electronique",
+      "description": "Vends iPhone 13 en excellent état à 450€ !\nOffrez-vous la qualité Apple à prix doux.\nCet iPhone 13 d'occasion est en parfait état de fonctionnement et esthétique.\nProfitez d'un design élégant, d'un écran époustouflant et d'une performance remarquable, le tout à un prix abordable.\nNe ratez pas cette opportunité, contactez-moi rapidement avant qu'il ne soit trop tard !"
+    },
+    {
+      "username": "JeanMichel",
+      "rating": 4.5,
+      "rateNumber": 12,
+      "imageUrl": ["/images/iphone.jpg"],
+      "title": "Iphone 13 Bon état",
+      "price": 450,
+      "delivery": [],
+      "location": "Carcassonne",
+      "postal": 11000,
+      "createdAt": "Aujourd'hui à 15:23",
+      "id": "4",
+      "category": "electronique",
+      "description": "Vends iPhone 13 en excellent état à 450€ !\nOffrez-vous la qualité Apple à prix doux.\nCet iPhone 13 d'occasion est en parfait état de fonctionnement et esthétique.\nProfitez d'un design élégant, d'un écran époustouflant et d'une performance remarquable, le tout à un prix abordable.\nNe ratez pas cette opportunité, contactez-moi rapidement avant qu'il ne soit trop tard !"
+    },
+    {
+      "username": "JeanMichel",
+      "rating": 4.5,
+      "rateNumber": 12,
+      "imageUrl": ["/images/iphone.jpg"],
+      "title": "Iphone 13 Bon état",
+      "price": 450,
+      "delivery": [],
+      "location": "Carcassonne",
+      "postal": 11000,
+      "createdAt": "Aujourd'hui à 15:23",
+      "id": "5",
+      "category": "electronique",
+      "description": "Vends iPhone 13 en excellent état à 450€ !\nOffrez-vous la qualité Apple à prix doux.\nCet iPhone 13 d'occasion est en parfait état de fonctionnement et esthétique.\nProfitez d'un design élégant, d'un écran époustouflant et d'une performance remarquable, le tout à un prix abordable.\nNe ratez pas cette opportunité, contactez-moi rapidement avant qu'il ne soit trop tard !"
+    },
+    {
+      "username": "JeanMichel",
+      "rating": 4.5,
+      "rateNumber": 12,
+      "imageUrl": ["/images/iphone.jpg"],
+      "title": "Iphone 13 Bon état",
+      "price": 450,
+      "delivery": [],
+      "location": "Carcassonne",
+      "postal": 11000,
+      "createdAt": "Aujourd'hui à 15:23",
+      "id": "6",
+      "category": "electronique",
+      "description": "Vends iPhone 13 en excellent état à 450€ !\nOffrez-vous la qualité Apple à prix doux.\nCet iPhone 13 d'occasion est en parfait état de fonctionnement et esthétique.\nProfitez d'un design élégant, d'un écran époustouflant et d'une performance remarquable, le tout à un prix abordable.\nNe ratez pas cette opportunité, contactez-moi rapidement avant qu'il ne soit trop tard !"
+    }
+  ],
+  "immobilier": [],
+  "vehicule": [],
+  "vacance": [],
+  "job": [],
+  "mode": [],
+  "jardin": [],
+  "famille": [],
+  "loisir": [],
+  "autre": []
 }
