@@ -33,6 +33,12 @@ body {
 
 }
 
+@layer base {
+  .section_title {
+    @apply text-base font-semibold;
+  }
+}
+
 @layer components {
   .nav_item:hover::after {
     content: '';
@@ -56,4 +62,5 @@ body {
     @apply bg-black h-0.5;
   }
 
+ 
 }

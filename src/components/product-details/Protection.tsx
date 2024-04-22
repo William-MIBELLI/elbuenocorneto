@@ -20,8 +20,8 @@ const Protection = () => {
           <p>Notre service client dédié vous accompagne</p>
         </div>
         <Link href={"#"} className='flex items-center justify-left gap-2 mt-2'>
-          <p className='text-blue-900 font-semibold text-left ml-2'>En savoir plus</p>
-          <MoveRight size={20} className='text-blue-900'/>
+          <p className='text-blue-900 text-sm font-semibold text-left ml-2'>En savoir plus</p>
+          <MoveRight size={18} className='text-blue-900'/>
         </Link>
       </div>
     </div>

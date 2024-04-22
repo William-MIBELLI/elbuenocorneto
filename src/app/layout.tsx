@@ -27,7 +27,7 @@ export default function RootLayout({
           <main className="bg-white m-auto text-center max-w-screen-lg  mt-4 flex justify-center items-center">
             {children}
           </main>
-          <div className="w-full h-96 bg-yellow-200">
+          <div className="w-full h-96 mt-24 bg-yellow-200">
             JE SUIS LE FOOTER
           </div>
         </body>

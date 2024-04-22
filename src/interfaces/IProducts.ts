@@ -86,6 +86,11 @@ export interface ICategory {
   target: CategoriesType;
 }
 
+export interface ICoordonates {
+  lat: number;
+  lng: number;
+}
+
 export interface IProduct {
   id: string;
   username: string;
@@ -95,7 +100,7 @@ export interface IProduct {
   title: string;
   price: number;
   delivery: DeliveryType[];
-  location: string;
+  location: ICoordonates;
   postal: number;
   createdAt: Date | string;
   category: CategoriesType;
