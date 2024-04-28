@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import Slider from "./Slider";
 import { CategoriesType, categoriesList } from "@/interfaces/IProducts";
-import { getLastProductsByCategory } from "@/lib/requests/product.request";
+import { getProductsByCategory } from "@/lib/requests/product.request";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
 
@@ -11,7 +11,7 @@ interface IProps {
 
 const CardSlider: FC<IProps> = async ({ category }) => {
   
-  const productsList = await getLastProductsByCategory(category);
+  const productsList = await getProductsByCategory(category);
   const { label, target } = categoriesList[category];
 
   return (
@@ -23,7 +23,13 @@ const CardSlider: FC<IProps> = async ({ category }) => {
           <MoveRight size={18} />
         </Link>
       </div>
-      <Slider producstList={productsList} />
+      {
+        productsList.length !== 0 ? (
+          <Slider producstList={productsList} />
+        ) : (
+            <div>No available products ... 😢</div>
+        )
+      }
     </div>
   );
 };

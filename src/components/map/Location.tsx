@@ -10,11 +10,11 @@ const containerStyle = {
 };
 
 interface IProps {
-  location: ICoordonates;
+  coordonates: ICoordonates;
   API_KEY: string;
 }
 
-const Location: FC<IProps> = ({ API_KEY, location }) => {
+const Location: FC<IProps> = ({ API_KEY, coordonates }) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: API_KEY,
@@ -23,7 +23,7 @@ const Location: FC<IProps> = ({ API_KEY, location }) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
   const onLoad = useCallback(async (map: google.maps.Map) => {
-    const bounds = new window.google.maps.LatLngBounds(location);
+    const bounds = new window.google.maps.LatLngBounds(coordonates);
     //const { } = await google.maps.importLibrary('marker') as google.maps.MarkerLibrary
     //map.fitBounds(bounds);
     setMap(map);
@@ -43,12 +43,12 @@ const Location: FC<IProps> = ({ API_KEY, location }) => {
       {isLoaded && (
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={location}
+          center={coordonates}
           zoom={10}
           onLoad={onLoad}
           onUnmount={onUnmount}
         >
-          <Marker position={location} clickable={false}  />
+          <Marker position={coordonates} clickable={false}  />
         </GoogleMap>
       )}
     </section>

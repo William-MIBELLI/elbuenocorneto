@@ -50,6 +50,83 @@
       "when": 1713532426452,
       "tag": "0006_same_millenium_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1714231515495,
+      "tag": "0007_sharp_korg",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1714231596039,
+      "tag": "0008_lush_puppet_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1714233395763,
+      "tag": "0009_violet_hulk",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1714233494151,
+      "tag": "0010_absent_big_bertha",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1714241493439,
+      "tag": "0011_slimy_forge",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1714241760992,
+      "tag": "0012_lethal_maestro",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1714242271913,
+      "tag": "0013_overconfident_zodiak",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1714242721860,
+      "tag": "0014_empty_frightful_four",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1714244669511,
+      "tag": "0015_woozy_spot",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1714245114115,
+      "tag": "0016_spotty_proudstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1714301306674,
+      "tag": "0017_deep_supreme_intelligence",
+      "breakpoints": true
     }
   ]
 }

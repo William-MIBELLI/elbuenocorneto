@@ -16,13 +16,16 @@ export const client =  new Client({
 let db: NodePgDatabase<typeof schema>;
 
 const connectDb = async () => {
+  console.log('CONNECT DB');
   if (!db) {
+    console.log('DB NULL, CLIENT CONNECT');
     await client.connect();
     db = drizzle(client, { schema });
   }
 }
 
 export const getDb = async () => {
+  console.log('GETDB');
   if (!db) {
     await connectDb()
   }

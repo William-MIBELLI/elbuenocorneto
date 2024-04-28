@@ -5,7 +5,7 @@ import { Button } from "@nextui-org/react";
 import Image from "next/image";
 
 
-export default function Home() {
+export default async function  Home() {
   return (
     <div className="flex flex-col w-full gap-12 mt-12">
       <div className="w-full bg-orange-100 rounded-xl py-5 relative overflow-hidden flex flex-col md:flex-row justify-center items-center gap-1 md:gap-4">
@@ -28,8 +28,8 @@ export default function Home() {
       </div>
       <CategorySlider/>
       <CardSlider category="electronique"/>
-      <CardSlider category="electronique"/>
-      <CardSlider category="electronique"/>
+      {/* {/* <CardSlider category="electronique"/> */}
+      {/* <CardSlider category="electronique"/>  */}
     </div>
   );
 }

@@ -24,7 +24,7 @@ export default function RootLayout({
         <body className={`${inter.className} bg-white`}>
           <Navbar />
           <Categories/>
-          <main className="bg-white m-auto text-center max-w-screen-lg  mt-4 flex justify-center items-center">
+          <main className="bg-white m-auto px-2 text-center max-w-screen-lg  mt-4 flex justify-center items-center">
             {children}
           </main>
           <div className="w-full h-96 mt-24 bg-yellow-200">

@@ -4,16 +4,17 @@
       "username": "JeanMichel",
       "rating": 4.5,
       "rateNumber": 12,
-      "imageUrl": ["/images/iphone.jpg"],
+      "imageUrl": ["/images/iphone.jpg","/images/iphone_2.jpg"],
       "title": "Iphone 13 Bon état",
       "price": 450,
       "delivery": [ 
         "colissimo"
       ],
-      "location": {
-        "lat": 6235905.46,
-        "lng": 646386.2
+      "coordonates": {
+        "lng": 2.365353,
+        "lat": 43.209156
       },
+      "location": { "city": "Carcassonne"},
       "postal": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "1",
@@ -25,9 +26,9 @@
       "rating": 4.5,
       "rateNumber": 12,
       "imageUrl": [
+        "/images/iphone_2.jpg",
         "/images/iphone.jpg",
-        "/images/iphone.jpg",
-        "/images/iphone.jpg"
+        "/images/iphone_3.jpg"
       ],
       "title": "Iphone 13 Bon état",
       "price": 450,
@@ -37,10 +38,11 @@
         "mondialrelay",
         "chronopost"
       ],
-      "location": {
+      "coordonates": {
         "lng": 2.365353,
         "lat": 43.209156
       },
+      "location": { "city": "Carcassonne"},
       "postal": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "2",
@@ -51,14 +53,15 @@
       "username": "JeanMichel",
       "rating": 4.5,
       "rateNumber": 12,
-      "imageUrl": ["/images/iphone.jpg"],
+      "imageUrl": ["/images/iphone_3.jpg"],
       "title": "Iphone 13 Bon état",
       "price": 450,
       "delivery": [],
-      "location": {
-        "lat": 6235905.46,
-        "lng": 646386.2
+      "coordonates": {
+        "lng": 2.365353,
+        "lat": 43.209156
       },
+      "location": { "city": "Carcassonne"},
       "postal": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "3",
@@ -73,10 +76,11 @@
       "title": "Iphone 13 Bon état",
       "price": 450,
       "delivery": [],
-      "location": {
-        "lat": 6235905.46,
-        "lng": 646386.2
+      "coordonates": {
+        "lng": 2.365353,
+        "lat": 43.209156
       },
+      "location": { "city": "Carcassonne"},
       "postal": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "4",
@@ -91,10 +95,11 @@
       "title": "Iphone 13 Bon état",
       "price": 450,
       "delivery": [],
-      "location": {
-        "lat": 6235905.46,
-        "lng": 646386.2
+      "coordonates": {
+        "lng": 2.365353,
+        "lat": 43.209156
       },
+      "location": { "city": "Carcassonne"},
       "postal": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "5",
@@ -109,10 +114,11 @@
       "title": "Iphone 13 Bon état",
       "price": 450,
       "delivery": [],
-      "location": {
-        "lat": 6235905.46,
-        "lng": 646386.2
+      "coordonates": {
+        "lng": 2.365353,
+        "lat": 43.209156
       },
+      "location": { "city": "Carcassonne"},
       "postal": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "6",

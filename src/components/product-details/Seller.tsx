@@ -2,17 +2,22 @@
 import { Avatar, Button, Divider } from '@nextui-org/react'
 import { ChevronRight, Lock, LockKeyhole } from 'lucide-react'
 import Image from 'next/image'
-import React from 'react'
+import React, { FC } from 'react'
 import Rating from '../rating/Rating'
+import { SelectUser } from '@/drizzle/schema'
 const user = {
   name: 'Jean Michel',
   totalAnnounce: 32,
   rate: 2,
   totalRate: 8
 }
-const Seller = () => {
 
-  const { name, totalAnnounce, rate, totalRate } = user;
+interface IProps {
+  user: Partial<SelectUser>
+}
+const Seller: FC<IProps> = ({ user }) => {
+
+  const { name, rating, rateNumber } = user;
   return (
     <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium'>
       <div className=' flex items-center gap-6 justify-between'>
@@ -20,8 +25,8 @@ const Seller = () => {
           <Avatar size='lg'/>
           <div className='flex flex-col justify-center items-start'>
             <h3 className='font-semibold text-lg'>{ name}</h3>
-            <p className='text-sm'>{totalAnnounce} annonces</p>
-            <Rating rate={rate * 10} totalRate={totalRate} />
+            <p className='text-sm'>{99} annonces</p>
+            <Rating rate={rating! * 10} totalRate={rateNumber!} />
             <div>
             </div>
           </div>

@@ -1,4 +1,5 @@
-import { DeliveryType, IDelivery } from "./IDelivery";
+import { ImageSelect, ProductSelect, SelectUser } from "@/drizzle/schema";
+import { DeliveryType } from "./IDelivery";
 
 export const categoriesList: ICategoriesList = {
   immobilier: {
@@ -35,31 +36,31 @@ export const categoriesList: ICategoriesList = {
     label: "Maison & Jardin",
     imageUrl: "decoration",
     id: 6,
-    target: 'jardin'
+    target: "jardin",
   },
   famille: {
     label: "Famille",
     imageUrl: "ameublement",
     id: 7,
-    target: 'famille'
+    target: "famille",
   },
   electronique: {
     label: "Electronique",
     imageUrl: "informatique",
     id: 8,
-    target:'electronique'
+    target: "electronique",
   },
   loisir: {
     label: "Loisirs",
     imageUrl: "livres",
     id: 9,
-    target: 'loisir'
+    target: "loisir",
   },
   autre: {
     label: "Autres",
     imageUrl: "autre",
     id: 10,
-    target: 'autre'
+    target: "autre",
   },
 };
 
@@ -93,16 +94,29 @@ export interface ICoordonates {
 
 export interface IProduct {
   id: string;
-  username: string;
-  rating: number;
-  rateNumber: number;
+  userId: string;
   imageUrl: string[];
   title: string;
   price: number;
   delivery: DeliveryType[];
-  location: ICoordonates;
-  postal: number;
+  coordonates: ICoordonates;
+  location: {
+    city: string;
+    postal: number;
+  };
   createdAt: Date | string;
   category: CategoriesType;
   description: string;
 }
+
+export type IProductCard = Partial<
+  { product: ProductSelect } & Pick<
+    SelectUser,
+    "name" | "rating" | "rateNumber"
+  > & { images: { url: string } }
+>;
+
+export interface IProductDetails  {
+  product: ProductSelect | null;
+  user: SelectUser | null;
+};
