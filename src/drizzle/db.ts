@@ -1,9 +1,9 @@
-import { NodePgDatabase, drizzle } from 'drizzle-orm/node-postgres';
-import { Client } from 'pg';
-import * as schema from './schema';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
+import { Client, Pool } from "pg";
+import * as schema from "./schema";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 
-export const client =  new Client({
+export const pool = new Pool({
   host: process.env.DB_HOST!,
   port: Number(process.env.DB_PORT!),
   user: process.env.DB_USERNAME!,
@@ -16,20 +16,20 @@ export const client =  new Client({
 let db: NodePgDatabase<typeof schema>;
 
 const connectDb = async () => {
-  console.log('CONNECT DB');
+  console.log('CONNECT DB', pool.totalCount);
   if (!db) {
     console.log('DB NULL, CLIENT CONNECT');
-    await client.connect();
-    db = drizzle(client, { schema });
+    await pool.connect();
+    db = drizzle(pool, { schema });
   }
-}
+};
 
 export const getDb = async () => {
   console.log('GETDB');
   if (!db) {
-    await connectDb()
+    await connectDb();
   }
   return db;
-}
+};
 
 //export type SelectUser = typeof user.$inferSelect;

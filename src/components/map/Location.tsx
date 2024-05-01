@@ -1,7 +1,8 @@
 "use client";
-import { ICoordonates } from "@/interfaces/IProducts";
+import { LocationSelect } from "@/drizzle/schema";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { MapPin } from "lucide-react";
+import { notFound } from "next/navigation";
 import React, { FC, useCallback, useState } from "react";
 
 const containerStyle = {
@@ -10,15 +11,19 @@ const containerStyle = {
 };
 
 interface IProps {
-  coordonates: ICoordonates;
   API_KEY: string;
+  location: Required<Pick<LocationSelect, 'coordonates' | 'city' | 'postal'>>  | null
 }
 
-const Location: FC<IProps> = ({ API_KEY, coordonates }) => {
+const Location: FC<IProps> = ({ API_KEY , location }) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: API_KEY,
   });
+
+  if(!location || !location.coordonates) return notFound()
+
+  const { coordonates, city, postal } = location;
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
@@ -37,8 +42,8 @@ const Location: FC<IProps> = ({ API_KEY, coordonates }) => {
     <section>
       <div className="flex gap-2 items-center section_title mb-4">
         <MapPin size={18} />
-        <h3>Carcassonne</h3>
-        <p>(11000)</p>
+        <h3>{city}</h3>
+        <p>({postal})</p>
       </div>
       {isLoaded && (
         <GoogleMap

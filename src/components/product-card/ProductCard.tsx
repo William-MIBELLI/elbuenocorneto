@@ -3,27 +3,22 @@ import { Avatar } from "@nextui-org/react";
 import { Heart, Star } from "lucide-react";
 import Image from "next/image";
 import React, { FC, useRef } from "react";
-import {  IProductCard } from "@/interfaces/IProducts";
+import { ICard, IProductCard } from "@/interfaces/IProducts";
 import Link from "next/link";
 
 interface IProps {
-  productData: IProductCard;
+  productData: ICard;
 }
 
 const ProductCard: FC<IProps> = ({ productData }) => {
-  const {
-    images,
-    rateNumber,
-    rating,
-    name,
-    product
-  } = productData;
-  console.log('PRODUCTDATA : ', productData)
+  const { seller, images, createdAt, id, title, price, location, pdl } = productData;
+  const { name, rating, rateNumber } = seller;
+  // console.log('PRODUCTDATA : ', productData)
   const cardRef = useRef(null);
 
   return (
     <Link
-      href={`/product/${product?.id}`}
+      href={`/product/${id}`}
       ref={cardRef}
       className=" py-2 rounded-lg flex flex-col gap-2  min-w-[200px]  "
     >
@@ -40,25 +35,28 @@ const ProductCard: FC<IProps> = ({ productData }) => {
       </div>
       <div className="flex flex-col w-full  items-start font-semibold text-sm min-h-80  ">
         <div className="relative h-3/4 w-full mb-3">
-          <Image src={images?.url as string} alt="iphone" className="rounded-lg h-full w-full" fill />
+          <Image
+            src={images[0]?.url ?? '/images/default_img.jpg'}
+            alt="iphone"
+            className="rounded-lg h-full w-full"
+            fill
+          />
         </div>
-        <p>{product?.title}</p>
-        <p>{product?.price}€</p>
+        <p>{title}</p>
+        <p>{price}€</p>
 
         {/* RAJOUTER DELIVERY DANS LA REQUETE */}
 
-        {/* {delivery && (
+        {pdl.length && (
           <div className="bg-blue-200 px-2 rounded-lg text-xs mt-3">
             Livraison possible
           </div>
-        )} */}
-
-
+        )}
       </div>
       <div className="flex justify-between items-end text-xs mt-1">
         <div>
-          <p>{`${product?.location?.city} ${product?.location?.postal}`}</p>
-          <p>{product?.createdAt?.toString()}</p>
+          <p>{`${location?.city} ${location?.postal}`}</p>
+          <p>{createdAt?.toLocaleString().split(" ")[0]}</p>
         </div>
         <Heart />
       </div>

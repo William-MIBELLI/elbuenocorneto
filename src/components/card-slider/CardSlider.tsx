@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import Slider from "./Slider";
 import { CategoriesType, categoriesList } from "@/interfaces/IProducts";
-import { getProductsByCategory } from "@/lib/requests/product.request";
+import { fetchProductsForSlider, getProductsByCategory } from "@/lib/requests/product.request";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
 
@@ -11,7 +11,7 @@ interface IProps {
 
 const CardSlider: FC<IProps> = async ({ category }) => {
   
-  const productsList = await getProductsByCategory(category);
+  const productsList = await fetchProductsForSlider(category);
   const { label, target } = categoriesList[category];
 
   return (

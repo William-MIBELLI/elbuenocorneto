@@ -10,15 +10,19 @@ export const findUserByEmail = async (
     const db = await getDb();
     //const user: SelectUser | undefined = await db.query.users.findFirst({ where: (users, { eq }) => eq(users.email, email) });
     const user = await db.select().from(users).where(eq(users.email, email));
-    console.log('USER DANS FINDUSERBYEMAIL :', user);
+    // console.log('USER DANS FINDUSERBYEMAIL :', user);
     return user[0];
   } catch (error) {
-    console.log("Error finduser : ", error);
+    // console.log("Error finduser : ", error);
     return undefined;
   }
 };
 
-export const createUserOnDb = async (email: string, password: string, name: string) => {
+export const createUserOnDb = async (
+  email: string,
+  password: string,
+  name: string
+) => {
   try {
     // ON HASH LE PASSWORD
     const hash = await hashPassword(password);
@@ -32,14 +36,14 @@ export const createUserOnDb = async (email: string, password: string, name: stri
       .values({
         email,
         password: hash,
-        name
+        name,
       })
       .returning();
 
     // ON LE RETURN
     return newUser[0];
   } catch (error) {
-    console.log("Error : ", error);
+    // console.log("Error : ", error);
     return null;
   }
 };
@@ -59,7 +63,7 @@ export const loginUser = async (email: string, password: string) => {
     // RETURN USER
     return user;
   } catch (error) {
-    console.log("Error login error : ", error);
+    // console.log("Error login error : ", error);
     return null;
   }
 };

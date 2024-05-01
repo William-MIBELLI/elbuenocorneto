@@ -1,5 +1,11 @@
-import { ImageSelect, ProductSelect, SelectUser } from "@/drizzle/schema";
+import {
+  DeliveryLinkSelect,
+  ImageSelect,
+  ProductSelect,
+  SelectUser,
+} from "@/drizzle/schema";
 import { DeliveryType } from "./IDelivery";
+import { ILocation } from "./ILocation";
 
 export const categoriesList: ICategoriesList = {
   immobilier: {
@@ -109,14 +115,21 @@ export interface IProduct {
   description: string;
 }
 
-export type IProductCard = Partial<
-  { product: ProductSelect } & Pick<
-    SelectUser,
-    "name" | "rating" | "rateNumber"
-  > & { images: { url: string } }
->;
-
-export interface IProductDetails  {
+export interface IProductCard {
   product: ProductSelect | null;
+  user: Partial<SelectUser> | null;
+  imagesUrl: string[];
+}
+
+export interface IProductDetails {
+  product:  ProductSelect;
   user: SelectUser | null;
-};
+  images: string[];
+  del: string[];
+  location: ILocation | null
+}
+
+export type ICard = ProductSelect & {
+  seller: Pick<SelectUser, "name" | "rateNumber" | "rating">;
+} & { pdl: Pick<DeliveryLinkSelect, "deliveryId">[] }
+  & { images: Pick<ImageSelect, 'url'>[]};

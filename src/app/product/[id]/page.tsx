@@ -1,4 +1,4 @@
-import { getImagesUrlByProductId, getProductById } from "@/lib/requests/product.request";
+import { getProductDetailsById } from "@/lib/requests/product.request";
 import React, { FC } from "react";
 import { notFound } from "next/navigation";
 import Seller from "@/components/product-details/Seller";
@@ -10,6 +10,8 @@ import Location from "@/components/map/Location";
 import Specs from "@/components/product-details/Specs";
 import { ICoordonates, IProductDetails } from "@/interfaces/IProducts";
 import ImageContainer from "@/components/product-details/ImageContainer";
+import Delivery from "@/components/product-details/Delivery";
+import NoDelivery from "@/components/product-details/NoDelivery";
 
 interface IProps {
   params: {
@@ -19,42 +21,42 @@ interface IProps {
 
 const page: FC<IProps> = async ({ params: { id } }) => {
 
-  const data = await getProductById(id);
-  const images = await getImagesUrlByProductId(id);
 
-  if (!data?.product || !data?.user || !images) return notFound();
+  const data = await getProductDetailsById(id);
+
+  if (!data?.product || !data?.user) return notFound();
 
   const {
     title,
     price = 0,
     createdAt,
     description,
-    coordonates,
-
+    
   } = data.product;
+
+  const { del, location } = data;
 
 
   const { GOOGLE_API_KEY } = process.env;
 
-  console.log('DATA : ', data);
 
   return (
     // CONTAINER
-    <div className="w-full flex flex-col-reverse items-center px-2  md:flex-row md:items-start ">
+    <div className="w-full flex flex-col-reverse items-center px-2 gap-2  md:flex-row md:items-start ">
       <main className="w-full md:w-2/3">
         <div>
           <div className="flex justify-between">
-            <ImageContainer imageUrl={images} />
+            <ImageContainer imageUrl={data?.images} />
           </div>
           <div className="flex flex-col justify-start items-start gap-2 my-5">
             <h1 className="text-2xl font-bold">{title}</h1>
             <div className="flex gap-2 items-center">
               <p className="font-semibold">{price} €</p>
-              {/* {delivery.length && (
+              {data?.del.length && (
                 <div className="bg-blue-200 px-2 rounded-xl text-xs items-center flex">
                   <p className="font-semibold">Livraison à partir de 4.99€</p>
                 </div>
-              )} */}
+              )}
             </div>
 
             {/* PAIEMENT EN PLUSIEURS FOIS */}
@@ -96,15 +98,15 @@ const page: FC<IProps> = async ({ params: { id } }) => {
         <Divider className="my-4" />
         <Specs />
         <Divider className="my-4" />
-        {/* {delivery?.length ? (
-          <Delivery deliveryList={delivery} />
+        {del.length ? (
+          <Delivery deliveryList={del} />
         ) : (
           <NoDelivery />
-        )} */}
+        )}
         <Divider className="my-4" />
         <Location
           API_KEY={GOOGLE_API_KEY as string}
-          coordonates={coordonates as ICoordonates}
+          location={location}
         />
       </main>
       <aside className=" w-full md:w-1/3 ">

@@ -9,6 +9,8 @@ export interface IDelivery {
   iconUrl: string;
 }
 
+
+
 export const deliveryList: IDelivery[] = [
   {
     type: 'chronopost',

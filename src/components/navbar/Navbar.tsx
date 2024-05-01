@@ -48,7 +48,7 @@ const Navbar = () => {
   const [isSearchFocus, setIsSearchFocus] = useState(false);
 
   useEffect(() => {
-    console.log("ChANGEMENT : ", isOpenMenu);
+    // console.log("ChANGEMENT : ", isOpenMenu);
   }, [isOpenMenu]);
   return (
     <Nv
@@ -68,7 +68,11 @@ const Navbar = () => {
           className="md:hidden"
           onChange={(isOpen) => setIsOpenMenu(isOpen)}
         />
-        <NavbarBrand as={Link} href={'/'} className="relative flex justify-center flex-grow-0">
+        <NavbarBrand
+          as={Link}
+          href={"/"}
+          className="relative flex justify-center flex-grow-0"
+        >
           <p className="text-orange-500 font-bold text-xl">ElBuenoCorneto</p>
           <Image
             alt="hat"
@@ -83,9 +87,7 @@ const Navbar = () => {
       {/* SEARCH SECTION WITH NEW BUTTON */}
 
       <div className="hidden md:flex w-[50%] gap-2 justify-between">
-        {!isSearchFocus && (
-          <SellButton/>
-        )}
+        {!isSearchFocus && <SellButton />}
         <Input
           onFocus={() => setIsSearchFocus(true)}
           onBlur={() => setIsSearchFocus(false)}
