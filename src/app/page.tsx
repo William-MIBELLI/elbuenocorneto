@@ -2,15 +2,12 @@ import CardSlider from "@/components/card-slider/CardSlider";
 import CategorySlider from "@/components/categories/CategorySlider";
 import SellButton from "@/components/sell-button/SellButton";
 import { fetchProductsForSlider } from "@/lib/requests/product.request";
-import { Button } from "@nextui-org/react";
 import Image from "next/image";
 
 
 export default async function Home() {
   
   const prods = await fetchProductsForSlider('famille');
-  console.log('PRODS : ', prods[0].pdl);
-  console.log('length : ', prods.length)
 
   return (
     <div className="flex flex-col w-full gap-12 mt-12">

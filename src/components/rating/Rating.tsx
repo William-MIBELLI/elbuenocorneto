@@ -2,15 +2,15 @@ import React, { FC } from "react";
 import StarItem from "./StarItem";
 
 interface IProps {
-  rate: number;
+  rating: number;
   totalRate: number;
 }
 
 export type ValueType = "FULL" | "HALF" | "EMPTY";
 
-const Rating: FC<IProps> = ({ rate, totalRate }) => {
+const Rating: FC<IProps> = ({ rating, totalRate }) => {
   const starValues: ValueType[] = [];
-
+  const rate = rating * 10;
   for (let i = 10; i <= 50; i += 10) {
     if (rate >= i || i - rate < 3) {
       starValues.push("FULL");
@@ -25,7 +25,7 @@ const Rating: FC<IProps> = ({ rate, totalRate }) => {
   // console.log('rate : ', rate, starValues);
 
   return (
-    <div className="flex w-full justify-between items-center">
+    <div className="flex justify-between items-center gap-1">
       <div className="flex">
         {starValues.map((value) => (
           <StarItem value={value} key={Math.random()} />

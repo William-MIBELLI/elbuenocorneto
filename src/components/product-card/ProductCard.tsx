@@ -11,9 +11,9 @@ interface IProps {
 }
 
 const ProductCard: FC<IProps> = ({ productData }) => {
-  const { seller, images, createdAt, id, title, price, location, pdl } = productData;
+  const { seller, images, createdAt, id, title, price, pdl, location  } = productData;
   const { name, rating, rateNumber } = seller;
-  // console.log('PRODUCTDATA : ', productData)
+  //console.log(`PRODUCTDATA ${seller.name}`, productData)
   const cardRef = useRef(null);
 
   return (
@@ -23,8 +23,8 @@ const ProductCard: FC<IProps> = ({ productData }) => {
       className=" py-2 rounded-lg flex flex-col gap-2  min-w-[200px]  "
     >
       <div className="flex gap-1 items-center text-sm w-full">
-        <Avatar className="w-6 h-6 text-tiny" />
-        <h3 className="font-semibold">{name}</h3>
+        <Avatar className="min-w-6 max-w-6 h-6 text-tiny" />
+        <h3 className="font-semibold text-ellipsis">{name}</h3>
         <Star
           size={15}
           className="text-orange-500 fill-orange-500"
@@ -36,7 +36,7 @@ const ProductCard: FC<IProps> = ({ productData }) => {
       <div className="flex flex-col w-full  items-start font-semibold text-sm min-h-80  ">
         <div className="relative h-3/4 w-full mb-3">
           <Image
-            src={images[0]?.url ?? '/images/default_img.jpg'}
+            src={images[0]?.url ?? '/image_placeholder.svg'}
             alt="iphone"
             className="rounded-lg h-full w-full"
             fill
@@ -47,11 +47,11 @@ const ProductCard: FC<IProps> = ({ productData }) => {
 
         {/* RAJOUTER DELIVERY DANS LA REQUETE */}
 
-        {pdl.length && (
+        {pdl.length ? (
           <div className="bg-blue-200 px-2 rounded-lg text-xs mt-3">
             Livraison possible
           </div>
-        )}
+        ) : null}
       </div>
       <div className="flex justify-between items-end text-xs mt-1">
         <div>

@@ -37,27 +37,27 @@ export const insertRandomUsers = async (count: number) => {
       const loc = locsId[Math.floor(Math.random() * locsId.length)]
       return {
         id: uuidv4(),
-        name: faker.internet.userName(),
+        name: faker.internet.userName().slice(0,19),
         email: faker.internet.email(),
         password: hash,
         locationId: loc,
         rating: faker.number.float({ fractionDigits: 1, min: 0, max: 5 }),
         rateNumber: faker.number.int({ min: 1, max: 40 }),
+        createdAt: new Date()
       };
     };
-
     const usersList: InsertUser[] = faker.helpers.multiple(createRandomUser, {
       count,
     });
+    console.log('USERLIST : ', usersList.map(item => item.id));
 
     const res = await db
       .insert(users)
-      .values(usersList as InsertUser[])
-      .returning();
-    // console.log("ALL GOOD", res);
+      .values(usersList).returning()
+    console.log("ALL GOOD", res);
     return true;
   } catch (error) {
-    // console.log("ERROR WHEN SEEDING : ", error);
+    console.log("ERROR WHEN USER SEEDING : ", error);
     return null;
   }
 };
@@ -103,6 +103,7 @@ export const insertRandomProducts = async (count: number) => {
     });
 
     await db.insert(products).values(productsList);
+    return true;
   } catch (error) {
     // console.log("ERROR SEEDING PRODUCTS : ", error);
     return null;
@@ -141,10 +142,12 @@ export const insertRandomImageUrl = async (count: number) => {
 export const insertDeliveries = async () => {
   try {
     const db = await getDb();
+    await db.delete(deliveries);
     const list = deliveryList.map((item, index): DeliveryInsert => {
       return { ...item, id: (index + 1).toString(), price: item.price.toString() };
     })
     await db.insert(deliveries).values(list);
+    return true;
   } catch (error) {
     console.log('ERROR WHEN SEEDING DELIVERIES ', error);
     return null;
@@ -157,16 +160,16 @@ export const insertDeliveriesLink = async () => {
     // console.log('SEEDING DELIVERY LINK...');
     const db = await getDb();
     await db.delete(productDeliveryLink)
-    const prods = await db.select().from(products);
+    const prods = await db.select({id: products.id}).from(products);
     const deliverieslist = (await db.select({ id: deliveries.id }).from(deliveries)).map(item => item.id);
-
+    console.log('deliveryllist id : ', deliverieslist);
     if (!deliverieslist.length) throw new Error('You need to seed deliveries first.');
 
     const data: DeliveryLinkInsert[] = [];
 
-    prods.forEach(prod => {
-      const id = prod.id;
+    prods.forEach(({id}) => {
       const length = Math.floor(Math.random() * deliverieslist.length + 1);
+      console.log('length : ', length);
       if (Math.random() > 0.4) {
         for (let i = 0; i < length; i++){
           const link: DeliveryLinkInsert = {
@@ -177,6 +180,7 @@ export const insertDeliveriesLink = async () => {
         } 
       }
     })
+    console.log(data)
     await db.insert(productDeliveryLink).values(data);
     // console.log('DONE');
     return true

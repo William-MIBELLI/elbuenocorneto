@@ -12,6 +12,8 @@ import { ICoordonates, IProductDetails } from "@/interfaces/IProducts";
 import ImageContainer from "@/components/product-details/ImageContainer";
 import Delivery from "@/components/product-details/Delivery";
 import NoDelivery from "@/components/product-details/NoDelivery";
+import Image from "next/image";
+import ImagePlaceHolder from 'public/image_placeholder.svg'
 
 interface IProps {
   params: {
@@ -46,17 +48,25 @@ const page: FC<IProps> = async ({ params: { id } }) => {
       <main className="w-full md:w-2/3">
         <div>
           <div className="flex justify-between">
-            <ImageContainer imageUrl={data?.images} />
+            {
+              data?.images?.length ? (
+                <ImageContainer imageUrl={data?.images} />
+              ) : (
+                  <div className="h-96 w-full flex relative justify-center items-center  rounded-lg">
+                    <Image src={ImagePlaceHolder} alt="default image" fill className="rounded-lg w-full"/>
+                  </div>
+              )
+            }
           </div>
           <div className="flex flex-col justify-start items-start gap-2 my-5">
             <h1 className="text-2xl font-bold">{title}</h1>
             <div className="flex gap-2 items-center">
               <p className="font-semibold">{price} €</p>
-              {data?.del.length && (
+              {data?.del.length ? (
                 <div className="bg-blue-200 px-2 rounded-xl text-xs items-center flex">
                   <p className="font-semibold">Livraison à partir de 4.99€</p>
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* PAIEMENT EN PLUSIEURS FOIS */}
@@ -87,7 +97,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
 
               {/* DATE DE CREATION */}
             </div>
-            <p className="text-xs">{createdAt?.toString()}</p>
+            <p className="text-xs">{createdAt?.toLocaleDateString() ?.toString()}</p>
           </div>
         </div>
         <Divider className="my-4" />

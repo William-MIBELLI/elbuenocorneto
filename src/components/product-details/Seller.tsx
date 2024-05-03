@@ -5,6 +5,7 @@ import Image from 'next/image'
 import React, { FC } from 'react'
 import Rating from '../rating/Rating'
 import { SelectUser } from '@/drizzle/schema'
+import Link from 'next/link'
 const user = {
   name: 'Jean Michel',
   totalAnnounce: 32,
@@ -17,22 +18,26 @@ interface IProps {
 }
 const Seller: FC<IProps> = ({ user }) => {
 
-  const { name, rating, rateNumber } = user;
+  const { name, rating, rateNumber, id } = user;
   return (
     <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium'>
-      <div className=' flex items-center gap-6 justify-between'>
+      <Link href={`/profile/${id}`} className=' flex items-center gap-6 justify-between'>
         <div className='flex gap-3'>
           <Avatar size='lg'/>
           <div className='flex flex-col justify-center items-start'>
             <h3 className='font-semibold text-lg'>{ name}</h3>
             <p className='text-sm'>{99} annonces</p>
-            <Rating rate={rating! * 10} totalRate={rateNumber!} />
+            {
+              rating && rateNumber && (
+                <Rating rating={rating} totalRate={rateNumber} />
+              )
+            }
             <div>
             </div>
           </div>
         </div>
         <ChevronRight/>
-      </div>
+      </Link>
       <Divider />
       <div className='flex flex-col gap-2 my-3'>
         <Button fullWidth className='bg-orange-500 text-white '>

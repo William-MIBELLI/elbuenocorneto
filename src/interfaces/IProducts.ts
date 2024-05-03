@@ -1,6 +1,7 @@
 import {
   DeliveryLinkSelect,
   ImageSelect,
+  LocationSelect,
   ProductSelect,
   SelectUser,
 } from "@/drizzle/schema";
@@ -132,4 +133,4 @@ export interface IProductDetails {
 export type ICard = ProductSelect & {
   seller: Pick<SelectUser, "name" | "rateNumber" | "rating">;
 } & { pdl: Pick<DeliveryLinkSelect, "deliveryId">[] }
-  & { images: Pick<ImageSelect, 'url'>[]};
+  & { images: Pick<ImageSelect, 'url'>[]} & { location: Pick<LocationSelect, 'city' | 'postal'>};

@@ -11,7 +11,8 @@ import {
   text,
   uuid,
   real,
-  decimal
+  decimal,
+  varchar
 } from "drizzle-orm/pg-core"
 import type { AdapterAccount } from "next-auth/adapters"
 import { CategoriesType } from '@/interfaces/IProducts';
@@ -19,7 +20,7 @@ import { relations } from 'drizzle-orm';
  
 export const users = pgTable("user", {
   id: text("id").primaryKey(),
-  name: text("name").notNull(),
+  name: varchar("name", { length: 20 }).notNull(),
   email: text("email").notNull(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
@@ -27,6 +28,9 @@ export const users = pgTable("user", {
   locationId: text('location_id').notNull().references(() => locations.id, { onDelete: "cascade"}),
   rating: real('rating'),
   rateNumber: integer('rate_number'),
+  createdAt: timestamp('created_at').defaultNow(),
+  phone: varchar('phone', { length: 10 }),
+  phoneVerified: timestamp('phone_verified')
 })
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -89,7 +93,7 @@ export const products = pgTable("product", {
   userId: text("user_id")
   .notNull()
   .references(() => users.id, { onDelete: "cascade" }),
-  title: text('title').notNull(),
+  title: varchar('title').notNull(),
   price: integer('price').notNull(),
   locationId: text('location_id').notNull().references(() => locations.id, { onDelete: "cascade"}),
   createdAt: timestamp('created_at').defaultNow(),

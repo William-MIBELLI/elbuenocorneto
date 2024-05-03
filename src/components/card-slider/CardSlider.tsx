@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import Slider from "./Slider";
 import { CategoriesType, categoriesList } from "@/interfaces/IProducts";
-import { fetchProductsForSlider, getProductsByCategory } from "@/lib/requests/product.request";
+import { fetchProductsForSlider } from "@/lib/requests/product.request";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
 
