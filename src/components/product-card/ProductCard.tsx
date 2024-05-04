@@ -20,7 +20,7 @@ const ProductCard: FC<IProps> = ({ productData }) => {
     <Link
       href={`/product/${id}`}
       ref={cardRef}
-      className=" py-2 rounded-lg flex flex-col gap-2  min-w-[200px]  "
+      className=" py-2 rounded-lg flex flex-col gap-2  min-w-[200px] h-full"
     >
       <div className="flex gap-1 items-center text-sm w-full">
         <Avatar className="min-w-6 max-w-6 h-6 text-tiny" />
@@ -33,7 +33,7 @@ const ProductCard: FC<IProps> = ({ productData }) => {
         <p className="font-semibold">{rating}</p>
         <p className="text-xs">({rateNumber})</p>
       </div>
-      <div className="flex flex-col w-full  items-start font-semibold text-sm min-h-80  ">
+      <div className="flex flex-col w-full  items-start font-semibold text-sm h-80 ">
         <div className="relative h-3/4 w-full mb-3">
           <Image
             src={images[0]?.url ?? '/image_placeholder.svg'}

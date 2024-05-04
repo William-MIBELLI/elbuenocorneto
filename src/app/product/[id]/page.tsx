@@ -2,7 +2,7 @@ import { getProductDetailsById } from "@/lib/requests/product.request";
 import React, { FC } from "react";
 import { notFound } from "next/navigation";
 import Seller from "@/components/product-details/Seller";
-import { BadgeInfo } from "lucide-react";
+import { BadgeInfo, Flag } from "lucide-react";
 import { Button, Divider } from "@nextui-org/react";
 import Protection from "@/components/product-details/Protection";
 import Description from "@/components/product-details/Description";
@@ -14,6 +14,8 @@ import Delivery from "@/components/product-details/Delivery";
 import NoDelivery from "@/components/product-details/NoDelivery";
 import Image from "next/image";
 import ImagePlaceHolder from 'public/image_placeholder.svg'
+import CardSlider from "@/components/card-slider/CardSlider";
+import SellerContent from "@/components/product-details/SellerContent";
 
 interface IProps {
   params: {
@@ -33,6 +35,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
     price = 0,
     createdAt,
     description,
+    category
     
   } = data.product;
 
@@ -44,8 +47,8 @@ const page: FC<IProps> = async ({ params: { id } }) => {
 
   return (
     // CONTAINER
-    <div className="w-full flex flex-col-reverse items-center px-2 gap-2  md:flex-row md:items-start ">
-      <main className="w-full md:w-2/3">
+    <div className="w-full flex flex-col-reverse items-center px-2 gap-2  lg:flex-row lg:items-start ">
+      <main className="w-full lg:w-2/3">
         <div>
           <div className="flex justify-between">
             {
@@ -118,8 +121,17 @@ const page: FC<IProps> = async ({ params: { id } }) => {
           API_KEY={GOOGLE_API_KEY as string}
           location={location}
         />
+        <Divider className="my-4" />
+        <SellerContent user={data.user}/>
+        <Divider className="my-4" />
+        <div className="flex items-center gap-2 text-sm font-semibold underline my-8 ">
+          <Flag size={17} />
+          <p>Signaler l'annonce</p>
+        </div>
+        <Divider className="my-4" />
+        <CardSlider category={category} title="Ces annonces peuvent vous intéresser"/>
       </main>
-      <aside className=" w-full md:w-1/3 ">
+      <aside className=" w-full lg:w-1/3 ">
         <Seller user={data.user} />
       </aside>
       {/* HEADER */}

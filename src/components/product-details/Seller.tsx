@@ -6,6 +6,7 @@ import React, { FC } from 'react'
 import Rating from '../rating/Rating'
 import { SelectUser } from '@/drizzle/schema'
 import Link from 'next/link'
+import UserHeader from '../user/UserHeader'
 const user = {
   name: 'Jean Michel',
   totalAnnounce: 32,
@@ -22,20 +23,7 @@ const Seller: FC<IProps> = ({ user }) => {
   return (
     <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium'>
       <Link href={`/profile/${id}`} className=' flex items-center gap-6 justify-between'>
-        <div className='flex gap-3'>
-          <Avatar size='lg'/>
-          <div className='flex flex-col justify-center items-start'>
-            <h3 className='font-semibold text-lg'>{ name}</h3>
-            <p className='text-sm'>{99} annonces</p>
-            {
-              rating && rateNumber && (
-                <Rating rating={rating} totalRate={rateNumber} />
-              )
-            }
-            <div>
-            </div>
-          </div>
-        </div>
+        <UserHeader userData={user}/>
         <ChevronRight/>
       </Link>
       <Divider />

@@ -24,7 +24,7 @@ const connectDb = async () => {
   }
 };
 
-export const getDb = async () => {
+export const getDb = async (): Promise<NodePgDatabase<typeof schema>> => {
   console.log('GETDB');
   if (!db) {
     await connectDb();

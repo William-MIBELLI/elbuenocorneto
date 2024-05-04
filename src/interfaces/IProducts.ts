@@ -83,6 +83,19 @@ export type CategoriesType =
   | "loisir"
   | "autre";
 
+export const categoriesTypeList: CategoriesType[] = [
+   "immobilier",
+   "vehicule",
+   "vacance",
+   "job",
+   "mode",
+   "jardin",
+   "famille",
+   "electronique",
+   "loisir",
+   "autre",
+];
+
 export type ICategoriesList = {
   [key in CategoriesType]: ICategory;
 };

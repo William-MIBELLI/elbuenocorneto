@@ -15,6 +15,7 @@ import {
   users,
 } from "@/drizzle/schema";
 import { eq, count } from "drizzle-orm";
+import { ProductDataForList } from "@/components/product-list/ProductList";
 
 
 
@@ -109,3 +110,46 @@ export const fetchProductsForSlider = async (category: CategoriesType): Promise<
     return [];
   }
 };
+
+// export const getProductsByUserId = async (userId: string): Promise<Array<Partial<ProductSelect> & Partial<ImageSelect> | null>> => {
+//   try {
+//     const db = await getDb();
+//     const prods = await db.select().from(products).where(eq(products.userId, userId)).leftJoin(images, eq(images.productId, products.id)).limit(10);
+//     // const prods = await db.query.products.findMany({
+//     //   where: eq(products.userId, userId),
+//     //   with: {
+//     //     images: {
+//     //       limit: 1
+//     //     }
+        
+//     //   }
+//     // })
+//     return prods;
+//   } catch (error) {
+//     console.log('ERROR FETCHING PRODUCT BY USERID : ', error);
+//     return [];
+//   }
+// }
+
+
+export const getProductsByCategory = async (category: CategoriesType): Promise<ProductDataForList[]>=> {
+  try {
+    const db = await getDb();
+    const prods = await db.query.products.findMany({
+      where: eq(products.category, category),
+      with: {
+        images: {
+          limit: 1
+        },
+        location: true
+      }
+    })
+    const mappedProds = prods.map(p => {
+      return { product: {...p}, images: p.images, location: p.location}
+    })
+    return mappedProds;
+  } catch (error) {
+    console.log('ERROR FETCHING PORDS BY CATGEROY : ',);
+    return [];
+  }
+}
