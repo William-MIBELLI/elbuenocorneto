@@ -1,5 +1,6 @@
-import { Button } from "@nextui-org/react";
-import { Heart, Share2 } from "lucide-react";
+'use client';
+import { Button, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/react";
+import { Heart, Share2, X } from "lucide-react";
 import Image from "next/image";
 import React, { FC } from "react";
 
@@ -10,6 +11,7 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
   const regularDisplay = "relative w-auto mx-auto flex justify-center gap-2";
 
   const imagesToDisplay = imageUrl.slice(0, 3);
+  const { isOpen, onClose, onOpen} = useDisclosure()
 
   const isRegular = imagesToDisplay.length < 3;
   // console.log('IMAGE TO DISPLAY.LENGTH ', imagesToDisplay.length, isRegular);
@@ -76,9 +78,34 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
         className="absolute font-semibold text-sm bottom-0 right-0 mr-4 mb-3"
         size="sm"
         radius="full"
+        onClick={onOpen}
       >
         Voir les {imageUrl.length} photos
       </Button>
+      <Modal size="full" isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          {
+            (onClose) => (
+              <>
+                <ModalHeader className="flex items-center p-6">
+                  <p>
+                    GALERIE D'IMAGES
+                  </p>
+                </ModalHeader>
+                <ModalBody>
+                  <div className="grid grid-cols-3 w-full">
+                    {
+                      imageUrl.map(url => (
+                        <Image src={url} key={Math.random()} alt='picture' width={200} height={200}/>
+                      ))
+                    }
+                  </div>
+                </ModalBody>
+              </>
+            )
+          }
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

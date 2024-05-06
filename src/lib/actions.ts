@@ -3,6 +3,7 @@
 import { signIn } from "@/auth";
 import { loginSchema } from "./zod";
 import { redirect } from "next/navigation";
+import { AuthError } from "next-auth";
 
 export const login = async (
   intialState: { error: string },
@@ -20,13 +21,24 @@ export const login = async (
   }
 
   const { email, password } = parsedCredentials.data;
-  // console.log(email, password);
-  await signIn("credentials", { email, password });
-  return { error: "All good 😀" };
-  // try {
-  //   //redirect('/')
-  // } catch (error) {
-  //   // console.log('ERROR : ',error)
-  //   return { error: 'Something goes wrong.'};
-  // }
+
+  try {
+    await signIn("credentials", { email, password, redirectTo: '/' });
+    //return { error: "All good 😀" };
+  } catch (error) {
+    if (error instanceof AuthError) {
+      console.log('ON RENTRE DANS LE CATCH');
+      switch (error.type) {
+        case "CredentialsSignin": {
+          console.log("CREDENTIALS ERROR DANS LE IF ");
+          return { error: "Invalid credentials 😱." };
+        }
+        default:
+          return {
+            error: "Something in auth process went wrong, please retry.",
+          };
+      }
+    }
+    throw error
+  }
 };

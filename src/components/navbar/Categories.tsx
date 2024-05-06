@@ -11,10 +11,10 @@ const Categories = () => {
       height="1rem"
       className="py-2 hidden md:flex"
     >
-      {Object.entries(categoriesList).map(([key, { label }], index) => (
+      {Object.entries(categoriesList).map(([key, { label, target }], index) => (
         <NavbarItem
           as={Link}
-          href={key}
+          href={`/category/${target}`}
           key={index}
           className="text-xs  pb-1 nav_item cat_item relative"
         >

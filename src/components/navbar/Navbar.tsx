@@ -17,6 +17,7 @@ import {
   Bell,
   Heart,
   MessageSquareText,
+  UserRound,
 } from "lucide-react";
 import NavItem from "./NavItem";
 import Link from "next/link";
@@ -24,6 +25,7 @@ import Menu from "./Menu";
 import Image from "next/image";
 import hat from "public/hat.svg";
 import SellButton from "../sell-button/SellButton";
+import { useSession } from "next-auth/react";
 
 export const navItems = [
   {
@@ -46,6 +48,9 @@ export const navItems = [
 const Navbar = () => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [isSearchFocus, setIsSearchFocus] = useState(false);
+  const { data, status, update } = useSession();
+
+  console.log("session : ", data, status);
 
   useEffect(() => {
     // console.log("ChANGEMENT : ", isOpenMenu);
@@ -117,9 +122,24 @@ const Navbar = () => {
           />
         ))}
       </NavbarContent>
-      <Button as={Link} href="/auth/login" className="bg-orange-500 text-white">
-        Sign in
-      </Button>
+
+      {/* AUTH */}
+      
+      {status === "authenticated" ? (
+        <NavItem
+          Icon={UserRound}
+          text={data?.user?.name || "Profile"}
+          target="/dashboard"
+        />
+      ) : (
+        <Button
+          as={Link}
+          href="/auth/login"
+          className="bg-orange-500 text-white"
+        >
+          Sign in
+        </Button>
+      )}
 
       {/* MOBILE MENU */}
 

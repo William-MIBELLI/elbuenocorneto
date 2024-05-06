@@ -1,7 +1,8 @@
 import { getDb } from "@/drizzle/db";
-import { hashPassword, isPasswordMatching } from "./password";
-import { SelectUser, users } from "@/drizzle/schema";
+import { hashPassword, isPasswordMatching } from "../password";
+import { InsertUser, SelectUser, users } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
+import { v4 as uuidv4} from 'uuid'
 
 export const findUserByEmail = async (
   email: string
@@ -34,16 +35,18 @@ export const createUserOnDb = async (
     const newUser = await db
       .insert(users)
       .values({
+        id: uuidv4(),
         email,
         password: hash,
         name,
+        locationId: '95f5d191-ef8f-48c0-a1e4-e4cab2e0f47a'
       })
       .returning();
 
     // ON LE RETURN
     return newUser[0];
   } catch (error) {
-    // console.log("Error : ", error);
+    console.log("Error : ", error);
     return null;
   }
 };

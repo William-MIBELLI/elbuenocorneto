@@ -1,11 +1,12 @@
 "use server";
 
-import { hashPassword } from "./../password";
-import { createUserOnDb, findUserByEmail } from "../requests";
+import { hashPassword } from "../password";
+import { createUserOnDb, findUserByEmail } from "../requests/auth.requests";
 import { signUpSchema } from "../zod";
 import { redirect } from "next/navigation";
 import { getDb } from "@/drizzle/db";
 import { users } from "@/drizzle/schema";
+import { signIn } from "@/auth";
 
 export const signUp = async (initialState: {}, formData: FormData) => {
   try {
@@ -37,11 +38,11 @@ export const signUp = async (initialState: {}, formData: FormData) => {
 
     if (!user) throw new Error("Cant create user");
 
-    // SI TOUT EST OK, ON REDIRIGE VERS HOME
-    // console.log('user : ', user)
+    // SI TOUT EST OK, ON SIGNIN
+    await signIn("credentials", { email, password, redirectTo: '/' });
+
   } catch (error: any) {
     // console.log('error : ', error?.message);
     return { _form: ["Something went wrong."] };
   }
-  redirect("/");
 };

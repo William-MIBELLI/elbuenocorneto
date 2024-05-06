@@ -1,7 +1,8 @@
 "use client";
 import { login } from "@/lib/actions";
 import { Button, Input } from "@nextui-org/react";
-import { EyeOff, Eye, Link, MoveRight } from "lucide-react";
+import { EyeOff, Eye, MoveRight } from "lucide-react";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { useFormState } from "react-dom";

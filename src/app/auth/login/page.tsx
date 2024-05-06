@@ -1,8 +1,13 @@
 import LoginForm from "@/components/forms/Login";
+import { getSession,  } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 
 const Login = async () => {
+
+  // const session = await getSession();
+  // console.log('SESSION : ', session);
+
   return (
     <div className="text-left my-5  px-6 py-9 rounded-xl bg-white shadow-lg w-1/2">
       <h2 className="font-semibold text-2xl">Bonjour !</h2>

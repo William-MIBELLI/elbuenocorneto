@@ -16,6 +16,12 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "bg_login": "url('/images/bg_login.png')"
       },
+      colors: {
+        // 'gray': '#8492a6'
+      },
+      boxShadow: {
+        'dashboard_card': '0 8px 16px #0003'
+      }
     }
   },
   plugins: [nextui()],

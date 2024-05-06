@@ -1,52 +1,26 @@
-import NextAuth from "next-auth";
-// import prisma from "./lib/prisma";
-import Credentials from "next-auth/providers/credentials";
-import { loginUser } from "./lib/requests";
-import { getDb } from "./drizzle/db";
+import  Credentials  from 'next-auth/providers/credentials';
+import { authConfig } from './../auth.config';
+import NextAuth, { AuthError } from "next-auth";
+import { findUserByEmail } from './lib/requests/auth.requests';
+import { isPasswordMatching } from './lib/password';
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
-  providers: [
-    Credentials({
-      credentials: {
-        email: {},
-        password: {},
-      },
-      authorize: async ({ email, password }) => {
-        try {
-          const user = await loginUser(email as string, password as string);
-          // console.log('user dans auth : ', user, typeof user);
-          if (user) {
-            return { email: user.email, password: user.password };
-          }
-          return null;
-        } catch (error) {
-          return null;
-        }
-        try {
-          const db = await getDb();
-          const user = await db.query.users.findFirst({ where: (user, { eq }) => eq(user.email, email as string) });
-          //return user
-        } catch (error) {
-          // console.log(error);
-          return null;
-        }
-      },
-    }),
-  ],
-  // adapter: PrismaAdapter(prisma),
-  pages: {
-    signIn: "/auth/login",
-  },
-  callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnDashBoard = nextUrl.pathname.startsWith("/dashboard");
-      if (isOnDashBoard) {
-        return isLoggedIn;
-      } else if (isLoggedIn) {
-        return Response.redirect(new URL("/dashboard", nextUrl));
-      }
-      return true;
-    },
-  },
+  ...authConfig,
+  providers: [Credentials({
+    async authorize(credentials) {
+      
+      console.log('credentials : ', credentials);
+
+      const { email, password } = credentials;
+      const user = await findUserByEmail(email as string)
+      console.log('USER DANS AUTH : ', user);
+      if (!user) return null;
+
+      const isMatching = await isPasswordMatching(password as string, user.password);
+      
+      if (isMatching) return user;
+
+      return null;
+    }
+  })]
 });

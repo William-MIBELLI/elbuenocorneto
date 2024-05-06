@@ -1,5 +1,5 @@
 "use client";
-import { signUp } from "@/lib/actions/auth";
+import { signUp } from "@/lib/actions/auth.action";
 import { Button, Input } from "@nextui-org/react";
 import React from "react";
 import { useFormState } from "react-dom";
