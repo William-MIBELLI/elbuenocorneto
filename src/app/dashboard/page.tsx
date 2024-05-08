@@ -59,7 +59,6 @@ const cardsToDisplay: ICardDashboard[] = [
 const Dashboard = async () => {
 
   const session = await auth();
-  console.log("session : ", session);
 
   if (!session) redirect('/auth/login');
   

@@ -50,11 +50,6 @@ const Navbar = () => {
   const [isSearchFocus, setIsSearchFocus] = useState(false);
   const { data, status } = useSession();
 
-  console.log("session dans navbar : ", data, status);
-
-  useEffect(() => {
-    console.log('session useeffect : ', data)
-  }, [status]);
   return (
     <Nv
       maxWidth="lg"

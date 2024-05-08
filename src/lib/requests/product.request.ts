@@ -67,7 +67,7 @@ export const fetchProductsForSlider = async (
   category: CategoriesType
 ): Promise<ICard[]> => {
   try {
-    const db = await getDb();
+    const db =  getDb();
 
     const prods = await db.query.products.findMany({
       where: eq(products.category, category),

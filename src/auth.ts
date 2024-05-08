@@ -8,8 +8,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
   providers: [Credentials({
     async authorize(credentials) {
-      
-      console.log('credentials : ', credentials);
 
       const { email, password } = credentials;
       const user = await findUserByEmail(email as string)

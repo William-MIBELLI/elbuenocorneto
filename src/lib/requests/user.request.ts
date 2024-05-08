@@ -45,7 +45,6 @@ export const getUserById = async (id: string) => {
       .rightJoin(users, eq(users.id, id))
       .groupBy(users.id)
       .then((res) => res[0]);
-    console.log('USER COUNT : ', user);
     return user;
   } catch (error) {
     console.log("ERROR FETCHING USER : ", error);

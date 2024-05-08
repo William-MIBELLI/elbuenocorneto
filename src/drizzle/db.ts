@@ -1,6 +1,8 @@
-import { NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import {  Pool } from "pg";
 import * as schema from "./schema";
+import { sql } from '@vercel/postgres'
+import { drizzle } from "drizzle-orm/vercel-postgres/driver";
 
 export const pool = new Pool({
   host: process.env.DB_HOST!,
@@ -10,9 +12,8 @@ export const pool = new Pool({
   database: process.env.DB_NAME!,
 });
 
-export const db = drizzle(pool, { schema });
+export const db = drizzle(sql,{ schema });
 
-export const getDb =  (): NodePgDatabase<typeof schema> => {
-  console.log('GETDB');
+export const getDb =  () => {
   return db;
 };

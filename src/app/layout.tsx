@@ -27,8 +27,12 @@ export default function RootLayout({
           <main className="bg-white m-auto px-2 text-center max-w-screen-lg  mt-4 flex justify-center items-center">
             {children}
           </main>
-          <div className="w-full h-96 mt-24 bg-yellow-200">
-            JE SUIS LE FOOTER
+          <div className="w-full h-96 mt-24 bg-gray-400 flex flex-col justify-center items-center">
+            <h3 className="text-2xl font-semibold">
+              ⚠️ SITE EN COURS DE DEVELOPPEMENT ⚠️
+            </h3>
+            <p>Certaines fonctionnalités du site ne sont pas encore disponible</p>
+            <p>La base de donnée a été seed de facon aleatoire <span className="text-xs">(mais oui, ici on aimes les chats 👀)</span></p>
           </div>
         </body>
       </SessionProvider>

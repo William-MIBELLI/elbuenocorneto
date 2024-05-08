@@ -12,7 +12,7 @@ const CategoryCard: FC<IProps> = ({ category }) => {
   const { imageUrl, label, target } = category;
 
   return (
-    <Card as={Link} href={target}  isFooterBlurred radius="lg" className="border-none min-w-40  bg-blue-300">
+    <Card as={Link} href={`/category/${target}`}  isFooterBlurred radius="lg" className="border-none min-w-40  bg-blue-300">
       <Image
         alt={label}
         className="object-fit"

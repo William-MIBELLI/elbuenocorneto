@@ -5,8 +5,6 @@ import React from "react";
 
 const Login = async () => {
 
-  // const session = await getSession();
-  // console.log('SESSION : ', session);
 
   return (
     <div className="text-left my-5  px-6 py-9 rounded-xl bg-white shadow-lg w-1/2">

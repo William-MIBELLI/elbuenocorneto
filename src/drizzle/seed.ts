@@ -49,12 +49,10 @@ export const insertRandomUsers = async (count: number) => {
     const usersList: InsertUser[] = faker.helpers.multiple(createRandomUser, {
       count,
     });
-    console.log('USERLIST : ', usersList.map(item => item.id));
 
     const res = await db
       .insert(users)
       .values(usersList).returning()
-    console.log("ALL GOOD", res);
     return true;
   } catch (error) {
     console.log("ERROR WHEN USER SEEDING : ", error);
@@ -157,19 +155,17 @@ export const insertDeliveries = async () => {
 export const insertDeliveriesLink = async () => {
   try {
 
-    // console.log('SEEDING DELIVERY LINK...');
     const db = await getDb();
     await db.delete(productDeliveryLink)
     const prods = await db.select({id: products.id}).from(products);
     const deliverieslist = (await db.select({ id: deliveries.id }).from(deliveries)).map(item => item.id);
-    console.log('deliveryllist id : ', deliverieslist);
+
     if (!deliverieslist.length) throw new Error('You need to seed deliveries first.');
 
     const data: DeliveryLinkInsert[] = [];
 
     prods.forEach(({id}) => {
       const length = Math.floor(Math.random() * deliverieslist.length + 1);
-      console.log('length : ', length);
       if (Math.random() > 0.4) {
         for (let i = 0; i < length; i++){
           const link: DeliveryLinkInsert = {
@@ -180,9 +176,7 @@ export const insertDeliveriesLink = async () => {
         } 
       }
     })
-    console.log(data)
     await db.insert(productDeliveryLink).values(data);
-    // console.log('DONE');
     return true
   } catch (error) {
     console.log('ERROR INSERT DELIVERIES', error);
@@ -229,12 +223,12 @@ const getLocationIdForSeedind = async () => {
 
 export const fullSeedDB = async () => {
   try {
-    await insertLocation(100);
+    await insertLocation(150);
     await insertDeliveries();
-    await insertRandomUsers(30);
-    await insertRandomProducts(70);
+    await insertRandomUsers(70);
+    await insertRandomProducts(200);
     await insertDeliveriesLink();
-    await insertRandomImageUrl(200);
+    await insertRandomImageUrl(400);
     return true;
   } catch (error) {
     console.log('SOMETHING WENT WRONG : ', error);

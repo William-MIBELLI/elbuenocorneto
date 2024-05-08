@@ -27,10 +27,8 @@ export const login = async (
     return { error: "All good 😀" };
   } catch (error) {
     if (error instanceof AuthError) {
-      console.log('ON RENTRE DANS LE CATCH');
       switch (error.type) {
         case "CredentialsSignin": {
-          console.log("CREDENTIALS ERROR DANS LE IF ");
           return { error: "Invalid credentials 😱." };
         }
         default:

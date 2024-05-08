@@ -19,7 +19,6 @@ interface IProps {
 }
 
 const Slider: FC<IProps> = ({ producstList }) => {
-  // console.log('productlist : ', producstList);
   const sliderRef = useRef(null);
   const [scroll, setScroll] = useState(0);
   const [totalWidth, setTotalWidth] = useState<number | undefined>(undefined);
