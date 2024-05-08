@@ -48,13 +48,13 @@ export const navItems = [
 const Navbar = () => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [isSearchFocus, setIsSearchFocus] = useState(false);
-  const { data, status, update } = useSession();
+  const { data, status } = useSession();
 
-  console.log("session : ", data, status);
+  console.log("session dans navbar : ", data, status);
 
   useEffect(() => {
-    // console.log("ChANGEMENT : ", isOpenMenu);
-  }, [isOpenMenu]);
+    console.log('session useeffect : ', data)
+  }, [status]);
   return (
     <Nv
       maxWidth="lg"

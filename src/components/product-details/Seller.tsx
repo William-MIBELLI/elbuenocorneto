@@ -7,6 +7,7 @@ import Rating from '../rating/Rating'
 import { SelectUser } from '@/drizzle/schema'
 import Link from 'next/link'
 import UserHeader from '../user/UserHeader'
+import { getUserById } from '@/lib/requests/user.request'
 const user = {
   name: 'Jean Michel',
   totalAnnounce: 32,
@@ -15,15 +16,21 @@ const user = {
 }
 
 interface IProps {
-  user: Partial<SelectUser>
+  userId: string;
 }
-const Seller: FC<IProps> = ({ user }) => {
+const Seller: FC<IProps> = async ({ userId }) => {
 
-  const { name, rating, rateNumber, id } = user;
+  const data = await getUserById(userId);
+  if (!data) {
+    return (
+      <div>Cant retrieve user 😢</div>
+    )
+  }
+  const { id } = data.user;
   return (
     <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium'>
       <Link href={`/profile/${id}`} className=' flex items-center gap-6 justify-between'>
-        <UserHeader userData={user}/>
+        <UserHeader userData={data.user} count={data.count}/>
         <ChevronRight/>
       </Link>
       <Divider />

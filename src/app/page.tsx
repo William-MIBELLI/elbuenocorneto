@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import CardSlider from "@/components/card-slider/CardSlider";
 import CategorySlider from "@/components/categories/CategorySlider";
 import SellButton from "@/components/sell-button/SellButton";
@@ -8,6 +9,8 @@ import Image from "next/image";
 export default async function Home() {
   
   const prods = await fetchProductsForSlider('famille');
+  const session = await auth();
+  console.log('session dans page : ', session)
 
   return (
     <div className="flex flex-col w-full gap-12 mt-12">

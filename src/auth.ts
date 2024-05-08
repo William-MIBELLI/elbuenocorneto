@@ -13,13 +13,12 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
       const { email, password } = credentials;
       const user = await findUserByEmail(email as string)
-      console.log('USER DANS AUTH : ', user);
       if (!user) return null;
+      
 
       const isMatching = await isPasswordMatching(password as string, user.password);
       
       if (isMatching) return user;
-
       return null;
     }
   })]

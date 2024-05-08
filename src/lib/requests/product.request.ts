@@ -1,7 +1,4 @@
-import {
-  CategoriesType,
-  ICard
-} from "@/interfaces/IProducts";
+import { CategoriesType, ICard } from "@/interfaces/IProducts";
 import { getDb } from "@/drizzle/db";
 import {
   ImageSelect,
@@ -14,31 +11,28 @@ import {
   products,
   users,
 } from "@/drizzle/schema";
-import { eq, count } from "drizzle-orm";
+import { eq, count, sql } from "drizzle-orm";
 import { ProductDataForList } from "@/components/product-list/ProductList";
-
-
 
 export const getProductDetailsById = async (id: string) => {
   try {
     const db = await getDb();
     const data = await db.transaction(async (tx) => {
-
       const p: ProductSelect[] = await tx
         .select()
         .from(products)
         .where(eq(products.id, id));
-      
+
       const u: SelectUser[] = await tx
         .select()
         .from(users)
         .where(eq(users.id, p[0].userId));
-      
+
       const i: ImageSelect[] = await tx
         .select()
         .from(images)
         .where(eq(images.productId, id));
-      
+
       const d = await tx
         .select()
         .from(productDeliveryLink)
@@ -46,16 +40,19 @@ export const getProductDetailsById = async (id: string) => {
         .leftJoin(
           deliveries,
           eq(productDeliveryLink.deliveryId, deliveries.id)
-      );
+        );
 
-      const l = await tx.select().from(locations).where(eq(locations.id, p[0].locationId))
+      const l = await tx
+        .select()
+        .from(locations)
+        .where(eq(locations.id, p[0].locationId));
 
       return {
         product: p[0],
         user: u[0],
         images: i.map((item) => item.url),
         del: d.map((item) => item.deliveries),
-        location: l[0]
+        location: l[0],
       };
     });
 
@@ -66,21 +63,22 @@ export const getProductDetailsById = async (id: string) => {
   }
 };
 
-export const fetchProductsForSlider = async (category: CategoriesType): Promise<ICard[]> => {
+export const fetchProductsForSlider = async (
+  category: CategoriesType
+): Promise<ICard[]> => {
   try {
-     const db = await getDb();
- 
+    const db = await getDb();
+
     const prods = await db.query.products.findMany({
       where: eq(products.category, category),
       with: {
-        images: { 
+        images: {
           columns: {
             url: true,
             id: false,
-            productId: false
+            productId: false,
           },
           limit: 1,
-
         },
         seller: {
           columns: {
@@ -88,22 +86,22 @@ export const fetchProductsForSlider = async (category: CategoriesType): Promise<
             rating: true,
             rateNumber: true,
             password: false,
-          }
+          },
         },
         pdl: {
           columns: {
-            deliveryId: true
+            deliveryId: true,
           },
-          limit: 1
+          limit: 1,
         },
         location: {
           columns: {
             postal: true,
-            city: true
-          }
-        }
-       }
-    })
+            city: true,
+          },
+        },
+      },
+    });
     return prods;
   } catch (error) {
     console.log("ERROR FETCHING PRODUCTS : ", error);
@@ -111,45 +109,28 @@ export const fetchProductsForSlider = async (category: CategoriesType): Promise<
   }
 };
 
-// export const getProductsByUserId = async (userId: string): Promise<Array<Partial<ProductSelect> & Partial<ImageSelect> | null>> => {
-//   try {
-//     const db = await getDb();
-//     const prods = await db.select().from(products).where(eq(products.userId, userId)).leftJoin(images, eq(images.productId, products.id)).limit(10);
-//     // const prods = await db.query.products.findMany({
-//     //   where: eq(products.userId, userId),
-//     //   with: {
-//     //     images: {
-//     //       limit: 1
-//     //     }
-        
-//     //   }
-//     // })
-//     return prods;
-//   } catch (error) {
-//     console.log('ERROR FETCHING PRODUCT BY USERID : ', error);
-//     return [];
-//   }
-// }
-
-
-export const getProductsByCategory = async (category: CategoriesType): Promise<ProductDataForList[]>=> {
+export const getProductsByCategory = async (
+  category: CategoriesType
+): Promise<ProductDataForList[]> => {
   try {
     const db = await getDb();
     const prods = await db.query.products.findMany({
       where: eq(products.category, category),
       with: {
         images: {
-          limit: 1
+          limit: 1,
         },
-        location: true
-      }
-    })
-    const mappedProds = prods.map(p => {
-      return { product: {...p}, images: p.images, location: p.location}
-    })
+        location: true,
+      },
+    });
+    const mappedProds = prods.map((p) => {
+      return { product: { ...p }, images: p.images, location: p.location };
+    });
     return mappedProds;
   } catch (error) {
-    console.log('ERROR FETCHING PORDS BY CATGEROY : ',);
+    console.log("ERROR FETCHING PORDS BY CATGEROY : ");
     return [];
   }
-}
+};
+
+

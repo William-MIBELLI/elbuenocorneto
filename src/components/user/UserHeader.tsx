@@ -7,16 +7,19 @@ interface IProps {
   userData: Partial<
     Pick<SelectUser, "name" | "rateNumber" | "rating" | "image">
   >;
+  count?: number
 }
 
-const UserHeader: FC<IProps> = ({ userData }) => {
+const UserHeader: FC<IProps> = ({ userData, count }) => {
   const { name, rating, rateNumber } = userData;
   return (
     <div className="flex gap-3">
       <Avatar size="lg" />
       <div className="flex flex-col justify-center items-start">
         <h3 className="font-semibold text-lg">{name}</h3>
-        <p className="text-sm">{99} annonces</p>
+        {count && (
+          <p className="text-sm">{count} annonces</p>
+        )}
         {rating && rateNumber && (
           <Rating rating={rating} totalRate={rateNumber} />
         )}

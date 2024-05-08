@@ -1,7 +1,6 @@
 import { NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
-import { Client, Pool } from "pg";
+import {  Pool } from "pg";
 import * as schema from "./schema";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
 
 export const pool = new Pool({
   host: process.env.DB_HOST!,
@@ -11,25 +10,9 @@ export const pool = new Pool({
   database: process.env.DB_NAME!,
 });
 
-// { schema } is used for relational queries
-//export const db = drizzle(client, { schema });
-let db: NodePgDatabase<typeof schema>;
+export const db = drizzle(pool, { schema });
 
-const connectDb = async () => {
-  console.log('CONNECT DB', pool.totalCount);
-  if (!db) {
-    console.log('DB NULL, CLIENT CONNECT');
-    await pool.connect();
-    db = drizzle(pool, { schema });
-  }
-};
-
-export const getDb = async (): Promise<NodePgDatabase<typeof schema>> => {
+export const getDb =  (): NodePgDatabase<typeof schema> => {
   console.log('GETDB');
-  if (!db) {
-    await connectDb();
-  }
   return db;
 };
-
-//export type SelectUser = typeof user.$inferSelect;

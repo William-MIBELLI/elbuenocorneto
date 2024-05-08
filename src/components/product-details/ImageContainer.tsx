@@ -1,8 +1,15 @@
-'use client';
-import { Button, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/react";
-import { Heart, Share2, X } from "lucide-react";
+"use client";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/react";
+import { Heart, MoveLeft, MoveRight, Share2, X } from "lucide-react";
 import Image from "next/image";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 
 interface IProps {
   imageUrl: string[];
@@ -11,7 +18,24 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
   const regularDisplay = "relative w-auto mx-auto flex justify-center gap-2";
 
   const imagesToDisplay = imageUrl.slice(0, 3);
-  const { isOpen, onClose, onOpen} = useDisclosure()
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  const [urlIndex, setUrlIndex] = useState(0)
+  const maxIndex = imageUrl.length - 1;
+
+  const onIncrementIndex = () => {
+    if (urlIndex >= maxIndex) {
+      return setUrlIndex(0);
+    }
+    setUrlIndex(urlIndex + 1)
+  }
+
+  const onDecrementIndex = () => {
+    if (urlIndex <= 0) {
+      return setUrlIndex(maxIndex)
+    }
+    setUrlIndex(urlIndex - 1);
+  }
 
   const isRegular = imagesToDisplay.length < 3;
   // console.log('IMAGE TO DISPLAY.LENGTH ', imagesToDisplay.length, isRegular);
@@ -42,7 +66,7 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
               key={Math.random()}
               src={imagesToDisplay[0]}
               alt="product picture"
-                fill
+              fill
             />
           </div>
           <div className="col-start-3 col-span-2 gap-1 p-1 h-96  flex flex-col">
@@ -82,28 +106,27 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
       >
         Voir les {imageUrl.length} photos
       </Button>
-      <Modal size="full" isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          {
-            (onClose) => (
-              <>
-                <ModalHeader className="flex items-center p-6">
-                  <p>
-                    GALERIE D'IMAGES
-                  </p>
-                </ModalHeader>
-                <ModalBody>
-                  <div className="grid grid-cols-3 w-full">
-                    {
-                      imageUrl.map(url => (
-                        <Image src={url} key={Math.random()} alt='picture' width={200} height={200}/>
-                      ))
-                    }
-                  </div>
-                </ModalBody>
-              </>
-            )
-          }
+      <Modal size="full" isOpen={isOpen} onClose={onClose} >
+        <ModalContent className=" flex justify-center items-center">
+          {(onClose) => (
+            <>
+              <ModalBody className="flex flex-row items-center ">
+                <Button onClick={onDecrementIndex}>
+                  <MoveLeft size={17} />
+                </Button>
+                <Image
+                  src={imageUrl[urlIndex]}
+                  key={Math.random()}
+                  alt="picture"
+                  width={600}
+                  height={600}
+                />
+                <Button onClick={onIncrementIndex}>
+                  <MoveRight size={17} />
+                </Button>
+              </ModalBody>
+            </>
+          )}
         </ModalContent>
       </Modal>
     </div>

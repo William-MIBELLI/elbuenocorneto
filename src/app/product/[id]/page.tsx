@@ -132,7 +132,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
         <CardSlider category={category} title="Ces annonces peuvent vous intéresser"/>
       </main>
       <aside className=" w-full lg:w-1/3 ">
-        <Seller user={data.user} />
+        <Seller userId={data.user.id} />
       </aside>
       {/* HEADER */}
     </div>

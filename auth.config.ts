@@ -1,4 +1,4 @@
-import { getDb } from "@/drizzle/db";
+import { db, getDb } from "@/drizzle/db";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { NextAuthConfig } from "next-auth";
 
@@ -8,12 +8,11 @@ export const authConfig = {
     
   },
   providers: [],
-  //adapter:DrizzleAdapter(),
+  //adapter:DrizzleAdapter(db),
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnDashBoard = nextUrl.pathname.startsWith('/dashboard');
-      console.log('DANS LE CALLBACK CONFIG : ', isLoggedIn, isOnDashBoard);
       if (isOnDashBoard) {
         if (isLoggedIn) return true;
         return false;
@@ -21,6 +20,15 @@ export const authConfig = {
         return Response.redirect(new URL('/dashboard', nextUrl));
       }
       return true;
+    },
+    session({ session, token, user }) {
+      
+      if (token?.sub) {
+        session.userId = token.sub 
+      }
+
+      return session;
     }
-  }
+  },
+  
 } satisfies NextAuthConfig
