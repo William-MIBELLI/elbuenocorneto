@@ -24,7 +24,7 @@ export const login = async (
 
   try {
     await signIn("credentials", { email, password, redirectTo: '/' });
-    //return { error: "All good 😀" };
+    return { error: "All good 😀" };
   } catch (error) {
     if (error instanceof AuthError) {
       console.log('ON RENTRE DANS LE CATCH');

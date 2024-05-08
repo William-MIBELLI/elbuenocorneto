@@ -23,7 +23,6 @@
     "pg": "^8.11.5",
     "react": "^18",
     "react-dom": "^18",
-    "react-responsive-carousel": "^3.2.23",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },

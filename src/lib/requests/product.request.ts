@@ -16,7 +16,7 @@ import { ProductDataForList } from "@/components/product-list/ProductList";
 
 export const getProductDetailsById = async (id: string) => {
   try {
-    const db = await getDb();
+    const db = getDb();
     const data = await db.transaction(async (tx) => {
       const p: ProductSelect[] = await tx
         .select()

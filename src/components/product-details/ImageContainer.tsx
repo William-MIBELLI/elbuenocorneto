@@ -10,6 +10,7 @@ import {
 import { Heart, MoveLeft, MoveRight, Share2, X } from "lucide-react";
 import Image from "next/image";
 import React, { FC, useState } from "react";
+import ImageModal from "./ImageModal";
 
 interface IProps {
   imageUrl: string[];
@@ -20,22 +21,6 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
   const imagesToDisplay = imageUrl.slice(0, 3);
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const [urlIndex, setUrlIndex] = useState(0)
-  const maxIndex = imageUrl.length - 1;
-
-  const onIncrementIndex = () => {
-    if (urlIndex >= maxIndex) {
-      return setUrlIndex(0);
-    }
-    setUrlIndex(urlIndex + 1)
-  }
-
-  const onDecrementIndex = () => {
-    if (urlIndex <= 0) {
-      return setUrlIndex(maxIndex)
-    }
-    setUrlIndex(urlIndex - 1);
-  }
 
   const isRegular = imagesToDisplay.length < 3;
   // console.log('IMAGE TO DISPLAY.LENGTH ', imagesToDisplay.length, isRegular);
@@ -106,26 +91,10 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
       >
         Voir les {imageUrl.length} photos
       </Button>
-      <Modal size="full" isOpen={isOpen} onClose={onClose} >
+      <Modal size="full" isOpen={isOpen} onClose={onClose}>
         <ModalContent className=" flex justify-center items-center">
           {(onClose) => (
-            <>
-              <ModalBody className="flex flex-row items-center ">
-                <Button onClick={onDecrementIndex}>
-                  <MoveLeft size={17} />
-                </Button>
-                <Image
-                  src={imageUrl[urlIndex]}
-                  key={Math.random()}
-                  alt="picture"
-                  width={600}
-                  height={600}
-                />
-                <Button onClick={onIncrementIndex}>
-                  <MoveRight size={17} />
-                </Button>
-              </ModalBody>
-            </>
+            <ImageModal imageUrl={imageUrl}/>
           )}
         </ModalContent>
       </Modal>

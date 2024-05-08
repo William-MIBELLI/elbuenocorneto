@@ -17,6 +17,8 @@ import ImagePlaceHolder from 'public/image_placeholder.svg'
 import CardSlider from "@/components/card-slider/CardSlider";
 import SellerContent from "@/components/product-details/SellerContent";
 
+export const revalidate = 0;
+
 interface IProps {
   params: {
     id: string;

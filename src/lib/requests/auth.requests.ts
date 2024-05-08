@@ -31,12 +31,12 @@ export const createUserOnDb = async (
     if (!hash) throw new Error("Cant hash pass");
 
     // ON CREE ET ON INSERT LE NEWUSER DANS LA DB
-    const db = await getDb();
+    const db = getDb();
     const newUser = await db
       .insert(users)
       .values({
         id: uuidv4(),
-        email,
+        email: email.toLowerCase().trim(),
         password: hash,
         name,
         locationId: '95f5d191-ef8f-48c0-a1e4-e4cab2e0f47a'

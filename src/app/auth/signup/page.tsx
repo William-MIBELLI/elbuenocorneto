@@ -6,7 +6,7 @@ import { useFormState } from "react-dom";
 
 const Signup = () => {
   const [state, action] = useFormState(signUp, {});
-  // console.log('state : ', state);
+  console.log('state : ', state);
 
   return (
     <div className="my-6 p-6 shadow-lg rounded-lg bg-white">
