@@ -100,7 +100,7 @@ export const fetchProductsForSlider = async (
             city: true,
           },
         },
-      },
+      }, limit: 10
     });
     return prods;
   } catch (error) {

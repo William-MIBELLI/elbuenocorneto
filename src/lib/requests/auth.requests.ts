@@ -1,3 +1,4 @@
+"use server"
 import { getDb } from "@/drizzle/db";
 import { hashPassword, isPasswordMatching } from "../password";
 import { InsertUser, SelectUser, users } from "@/drizzle/schema";
@@ -8,7 +9,7 @@ export const findUserByEmail = async (
   email: string
 ): Promise<SelectUser | undefined> => {
   try {
-    const db = await getDb();
+    const db =  getDb();
     //const user: SelectUser | undefined = await db.query.users.findFirst({ where: (users, { eq }) => eq(users.email, email) });
     const user = await db.select().from(users).where(eq(users.email, email));
     // console.log('USER DANS FINDUSERBYEMAIL :', user);

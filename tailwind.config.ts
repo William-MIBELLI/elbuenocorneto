@@ -18,6 +18,7 @@ const config: Config = {
       },
       colors: {
         // 'gray': '#8492a6'
+        'main': '#F97316'
       },
       boxShadow: {
         'dashboard_card': '0 8px 16px #0003'

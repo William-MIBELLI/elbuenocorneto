@@ -80,7 +80,7 @@ const Dashboard = async () => {
           <div className="flex gap-1 items-center">
             <Link
               className="text-sm font-semibold underline"
-              href={`/profile/${session?.user?.id}`}
+              href={`/profile/${session.user?.id}`}
             >
               Accéder à mon profil public
             </Link>
@@ -88,8 +88,10 @@ const Dashboard = async () => {
           </div>
         </div>
 
-        <div className="flex font-semibold p-6 shadow-dashboard_card rounded-xl">
-          <div className="flex flex-col items-start gap-3">
+        <div className="flex font-semibold relative shadow-dashboard_card p-6 rounded-xl overflow-hidden">
+          <div className="bg-orange-300 w-40  h-40 rounded-full absolute -top-10 -left-28 "> </div>
+          <div className="bg-gray-200 w-40 opacity-70  h-40 rounded-full absolute -bot-10 -left-28 "> </div>
+          <div className="flex flex-col items-start gap-3 bg-transparent ml-14">
             <h3>Porte-monnaie</h3>
             <p>0 €</p>
             <p className="font-normal text-sm">Solde disponible</p>

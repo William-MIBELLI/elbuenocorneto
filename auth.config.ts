@@ -22,9 +22,9 @@ export const authConfig = {
       return true;
     },
     session({ session, token, user }) {
-      
       if (token?.sub) {
         session.userId = token.sub 
+        session.user.id = token.sub;
       }
 
       return session;

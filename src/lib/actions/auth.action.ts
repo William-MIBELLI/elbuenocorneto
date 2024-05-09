@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/drizzle/db";
 import { users } from "@/drizzle/schema";
 import { signIn } from "@/auth";
+import { z } from "zod";
 
 export const signUp = async (initialState: {}, formData: FormData) => {
   // CHECK LES INPUTS
@@ -34,7 +35,7 @@ export const signUp = async (initialState: {}, formData: FormData) => {
 
     if (!user) throw new Error("Cant create user");
   } catch (error: any) {
-    console.log('error : ', error?.message);
+    console.log("error : ", error?.message);
     return { _form: ["Something went wrong."] };
   }
   // SI TOUT EST OK, ON SIGNIN
@@ -45,4 +46,24 @@ export const signUp = async (initialState: {}, formData: FormData) => {
   });
 
   return {};
+};
+
+export const checkEmail = async (initialState: {}, fd: FormData) => {
+  console.log('CHECK EMAIL');
+  try {
+    const parsedEmail = z
+      .object({
+        email: z.string().email("please provide a valid email address"),
+      })
+      .safeParse({
+        email: fd.get("email"),
+      });
+    if (!parsedEmail.success) {
+      return { email: 'Please provide a valid email address.' };
+    }
+    return {}
+  } catch (error) {
+    console.log("ERROR CHECKING EMAIL : ", error);
+    return { _form: "Something went wrong." };
+  }
 };
