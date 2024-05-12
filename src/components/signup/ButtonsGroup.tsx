@@ -1,9 +1,9 @@
-import { SignupContext } from "@/app/auth/signup/page";
+import { useSignUpContext } from "@/context/signup.context";
 import { Button } from "@nextui-org/react";
-import React, { useContext } from "react";
+import React from "react";
 
 const ButtonsGroup = () => {
-  const { step, setStep, userValue } = useContext(SignupContext);
+  const { step, setStep, userValue } = useSignUpContext();
   return (
     <div className="flex w-full gap-3">
       {step > 0 && (
@@ -17,13 +17,12 @@ const ButtonsGroup = () => {
       )}
 
       <Button
-        // onClick={() => setStep(step + 1)}
         type="submit"
         className="button_main"
         fullWidth
       >
         {
-          step < Object.keys(userValue).length ? 'Suivant' : "S'inscrire"
+          step < Object.keys(userValue).length - 1  ? 'Suivant' : "S'inscrire"
         }
       </Button>
     </div>

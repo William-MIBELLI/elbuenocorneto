@@ -5,14 +5,14 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <div className="w-full h-96 mt-24 bg-gray-400 flex flex-col justify-center items-center text-sm">
+    <div className="w-full h-96 mt-24 bg-gray-900 flex text-gray-200 flex-col justify-center items-center text-sm">
       <h3 className="text-2xl font-bold">
         ⚠️ SITE EN COURS DE DEVELOPPEMENT ⚠️
       </h3>
-      <p>Certaines fonctionnalités du site ne sont pas encore disponible</p>
-      <p>
+      <p className="text-gray-500">Certaines fonctionnalités du site ne sont pas encore disponible</p>
+      <p className="text-gray-500">
         La base de donnée a été seed de facon aleatoire{" "}
-        <span className="text-xs">(mais oui, ici on aime les chats 👀)</span>
+        <span className="text-xs text-gray-900">(mais oui, ici on aime les chats 👀)</span>
       </p>
       <p className="my-3 font-semibold">En ce moment : finir CRUD user</p>
       <div className="flex gap-3">
@@ -24,7 +24,7 @@ const Footer = () => {
         Mon portfolio
         <ExternalLink size={17}/>
       </Button>
-      <Button as={Link} className="flex items-center gap-2  font-semibold" href={'https://williammibelli.netlify.app/'} target="_blank">
+      <Button as={Link} className="flex items-center gap-2  font-semibold" href={'https://github.com/William-MIBELLI'} target="_blank">
         Mon Github
         <ExternalLink size={17}/>
       </Button>

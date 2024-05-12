@@ -1,29 +1,29 @@
-import { SignupContext } from "@/app/auth/signup/page";
 import { checkPassword } from "@/lib/actions/auth.action";
-import { Button, Input } from "@nextui-org/react";
-import React, { Dispatch, FC, useContext, useEffect, useState } from "react";
+import React, { FC, useEffect } from "react";
 import PasswordInput from "../inputs/PasswordInput";
 import { useFormState } from "react-dom";
 import ButtonsGroup from "./ButtonsGroup";
+import { useSignUpContext } from "@/context/signup.context";
 
 interface IProps {}
 const Password: FC<IProps> = () => {
-
-  const { userValue, setStep, setUserValue, step } = useContext(SignupContext);
-  const [error, setError] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState("");
+  const { userValue, setStep, setUserValue, step } = useSignUpContext();
 
   const [state, action] = useFormState(checkPassword, {
     status: false,
     confirm: undefined,
     password: undefined,
     validatePassword: undefined,
-    validateConfirm: undefined
+    validateConfirm: undefined,
   });
 
   useEffect(() => {
     if (state.status && state.validatePassword && state.validateConfirm) {
-      setUserValue({ ...userValue, password: state.validatePassword, confirm: state.validateConfirm });
+      setUserValue({
+        ...userValue,
+        password: state.validatePassword,
+        confirm: state.validateConfirm,
+      });
       setStep(step + 1);
       state.status = false;
     }
@@ -44,10 +44,6 @@ const Password: FC<IProps> = () => {
       {state?.confirm && (
         <p className="error_message">{state.confirm.join(", ")}</p>
       )}
-      {/* <div className='w-full flex justify-center gap-3 mt-5'>
-        <Button onClick={() => setStep(0)} className='button_secondary'>Précédent</Button>
-        <Button type='submit' className='button_main'>Suivant</Button>
-      </div> */}
       <p className="text-xs">
         Choisissez un mot de passe robuste entre 8 et 32 caractères.
       </p>

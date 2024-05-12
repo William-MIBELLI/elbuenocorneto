@@ -1,31 +1,27 @@
-'use client';
+"use client";
 
-import { SignupContext } from "@/app/auth/signup/page";
 import { checkEmailAvaibilityAndSanitize } from "@/lib/actions/auth.action";
-import { findUserByEmail } from "@/lib/requests/auth.requests";
-import { Button, Checkbox, Input } from "@nextui-org/react";
-import React, { Dispatch, FC, useContext, useEffect, useState } from "react";
+import { Checkbox, Input } from "@nextui-org/react";
+import React, { useEffect } from "react";
 import { useFormState } from "react-dom";
 import ButtonsGroup from "./ButtonsGroup";
+import { useSignUpContext } from "@/context/signup.context";
 
-
-interface IProps {
-
-}
-
-const Email: FC<IProps> = () => {
-
-  const [state, action] = useFormState(checkEmailAvaibilityAndSanitize, {email: [], isEmailOK: false, sanitizedEmail: undefined})
-  const { setUserValue, userValue, setStep, step } = useContext(SignupContext);
+const Email = () => {
+  const [state, action] = useFormState(checkEmailAvaibilityAndSanitize, {
+    email: [],
+    isEmailOK: false,
+    sanitizedEmail: undefined,
+  });
+  const { setUserValue, userValue, setStep, step } = useSignUpContext();
 
   useEffect(() => {
     if (state?.isEmailOK && state?.sanitizedEmail) {
-      setUserValue({ ...userValue, email: state.sanitizedEmail })
+      setUserValue({ ...userValue, email: state.sanitizedEmail });
       state.isEmailOK = false;
       setStep(step + 1);
     }
-  },[state]);
-
+  }, [state]);
 
   return (
     <form className="w-full  flex flex-col items-start gap-4" action={action}>
@@ -36,22 +32,20 @@ const Email: FC<IProps> = () => {
           isRequired={true}
           name="email"
           value={userValue.email}
-          onChange={(e) => setUserValue({...userValue, email: e.target.value})}
+          onChange={(e) =>
+            setUserValue({ ...userValue, email: e.target.value })
+          }
           classNames={{
             inputWrapper: "border bg-transparent",
           }}
         />
       </div>
-      {state?.email && (
-        <p className="text-red-500">
-          {state.email}
-        </p>
-      )}
+      {state?.email && <p className="text-red-500">{state.email}</p>}
       <div className="flex items-center">
         <Checkbox />
         <p>Recevoir les bons plans de nos sites partenaires</p>
       </div>
-      <ButtonsGroup/>
+      <ButtonsGroup />
       <p className="text-xs text-justify">
         Me renseigner sur les finalités du traitement de mes données
         personnelles, les destinataires, le responsable du traitement, les

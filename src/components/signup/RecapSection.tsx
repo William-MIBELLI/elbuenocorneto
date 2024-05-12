@@ -1,7 +1,7 @@
-import { SignupContext } from '@/app/auth/signup/page';
+import { useSignUpContext } from '@/context/signup.context';
 import { Button } from '@nextui-org/react';
 import { PencilLine } from 'lucide-react';
-import React, { FC, useContext } from 'react'
+import React, { FC } from 'react'
 
 interface IProps {
   label: string;
@@ -11,7 +11,7 @@ interface IProps {
 
 const RecapSection: FC<IProps> = ({ label, value, toStep }) => {
 
-  const { setStep} = useContext(SignupContext)
+  const { setStep } = useSignUpContext();
   return (
     <div className='flex text-sm  gap-4 items-center'>
       <p className='text-sm font-semibold'>

@@ -1,12 +1,12 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import ButtonsGroup from "./ButtonsGroup";
 import { Input } from "@nextui-org/react";
-import { SignupContext } from "@/app/auth/signup/page";
 import { useFormState } from "react-dom";
 import { checkUsername } from "@/lib/actions/auth.action";
+import { useSignUpContext } from "@/context/signup.context";
 
 const Username = () => {
-  const { userValue, setUserValue, step, setStep } = useContext(SignupContext);
+  const { userValue, setUserValue, step, setStep } = useSignUpContext();
   const initial = {
     isValidUsername: false,
     username: undefined,

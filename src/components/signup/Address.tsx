@@ -1,19 +1,16 @@
 import { Button, Input } from "@nextui-org/react";
-import React, { Dispatch, FC, useContext, useRef, useState } from "react";
-import ButtonsGroup from "./ButtonsGroup";
-import { SignupContext } from "@/app/auth/signup/page";
+import React, {  FC, useRef, useState } from "react";
 import { useFormState } from "react-dom";
 import { checkAddress, fetchAddressFromAPI } from "@/lib/actions/auth.action";
-import { IMappedResponse, IProperties } from "@/interfaces/ILocation";
-import { fi } from "@faker-js/faker";
+import { IMappedResponse } from "@/interfaces/ILocation";
+import { useSignUpContext } from "@/context/signup.context";
 
 interface IProps {}
 const Address: FC<IProps> = () => {
-  const { userValue, setStep, setUserValue, step } = useContext(SignupContext);
+  const { userValue, setStep, setUserValue, step } = useSignUpContext();
   const [state, action] = useFormState(checkAddress, { address: undefined });
   const [keyword, setKeyword] = useState("");
   const [list, setList] = useState<IMappedResponse[]>([]);
-  // const [typingTimer, settypingTimer] = useState<Date>(new Date());
   const lastTimeTyping = useRef<number>();
 
   const onChangeHandler = async (
@@ -59,7 +56,7 @@ const Address: FC<IProps> = () => {
             }}
           />
         </div>
-        {list &&
+        {list.length ?
           list.map((item) => (
             <div
               onClick={() => onClickHandler(item)}
@@ -68,7 +65,11 @@ const Address: FC<IProps> = () => {
             >
               {item.properties.label}
             </div>
-          ))}
+          )) : (
+            <p className="text-xs my-3">
+            Commencez a renseigner votre adresse et selectionnez la ensuite dans la liste.
+          </p>
+          )}
       </div>
       <Button onClick={() => setStep(step - 1)} className="button_secondary">Précédent</Button>
     </form>
