@@ -37,5 +37,4 @@ yarn-error.log*
 next-env.d.ts
 
 # drizzle
-/src/drizzle/*.sql
-/src/drizzle/meta/*.json
+*.sql

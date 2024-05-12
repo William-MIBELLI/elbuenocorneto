@@ -29,30 +29,28 @@ export const insertRandomUsers = async (count: number) => {
     const locsId = await getLocationIdForSeedind();
 
     if (!locsId.length) {
-      throw new Error('You need to seed DB with location first.');
+      throw new Error("You need to seed DB with location first.");
     }
     const hash = await hashPassword("dinasty");
 
     const createRandomUser = (): InsertUser => {
-      const loc = locsId[Math.floor(Math.random() * locsId.length)]
+      const loc = locsId[Math.floor(Math.random() * locsId.length)];
       return {
         id: uuidv4(),
-        name: faker.internet.userName().slice(0,19),
+        name: faker.internet.userName().slice(0, 19),
         email: faker.internet.email(),
         password: hash,
         locationId: loc,
         rating: faker.number.float({ fractionDigits: 1, min: 0, max: 5 }),
         rateNumber: faker.number.int({ min: 1, max: 40 }),
-        createdAt: new Date()
+        createdAt: new Date(),
       };
     };
     const usersList: InsertUser[] = faker.helpers.multiple(createRandomUser, {
       count,
     });
 
-    const res = await db
-      .insert(users)
-      .values(usersList).returning()
+    const res = await db.insert(users).values(usersList).returning();
     return true;
   } catch (error) {
     console.log("ERROR WHEN USER SEEDING : ", error);
@@ -92,7 +90,7 @@ export const insertRandomProducts = async (count: number) => {
         price: faker.number.int({ min: 10, max: 1500 }),
         category: faker.helpers.arrayElement(cat),
         description: faker.commerce.productDescription(),
-        locationId: loc
+        locationId: loc,
       };
     };
 
@@ -142,84 +140,96 @@ export const insertDeliveries = async () => {
     const db = await getDb();
     await db.delete(deliveries);
     const list = deliveryList.map((item, index): DeliveryInsert => {
-      return { ...item, id: (index + 1).toString(), price: item.price.toString() };
-    })
+      return {
+        ...item,
+        id: (index + 1).toString(),
+        price: item.price.toString(),
+      };
+    });
     await db.insert(deliveries).values(list);
     return true;
   } catch (error) {
-    console.log('ERROR WHEN SEEDING DELIVERIES ', error);
+    console.log("ERROR WHEN SEEDING DELIVERIES ", error);
     return null;
   }
-}
+};
 
 export const insertDeliveriesLink = async () => {
   try {
-
     const db = await getDb();
-    await db.delete(productDeliveryLink)
-    const prods = await db.select({id: products.id}).from(products);
-    const deliverieslist = (await db.select({ id: deliveries.id }).from(deliveries)).map(item => item.id);
+    await db.delete(productDeliveryLink);
+    const prods = await db.select({ id: products.id }).from(products);
+    const deliverieslist = (
+      await db.select({ id: deliveries.id }).from(deliveries)
+    ).map((item) => item.id);
 
-    if (!deliverieslist.length) throw new Error('You need to seed deliveries first.');
+    if (!deliverieslist.length)
+      throw new Error("You need to seed deliveries first.");
 
     const data: DeliveryLinkInsert[] = [];
 
-    prods.forEach(({id}) => {
+    prods.forEach(({ id }) => {
       const length = Math.floor(Math.random() * deliverieslist.length + 1);
       if (Math.random() > 0.4) {
-        for (let i = 0; i < length; i++){
+        for (let i = 0; i < length; i++) {
           const link: DeliveryLinkInsert = {
             productId: id,
-            deliveryId: deliverieslist[i]
-          }
+            deliveryId: deliverieslist[i],
+          };
           data.push(link);
-        } 
+        }
       }
-    })
+    });
     await db.insert(productDeliveryLink).values(data);
-    return true
+    return true;
   } catch (error) {
-    console.log('ERROR INSERT DELIVERIES', error);
+    console.log("ERROR INSERT DELIVERIES", error);
     return false;
   }
-}
+};
 
 export const insertLocation = async (count: number) => {
   try {
-      const db = await getDb();
+    const db = await getDb();
 
     const createLocation = (): LocationInsert => {
-      const [lat, lng] = fakerFR.location.nearbyGPSCoordinate({ isMetric: true, radius: 300, origin:[43.598235, 1.483408]})
+      const [lat, lng] = fakerFR.location.nearbyGPSCoordinate({
+        isMetric: true,
+        radius: 300,
+        origin: [43.598235, 1.483408],
+      });
       return {
         id: uuidv4(),
         city: fakerFR.location.city(),
-        postal: +fakerFR.location.zipCode(),
+        postcode: +fakerFR.location.zipCode(),
         coordonates: {
           lat,
-          lng
+          lng,
         },
-        streetName: fakerFR.location.streetAddress(true)
-      }
-    }
+        streetName: fakerFR.location.streetAddress(true),
+      };
+    };
 
     const data = faker.helpers.multiple(createLocation, { count });
     await db.insert(locations).values(data);
   } catch (error) {
-    console.log('ERROR SEEDING LOCATION : ', error);
+    console.log("ERROR SEEDING LOCATION : ", error);
     return null;
   }
-}
+};
 
 const getLocationIdForSeedind = async () => {
   try {
     const db = await getDb();
-    const locsId = (await db.select({ id: locations.id }).from(locations)).map(l => l.id);
+    const locsId = (await db.select({ id: locations.id }).from(locations)).map(
+      (l) => l.id
+    );
     return locsId;
   } catch (error) {
-    console.log('ERROR FETCHING LOCATION : ', error);
+    console.log("ERROR FETCHING LOCATION : ", error);
     return [];
   }
-}
+};
 
 export const fullSeedDB = async () => {
   try {
@@ -231,7 +241,7 @@ export const fullSeedDB = async () => {
     await insertRandomImageUrl(400);
     return true;
   } catch (error) {
-    console.log('SOMETHING WENT WRONG : ', error);
+    console.log("SOMETHING WENT WRONG : ", error);
     return false;
   }
-}
+};

@@ -132,7 +132,7 @@ const Navbar = () => {
           href="/auth/login"
           className="bg-orange-500 text-white"
         >
-          Sign in
+          Se connecter
         </Button>
       )}
 

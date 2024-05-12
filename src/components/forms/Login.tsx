@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { useFormState } from "react-dom";
+import PasswordInput from "../inputs/PasswordInput";
 
 const LoginForm = () => {
-  const [isVisible, setIsVisible] = useState(false);
+
   const [state, formAction] = useFormState(login, { error: "" });
   const session = useSession();
   // console.log('session : ', session);
@@ -24,24 +25,7 @@ const LoginForm = () => {
             inputWrapper: "border bg-transparent",
           }}
         />
-        <label htmlFor="password">Mot de passe</label>
-        <Input
-          isRequired={true}
-          name="password"
-          type={isVisible ? "text" : "password"}
-          classNames={{
-            inputWrapper: "border bg-transparent",
-          }}
-          endContent={
-            <button type="button" onClick={() => setIsVisible(!isVisible)}>
-              {!isVisible ? (
-                <EyeOff color="#6b6666" />
-              ) : (
-                <Eye color="#6b6666" />
-              )}
-            </button>
-          }
-        />
+        <PasswordInput name="password" label="Votre mot de passe"/>
         <Link href={"/reset-password"} className="text-xs underline">
           Mot de passe oublié
         </Link>

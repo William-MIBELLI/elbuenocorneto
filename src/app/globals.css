@@ -35,6 +35,22 @@ body {
     @apply relative sm:px-10 py-5 sm:pt-20 pb-5 max-w-[560px] h-[700px] w-full bg-[#F2F4F7] rounded-[30px] sm:mx-auto;
   }
 
+  .button_main {
+    @apply bg-main text-white font-semibold;
+  }
+
+  .button_secondary {
+    @apply bg-transparent font-semibold text-gray-400 border-gray-300 border-1
+  }
+
+  .error_message {
+    @apply text-red-500 text-sm font-semibold
+  }
+
+  .signup_title {
+    @apply text-left text-2xl font-bold;
+  }
+
 }
 
 @layer base {

@@ -23,7 +23,9 @@ export const findUserByEmail = async (
 export const createUserOnDb = async (
   email: string,
   password: string,
-  name: string
+  name: string,
+  phone: string,
+  locationId: string
 ) => {
   try {
     // ON HASH LE PASSWORD
@@ -40,12 +42,13 @@ export const createUserOnDb = async (
         email: email.toLowerCase().trim(),
         password: hash,
         name,
-        locationId: '95f5d191-ef8f-48c0-a1e4-e4cab2e0f47a'
+        phone,
+        locationId
       })
-      .returning();
+      .returning().then(r => r[0]);
 
     // ON LE RETURN
-    return newUser[0];
+    return newUser;
   } catch (error) {
     console.log("Error : ", error);
     return null;

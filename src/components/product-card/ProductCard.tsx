@@ -11,7 +11,8 @@ interface IProps {
 }
 
 const ProductCard: FC<IProps> = ({ productData }) => {
-  const { seller, images, createdAt, id, title, price, pdl, location  } = productData;
+  const { seller, images, createdAt, id, title, price, pdl, location } =
+    productData;
   const { name, rating, rateNumber } = seller;
   //console.log(`PRODUCTDATA ${seller.name}`, productData)
   const cardRef = useRef(null);
@@ -36,7 +37,7 @@ const ProductCard: FC<IProps> = ({ productData }) => {
       <div className="flex flex-col w-full  items-start font-semibold text-sm h-80 ">
         <div className="relative h-3/4 w-full mb-3">
           <Image
-            src={images[0]?.url ?? '/image_placeholder.svg'}
+            src={images[0]?.url ?? "/image_placeholder.svg"}
             alt="iphone"
             className="rounded-lg h-full w-full"
             fill
@@ -55,7 +56,7 @@ const ProductCard: FC<IProps> = ({ productData }) => {
       </div>
       <div className="flex justify-between items-end text-xs mt-1">
         <div>
-          <p>{`${location?.city} ${location?.postal}`}</p>
+          <p>{`${location?.city} ${location?.postcode}`}</p>
           <p>{createdAt?.toLocaleString().split(" ")[0]}</p>
         </div>
         <Heart />

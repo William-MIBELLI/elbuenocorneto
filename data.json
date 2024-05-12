@@ -4,18 +4,16 @@
       "username": "JeanMichel",
       "rating": 4.5,
       "rateNumber": 12,
-      "imageUrl": ["/images/iphone.jpg","/images/iphone_2.jpg"],
+      "imageUrl": ["/images/iphone.jpg", "/images/iphone_2.jpg"],
       "title": "Iphone 13 Bon état",
       "price": 450,
-      "delivery": [ 
-        "colissimo"
-      ],
+      "delivery": ["colissimo"],
       "coordonates": {
         "lng": 2.365353,
         "lat": 43.209156
       },
-      "location": { "city": "Carcassonne"},
-      "postal": 11000,
+      "location": { "city": "Carcassonne" },
+      "postcode": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "1",
       "category": "electronique",
@@ -32,18 +30,13 @@
       ],
       "title": "Iphone 13 Bon état",
       "price": 450,
-      "delivery": [ 
-        "colissimo",
-        "laposte",
-        "mondialrelay",
-        "chronopost"
-      ],
+      "delivery": ["colissimo", "laposte", "mondialrelay", "chronopost"],
       "coordonates": {
         "lng": 2.365353,
         "lat": 43.209156
       },
-      "location": { "city": "Carcassonne"},
-      "postal": 11000,
+      "location": { "city": "Carcassonne" },
+      "postcode": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "2",
       "category": "electronique",
@@ -61,8 +54,8 @@
         "lng": 2.365353,
         "lat": 43.209156
       },
-      "location": { "city": "Carcassonne"},
-      "postal": 11000,
+      "location": { "city": "Carcassonne" },
+      "postcode": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "3",
       "category": "electronique",
@@ -80,8 +73,8 @@
         "lng": 2.365353,
         "lat": 43.209156
       },
-      "location": { "city": "Carcassonne"},
-      "postal": 11000,
+      "location": { "city": "Carcassonne" },
+      "postcode": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "4",
       "category": "electronique",
@@ -99,8 +92,8 @@
         "lng": 2.365353,
         "lat": 43.209156
       },
-      "location": { "city": "Carcassonne"},
-      "postal": 11000,
+      "location": { "city": "Carcassonne" },
+      "postcode": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "5",
       "category": "electronique",
@@ -118,8 +111,8 @@
         "lng": 2.365353,
         "lat": 43.209156
       },
-      "location": { "city": "Carcassonne"},
-      "postal": 11000,
+      "location": { "city": "Carcassonne" },
+      "postcode": 11000,
       "createdAt": "Aujourd'hui à 15:23",
       "id": "6",
       "category": "electronique",

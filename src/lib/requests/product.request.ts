@@ -67,7 +67,7 @@ export const fetchProductsForSlider = async (
   category: CategoriesType
 ): Promise<ICard[]> => {
   try {
-    const db =  getDb();
+    const db = getDb();
 
     const prods = await db.query.products.findMany({
       where: eq(products.category, category),
@@ -96,11 +96,12 @@ export const fetchProductsForSlider = async (
         },
         location: {
           columns: {
-            postal: true,
+            postcode: true,
             city: true,
           },
         },
-      }, limit: 10
+      },
+      limit: 10,
     });
     return prods;
   } catch (error) {
@@ -132,5 +133,3 @@ export const getProductsByCategory = async (
     return [];
   }
 };
-
-

@@ -1,34 +1,82 @@
 "use client";
+import Address from "@/components/signup/Address";
 import Email from "@/components/signup/Email";
-import { signUp } from "@/lib/actions/auth.action";
-import { Button, Input } from "@nextui-org/react";
-import React from "react";
-import { useFormState } from "react-dom";
+import Password from "@/components/signup/Password";
+import Phone from "@/components/signup/Phone";
+import Recap from "@/components/signup/Recap";
+import Username from "@/components/signup/Username";
+import { IUserSignup } from "@/interfaces/IUser";
+import { Dispatch, createContext, useContext, useState } from "react";
+
+const fakeAdress = {
+  type: "Feature",
+  geometry: {
+    lng: -1.092782,
+    lat: 45.985045,
+  },
+  properties: {
+    label: "8 Boulevard des 2 Ports 17450 Fouras",
+    score: 0.31711636363636364,
+    housenumber: "8",
+    id: "17168_0270_00008",
+    name: "8 Boulevard des 2 Ports",
+    postcode: "17450",
+    citycode: "17168",
+    x: 383303.3,
+    y: 6551022.45,
+    city: "Fouras",
+    context: "17, Charente-Maritime, Nouvelle-Aquitaine",
+    type: "housenumber",
+    importance: 0.60828,
+    street: "Boulevard des 2 Ports",
+  },
+};
+
+const initialValue: IUserSignup = {
+  email: "",
+  password: "",
+  confirm: "",
+  address: undefined,
+  phone: "",
+  name: "",
+};
+
+type SignupContextType = {
+  userValue: typeof initialValue;
+  setUserValue: Dispatch<typeof initialValue>;
+  step: number;
+  setStep: Dispatch<number>;
+};
+
+export const SignupContext = createContext<SignupContextType>({
+  userValue: initialValue,
+  setUserValue: () => {},
+  step: 0,
+  setStep: () => {},
+});
 
 const Signup = () => {
-  
-  const [state, action] = useFormState(signUp, {});
+  const [step, setStep] = useState<number>(0);
+  const [userValue, setUserValue] = useState(initialValue);
 
   return (
-    <div className="my-6 p-10  rounded-lg bg-white w-2/3 shadow-dashboard_card ">
-      {/* <h2 className="font-bold">Créez vous un compte !</h2>
-      <p className="text-xs">C'est gratuit et rapide.</p> */}
-      {/* <form action={action} className="flex flex-col gap-3 mt-6">
-        <Input label="email" name="email" />
-        <Input label="name" name="name" />
-        <Input label="password" name="password" type="password" />
-        <Input label="confirm" name="confirm" type="password" />
-        <Button
-          type="submit"
-          className="bg-orange-500 text-white font-semibold mt-4"
-        >
-          Sign up!
-        </Button>
-      </form> */}
-        <Email/>
-      {/* <form action="">
-      </form> */}
-    </div>
+    <SignupContext.Provider value={{ userValue, setUserValue, step, setStep }}>
+      <div className="my-6 p-10  rounded-lg bg-white w-2/3 shadow-dashboard_card ">
+        {step === 0 ? (
+          <Email />
+        ) : step === 1 ? (
+          <Password />
+        ) : step === 2 ? (
+          <Phone />
+        ) : step === 3 ? (
+          <Address />
+        ) : step === 4 ? (
+          <Username />
+        ) : step === 5 ? (
+          <Recap />
+        ) : null}
+      </div>
+    </SignupContext.Provider>
   );
 };
 

@@ -4,7 +4,7 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 import React, { FC, useCallback, useState } from "react";
-
+import 'dotenv/config'
 const containerStyle = {
   width: "100%",
   height: "300px",
@@ -12,18 +12,21 @@ const containerStyle = {
 
 interface IProps {
   API_KEY: string;
-  location: Required<Pick<LocationSelect, 'coordonates' | 'city' | 'postal'>>  | null
+  location: Required<
+    Pick<LocationSelect, "coordonates" | "city" | "postcode">
+  > | null;
 }
 
-const Location: FC<IProps> = ({ API_KEY , location }) => {
+const Location: FC<IProps> = ({ API_KEY, location }) => {
+  
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: API_KEY,
   });
 
-  if(!location || !location.coordonates) return notFound()
+  if (!location || !location.coordonates) return notFound();
 
-  const { coordonates, city, postal } = location;
+  const { coordonates, city, postcode } = location;
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
@@ -43,7 +46,7 @@ const Location: FC<IProps> = ({ API_KEY , location }) => {
       <div className="flex gap-2 items-center section_title mb-4">
         <MapPin size={18} />
         <h3>{city}</h3>
-        <p>({postal})</p>
+        <p>({postcode})</p>
       </div>
       {isLoaded && (
         <GoogleMap
@@ -53,7 +56,7 @@ const Location: FC<IProps> = ({ API_KEY , location }) => {
           onLoad={onLoad}
           onUnmount={onUnmount}
         >
-          <Marker position={coordonates} clickable={false}  />
+          <Marker position={coordonates} clickable={false} />
         </GoogleMap>
       )}
     </section>

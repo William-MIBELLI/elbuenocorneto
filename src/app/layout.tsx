@@ -5,6 +5,7 @@ import Navbar from "@/components/navbar/Navbar";
 import Link from "next/link";
 import Categories from "@/components/navbar/Categories";
 import { SessionProvider } from "next-auth/react";
+import Footer from "@/components/footer/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,13 +28,7 @@ export default function RootLayout({
           <main className="bg-white m-auto px-2 text-center max-w-screen-lg  mt-4 flex justify-center items-center">
             {children}
           </main>
-          <div className="w-full h-96 mt-24 bg-gray-400 flex flex-col justify-center items-center">
-            <h3 className="text-2xl font-semibold">
-              ⚠️ SITE EN COURS DE DEVELOPPEMENT ⚠️
-            </h3>
-            <p>Certaines fonctionnalités du site ne sont pas encore disponible</p>
-            <p>La base de donnée a été seed de facon aleatoire <span className="text-xs">(mais oui, ici on aimes les chats 👀)</span></p>
-          </div>
+          <Footer/>
         </body>
       </SessionProvider>
     </html>

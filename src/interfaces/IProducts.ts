@@ -84,16 +84,16 @@ export type CategoriesType =
   | "autre";
 
 export const categoriesTypeList: CategoriesType[] = [
-   "immobilier",
-   "vehicule",
-   "vacance",
-   "job",
-   "mode",
-   "jardin",
-   "famille",
-   "electronique",
-   "loisir",
-   "autre",
+  "immobilier",
+  "vehicule",
+  "vacance",
+  "job",
+  "mode",
+  "jardin",
+  "famille",
+  "electronique",
+  "loisir",
+  "autre",
 ];
 
 export type ICategoriesList = {
@@ -122,7 +122,7 @@ export interface IProduct {
   coordonates: ICoordonates;
   location: {
     city: string;
-    postal: number;
+    postcode: number;
   };
   createdAt: Date | string;
   category: CategoriesType;
@@ -136,14 +136,15 @@ export interface IProductCard {
 }
 
 export interface IProductDetails {
-  product:  ProductSelect;
+  product: ProductSelect;
   user: SelectUser | null;
   images: string[];
   del: string[];
-  location: ILocation | null
+  location: ILocation | null;
 }
 
 export type ICard = ProductSelect & {
   seller: Pick<SelectUser, "name" | "rateNumber" | "rating">;
-} & { pdl: Pick<DeliveryLinkSelect, "deliveryId">[] }
-  & { images: Pick<ImageSelect, 'url'>[]} & { location: Pick<LocationSelect, 'city' | 'postal'>};
+} & { pdl: Pick<DeliveryLinkSelect, "deliveryId">[] } & {
+  images: Pick<ImageSelect, "url">[];
+} & { location: Pick<LocationSelect, "city" | "postcode"> };
