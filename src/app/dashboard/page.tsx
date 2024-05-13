@@ -1,5 +1,7 @@
 import { auth, signOut } from "@/auth";
 import Card from "@/components/dashboard/Card";
+import { findUserByEmail } from "@/lib/requests/auth.requests";
+import { getUserById } from "@/lib/requests/user.request";
 import { Button } from "@nextui-org/react";
 import { MoveRight, X } from "lucide-react";
 import Image from "next/image";
@@ -11,46 +13,55 @@ export interface ICardDashboard {
   title: string;
   content?: string;
   iconUrl: string;
+  target: string;
 }
 
 const cardsToDisplay: ICardDashboard[] = [
   {
     title: 'Annonces',
     content: 'Gérer mes annonces déposées',
-    iconUrl: 'annonces.png'
+    iconUrl: 'annonces.png',
+    target: '/mes-annonces'
   },
   {
     title: ' Transaction',
     content: 'Suivre mes achats et mes ventes',
-    iconUrl: 'transactions.png'
+    iconUrl: 'transactions.png',
+    target: '/mes-transactions'
   },
   {
     title: 'Réservation de vacances',
     content: 'Retrouver vos réservations en tant que voyageur',
-    iconUrl: 'portal-vacances.png'
+    iconUrl: 'portal-vacances.png',
+    target: '/reservation-vacances'
   },
   {
     title: 'Profil et Espaces',
     content: 'Modifier mon profil public, accéder à mes avis, aux espaces candidat, locataire et bailleur',
-    iconUrl: 'private-profile.png'
+    iconUrl: 'private-profile.png',
+    target: `/edit/profile/`
   },
   {
     title: 'Paramètres',
     content: 'Compléter et modifier mes informations privées et préférences',
-    iconUrl: 'parametres.png'
+    iconUrl: 'parametres.png',
+    target: `/edit/parametres/`
   },
   {
     title: 'Connexion et sécurité',
     content: 'Protéger mon compte et consulter son indice de sécurité',
-    iconUrl: 'securite.png'
+    iconUrl: 'securite.png',
+    target: '/securite'
   },
   {
     title: 'Mes crédits',
-    iconUrl: 'credits.svg'
+    iconUrl: 'credits.svg',
+    target: '/credits'
   },
   {
     title: 'Aide',
-    iconUrl: 'help.png'
+    iconUrl: 'help.png',
+    target: '/help'
   },
   
 
@@ -59,8 +70,11 @@ const cardsToDisplay: ICardDashboard[] = [
 const Dashboard = async () => {
 
   const session = await auth();
-
+  
   if (!session) redirect('/auth/login');
+  console.log("SESSION : ", session.user?.id, session);
+  const user = await findUserByEmail(session.user?.email!)
+  console.log('USER : ', user);
   
   return (
     <div className="w-full flex flex-col items-start gap-4">
@@ -68,14 +82,16 @@ const Dashboard = async () => {
 
       <div className="w-full flex gap-4">
         <div className="border-gray border-1 flex justify-between flex-grow p-6 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Image
-              src={"/profile-default.svg"}
-              alt="profile pics"
-              width={100}
-              height={100}
-            />
-            <h3>{session?.user?.name}</h3>
+          <div className="flex items-center gap-2 ">
+            <div className="relative rounded-full overflow-hidden h-28 w-28">
+              <Image
+                className="rounded-full overflow-hidden"
+                src={user?.image ?? "/profile-default.svg"}
+                alt="profile pics"
+                fill
+              />
+            </div>
+            <h3 className="text-xl font-bold">{session?.user?.name}</h3>
           </div>
           <div className="flex gap-1 items-center">
             <Link

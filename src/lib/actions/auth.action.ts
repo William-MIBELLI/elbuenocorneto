@@ -18,10 +18,20 @@ import "dotenv/config";
 import { IUserSignup } from "@/interfaces/IUser";
 import { mapLocationForStorage } from './location.action';
 import { createLocationOnDB } from '../requests/location.request';
+import { uploadImageToCloud } from '../requests/picture.request';
 
-export const signUpUser = async (data: IUserSignup, initialState: {}, fd: FormData) => {
+export const signUpUser = async (data: {user: IUserSignup, picture: any}  , initialState: {}, fd: FormData) => {
 
-  const { address, confirm, email, name, password, phone } = data;
+  const { address, confirm, email, name, password, phone } = data.user;
+  let imageUrl: string | null = null;
+
+  //SI IL Y A UNE PHOTO, ON LUPLOAD ET ON RECUPERE L'URL
+  if (data.picture) {
+    const res = await uploadImageToCloud(data.picture);
+    if (res) {
+      imageUrl = res.url;
+    }
+  }
 
   //ON CHECK LES DATAS DE LUSER
   const parsedUser = signUpSchema.safeParse({
@@ -49,7 +59,7 @@ export const signUpUser = async (data: IUserSignup, initialState: {}, fd: FormDa
     if (!location) throw new Error('get null instead of location in signupaction');
     
     //ON CREE LUSER AVEC l'ID DE LA LOCATION
-    const user = await createUserOnDb(email, password, name, phone, location.id);
+    const user = await createUserOnDb(email, password, name, phone, location.id, imageUrl);
 
     if (!user) throw new Error('get null instead of user in signupaction');
 

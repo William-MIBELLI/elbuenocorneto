@@ -15,13 +15,17 @@ type SignupContextType = {
   setUserValue: Dispatch<IUserSignup>;
   step: number;
   setStep: Dispatch<number>;
+  picture: any,
+  setPicture: Dispatch<any>
 };
 
 const SignupContext = createContext<SignupContextType>({
   userValue: initialValue,
   setUserValue: () => {},
   step: 0,
-  setStep: () => {},
+  setStep: () => { },
+  picture: null,
+  setPicture: () => {}
 });
 
 
@@ -33,12 +37,15 @@ export const SignUpProvider = ({ children }: Props) => {
 
   const [step, setStep] = useState<number>(0);
   const [userValue, setUserValue] = useState<IUserSignup>(initialValue);
+  const [picture, setPicture] = useState<any>(null);
 
   const value: SignupContextType = {
     userValue,
     setUserValue,
     step,
-    setStep
+    setStep,
+    picture,
+    setPicture
   }
   
   return (

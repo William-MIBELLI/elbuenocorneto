@@ -25,7 +25,8 @@ export const createUserOnDb = async (
   password: string,
   name: string,
   phone: string,
-  locationId: string
+  locationId: string,
+  imageUrl: string | null
 ) => {
   try {
     // ON HASH LE PASSWORD
@@ -43,7 +44,8 @@ export const createUserOnDb = async (
         password: hash,
         name,
         phone,
-        locationId
+        locationId,
+        image: imageUrl 
       })
       .returning().then(r => r[0]);
 
