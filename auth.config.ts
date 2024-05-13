@@ -21,13 +21,29 @@ export const authConfig = {
       }
       return true;
     },
-    session({ session, token, user }) {
+    session({ session, token, user, trigger }) {
       if (token?.sub) {
         session.userId = token.sub 
         session.user.id = token.sub;
       }
+      if (trigger === 'update') {
+        // console.log('TRIGGER', session);
+      }
 
       return session;
+    },
+    async jwt({ token, trigger, session, user, account, profile }) {
+      if (trigger === 'update' && session) {
+        // console.log('TRIGGER JWT, USER : ', user, token);
+        // console.log('TOKEN : ', token)
+        // console.log('SESSION : ', session)
+        // console.log('USER : ', user)
+        // console.log('ACCOUNT : ', account)
+        // console.log('PROFILE : ', profile)
+        token.name = session.user.name;
+      }
+    
+      return token
     }
   },
   

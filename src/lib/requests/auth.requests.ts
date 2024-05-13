@@ -76,3 +76,14 @@ export const loginUser = async (email: string, password: string) => {
     return null;
   }
 };
+
+export const updateUser = async (value: Partial<InsertUser>, id: string) => {
+  try {
+    const db = getDb();
+    const user = await db.update(users).set(value).where(eq(users.id, id)).returning().then(r => r[0]);
+    return user;
+  } catch (error) {
+    console.log('ERROR UPDATING USER : ', error);
+    return null;
+  }
+}

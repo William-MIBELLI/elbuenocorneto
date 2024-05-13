@@ -1,13 +1,8 @@
-import { loginUser } from './../requests/auth.requests';
 "use server";
 
-import { hashPassword } from "../password";
-import { createUserOnDb, findUserByEmail } from "../requests/auth.requests";
+import { createUserOnDb, findUserByEmail, updateUser } from "../requests/auth.requests";
 import { passwordSchema, signUpSchema } from "../zod";
-import { redirect } from "next/navigation";
-import { getDb } from "@/drizzle/db";
-import { LocationInsert, users } from "@/drizzle/schema";
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { z } from "zod";
 import {
   IGeometry,
@@ -19,6 +14,8 @@ import { IUserSignup } from "@/interfaces/IUser";
 import { mapLocationForStorage } from './location.action';
 import { createLocationOnDB } from '../requests/location.request';
 import { uploadImageToCloud } from '../requests/picture.request';
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export const signUpUser = async (data: {user: IUserSignup, picture: any}  , initialState: {}, fd: FormData) => {
 
@@ -77,8 +74,6 @@ export const signUpUser = async (data: {user: IUserSignup, picture: any}  , init
 
   return {}
 }
-
-
 
 export const checkEmailAvaibilityAndSanitize = async (initialState: {email: string[] | undefined, isEmailOK: boolean, sanitizedEmail: string | undefined }, fd: FormData) => {
   //ON CHECK SI LADRESSE FOURNIE EST VALIDE
@@ -213,3 +208,48 @@ export const checkUsername = async (initialState: {isValidUsername: boolean, use
   }
   return { ...initialState, isValidUsername: true, name: parsedUsername.data.username }
 };
+
+export const updateUserProfile = async (data: {picture: string | undefined, id: string}, initialState: { username: string[] | undefined, done: boolean, newName: string | null}, fd: FormData) => {
+  console.log('UPDATE USER ACTION');
+  try {
+    const { picture, id } = data;
+    let imageUrl: string | null = null;
+
+    //SI LUSER A CHANGE DE PHOTO DE PROFIL, ON LUPLOAD 
+    if (picture) {
+      const res = await uploadImageToCloud(picture)
+      if (res) {
+        imageUrl = res.url;
+      }
+    }
+
+    //ON CHECK SI LUSERNAME EST VALIDE
+    const parsedUsername = z.object({
+      username: z
+        .string()
+        .trim()
+        .min(4, "Your username need atleast 4 characters.")
+        .max(20, "Your username can't exceed 20 characters.")
+    }).safeParse({ username: fd.get('username') });
+
+    if (!parsedUsername.success) {
+      const err = parsedUsername.error.flatten().fieldErrors.username
+      return {...initialState, username: err};
+    }
+
+    //ON CALL LA DB POUR UPDATE
+    const { username } = parsedUsername.data
+    const updatedUser = await updateUser({ image: imageUrl, name: username }, id);
+
+    //SI LUPDATE EST OK, ON REVALIDE LA ROUTE
+    if (updatedUser) {
+      console.log('ONR EVALIDE LE PATH')
+      revalidatePath('/')
+    }
+    return { ...initialState, done: true, newName: username };
+  } catch (error) {
+    console.log('ERROR UPDATEUSER ACTION : ', error);
+    return {...initialState};
+  }
+  //redirect('/dashboard')
+}

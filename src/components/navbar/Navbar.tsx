@@ -2,18 +2,15 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
-  Divider,
   Input,
   NavbarBrand,
   NavbarContent,
-  NavbarMenu,
-  NavbarMenuItem,
   NavbarMenuToggle,
   Navbar as Nv,
+  Spinner,
 } from "@nextui-org/react";
 import {
   Search,
-  SquarePlus,
   Bell,
   Heart,
   MessageSquareText,
@@ -49,7 +46,12 @@ const Navbar = () => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [isSearchFocus, setIsSearchFocus] = useState(false);
   const { data, status } = useSession();
+  const [user, setUser] = useState(data?.user);
 
+  useEffect(() => {
+    // console.log('USEFFECT : ', data);
+    setUser(data?.user);
+  }, [data]);
   return (
     <Nv
       maxWidth="lg"
@@ -119,14 +121,29 @@ const Navbar = () => {
       </NavbarContent>
 
       {/* AUTH */}
-      
-      {status === "authenticated" ? (
-        <NavItem
+      {
+        status === 'authenticated' ? (
+          <NavItem
           Icon={UserRound}
-          text={data?.user?.name || "Profile"}
+          text={user?.name || "Profile"}
           target="/dashboard"
         />
-      ) : (
+        ) : status === "unauthenticated" ? (
+          <Button
+          as={Link}
+          href="/auth/login"
+          className="bg-orange-500 text-white"
+        >
+          Se connecter
+        </Button>
+          ) : (
+              <Spinner color="default" size="sm"/>
+        )
+      }
+
+      {/* {status === "authenticated" ? (
+        
+      ) : status === "unauthenticated " ? (
         <Button
           as={Link}
           href="/auth/login"
@@ -134,7 +151,9 @@ const Navbar = () => {
         >
           Se connecter
         </Button>
-      )}
+      ) : (
+        <div>Loading...</div>
+      )} */}
 
       {/* MOBILE MENU */}
 

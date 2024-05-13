@@ -1,4 +1,5 @@
 import { uploadImageToCloud } from "@/lib/requests/picture.request";
+import { toBase64 } from "@/lib/utils/image.util";
 import { Button } from "@nextui-org/react";
 import { Camera, FilesIcon, Plus } from "lucide-react";
 import Image from "next/image";
@@ -6,8 +7,8 @@ import React, { Dispatch, FC, useEffect, useRef, useState } from "react";
 
 
 interface IProps {
-  picture: any;
-  setPicture: Dispatch<any>
+  picture: string| undefined;
+  setPicture: Dispatch<string | undefined>
 }
 const AddPicture: FC<IProps> = ({ setPicture, picture }) => {
   
@@ -42,8 +43,11 @@ const AddPicture: FC<IProps> = ({ setPicture, picture }) => {
     fr.readAsDataURL(files[0]);
     fr.onload = () => {
       const res = fr.result;
-      setPicture(res)
+      setPicture(res as string)
     }
+    // const res = toBase64(file);
+    // console.log('res dans addproducts : ', res);
+    // setPicture(res);
  
   }
 
@@ -65,8 +69,8 @@ const AddPicture: FC<IProps> = ({ setPicture, picture }) => {
       </div>
       <div className="flex-grow">
         {
-          picture === null ? (
-          <p className="text-xs text-left">
+          picture === undefined ? (
+          <p className="text-sm text-left">
             Avec une photo, vous avez de quoi personnaliser votre profil et rassurer
             les autres membres !
           </p>

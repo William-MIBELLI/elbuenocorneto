@@ -39,13 +39,13 @@ const cardsToDisplay: ICardDashboard[] = [
     title: 'Profil et Espaces',
     content: 'Modifier mon profil public, accéder à mes avis, aux espaces candidat, locataire et bailleur',
     iconUrl: 'private-profile.png',
-    target: `/edit/profile/`
+    target: `/mon-profil/`
   },
   {
     title: 'Paramètres',
     content: 'Compléter et modifier mes informations privées et préférences',
     iconUrl: 'parametres.png',
-    target: `/edit/parametres/`
+    target: `/mes-parametres/`
   },
   {
     title: 'Connexion et sécurité',
@@ -72,9 +72,7 @@ const Dashboard = async () => {
   const session = await auth();
   
   if (!session) redirect('/auth/login');
-  console.log("SESSION : ", session.user?.id, session);
   const user = await findUserByEmail(session.user?.email!)
-  console.log('USER : ', user);
   
   return (
     <div className="w-full flex flex-col items-start gap-4">
@@ -91,7 +89,7 @@ const Dashboard = async () => {
                 fill
               />
             </div>
-            <h3 className="text-xl font-bold">{session?.user?.name}</h3>
+            <h3 className="text-xl font-bold">{user?.name}</h3>
           </div>
           <div className="flex gap-1 items-center">
             <Link
