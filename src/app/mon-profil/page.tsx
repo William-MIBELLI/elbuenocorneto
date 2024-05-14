@@ -13,9 +13,10 @@ const page = async () => {
   const user: SelectUser | undefined = await findUserByEmail(session.user?.email!);
 
   if (!user) return notFound();
+  
   return (
     <div className="w-full flex flex-col items-center">
-      <Header user={user} />
+      <Header/>
     </div>
   );
 };

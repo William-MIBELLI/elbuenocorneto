@@ -4,7 +4,7 @@ import NextAuth, { AuthError } from "next-auth";
 import { findUserByEmail } from './lib/requests/auth.requests';
 import { isPasswordMatching } from './lib/password';
 
-export const { auth, signIn, signOut, handlers } = NextAuth({
+export const { auth, signIn, signOut, handlers, unstable_update } = NextAuth({
   ...authConfig,
   providers: [Credentials({
     async authorize(credentials) {

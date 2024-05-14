@@ -1,14 +1,14 @@
-import { db, getDb } from "@/drizzle/db";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
   pages: {
     signIn: '/auth/signup',
-    
+    signOut: '/'
   },
   providers: [],
-  //adapter:DrizzleAdapter(db),
+  session: {
+    strategy: 'jwt'
+  },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
@@ -21,30 +21,29 @@ export const authConfig = {
       }
       return true;
     },
-    session({ session, token, user, trigger }) {
-      if (token?.sub) {
-        session.userId = token.sub 
-        session.user.id = token.sub;
+    session({ session, token, trigger, user }) {
+    
+      //ON PASSE LES INFO DU TOKEN VERS LA SESSION POUR POUVOIR LES RECUPERER DANS LES COMPOSANTS
+      if (token) {
+        session.user.id = token.sub!;
       }
-      if (trigger === 'update') {
-        // console.log('TRIGGER', session);
-      }
-
       return session;
     },
-    async jwt({ token, trigger, session, user, account, profile }) {
-      if (trigger === 'update' && session) {
-        // console.log('TRIGGER JWT, USER : ', user, token);
-        // console.log('TOKEN : ', token)
-        // console.log('SESSION : ', session)
-        // console.log('USER : ', user)
-        // console.log('ACCOUNT : ', account)
-        // console.log('PROFILE : ', profile)
-        token.name = session.user.name;
+    jwt({ token, trigger, session, user }) {
+
+      //AU SIGNIN, ON STOCKE ID ET IMAGE DE LUSER POUR POUVOIR LES PASSER A LA SESSION
+      if (user) {
+        token.id = user.id;
+        token.picture = user.image
       }
-    
+
+      //ON MET A JOUR LUSERNAME POUR REFRESH l'UI
+      if (trigger === 'update' && session) {
+        token = {...token, name: session.user.name, picture: session.user.image};
+      }
+
       return token
-    }
+    },
   },
   
 } satisfies NextAuthConfig

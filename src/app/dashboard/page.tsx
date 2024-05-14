@@ -72,7 +72,9 @@ const Dashboard = async () => {
   const session = await auth();
   
   if (!session) redirect('/auth/login');
-  const user = await findUserByEmail(session.user?.email!)
+  //console.log('SESSION DANS DASHBOARD ', session);
+  const { user: data } = session;
+  const user = await findUserByEmail(data?.email!)
   
   return (
     <div className="w-full flex flex-col items-start gap-4">

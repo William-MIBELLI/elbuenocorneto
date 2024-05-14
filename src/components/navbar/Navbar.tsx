@@ -132,7 +132,7 @@ const Navbar = () => {
           <Button
           as={Link}
           href="/auth/login"
-          className="bg-orange-500 text-white"
+          className="bg-gray-900 text-white"
         >
           Se connecter
         </Button>
@@ -140,20 +140,6 @@ const Navbar = () => {
               <Spinner color="default" size="sm"/>
         )
       }
-
-      {/* {status === "authenticated" ? (
-        
-      ) : status === "unauthenticated " ? (
-        <Button
-          as={Link}
-          href="/auth/login"
-          className="bg-orange-500 text-white"
-        >
-          Se connecter
-        </Button>
-      ) : (
-        <div>Loading...</div>
-      )} */}
 
       {/* MOBILE MENU */}
 

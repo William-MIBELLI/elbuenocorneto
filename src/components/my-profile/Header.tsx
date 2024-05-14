@@ -1,48 +1,137 @@
-'use client';
+"use client";
 
-import { SelectUser } from '@/drizzle/schema';
-import React, { FC, useEffect, useState } from 'react'
-import AddPicture from '../profil-picture/AddPicture';
-import { Button, Input } from '@nextui-org/react';
-import { useFormState } from 'react-dom';
-import { updateUserProfile } from '@/lib/actions/auth.action';
-import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+import { SelectUser } from "@/drizzle/schema";
+import React, { FC, useEffect, useState } from "react";
+import AddPicture from "../profil-picture/AddPicture";
+import { Button, Divider, Input, Spinner } from "@nextui-org/react";
+import { useFormState } from "react-dom";
+import { updateUserProfile } from "@/lib/actions/auth.action";
+import { signOut, useSession } from "next-auth/react";
+import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 
 interface IProps {
-  user: SelectUser
+  //user: SelectUser
 }
-const Header: FC<IProps> = ({ user }) => {
-
-  const { name, id } = user;
-  const [picture, setPicture] = useState<string | undefined>(undefined)
-  const [username, setUsername] = useState(name);
+const Header: FC<IProps> = () => {
+  //const { name, id } = user;
   const session = useSession();
-  const { update, data } = session;
+  if (session.status === "unauthenticated") {
+    console.log("session not gound ??? : ", session);
+    return notFound();
+  }
 
-  const [state, action] = useFormState(updateUserProfile.bind(null, {picture, id}), { username: undefined, done: false, newName:null})
+  // if (session.status === 'loading') {
+  //   return (
+  //     <div>Loading...</div>
+  //   )
+  // }
+
+  const { update, data } = session;
+  const [picture, setPicture] = useState<string | undefined>(undefined);
+  const [username, setUsername] = useState(data?.user?.name!);
+
+  const [state, action] = useFormState(
+    updateUserProfile.bind(null, {
+      picture,
+      id: data?.user?.id!,
+      actualImg: data?.user?.image,
+    }),
+    { username: undefined, done: false, newName: null, newImageUrl: null }
+  );
 
   useEffect(() => {
     if (state.done && state?.newName) {
-      update({ ...data, user: { ...data?.user, name: state?.newName } });
-      redirect('/dashboard');
+      update({
+        ...data,
+        user: {
+          ...data?.user,
+          name: state?.newName,
+          image: state?.newImageUrl,
+        },
+      });
+      redirect("/dashboard");
     }
-  },[state])
+  }, [state]);
+
+  useEffect(() => {
+    if (data?.user?.name) {
+      setUsername(data.user.name);
+    }
+  }, [data]);
   return (
-    <div className='flex flex-col gap-3 '>
-      <AddPicture picture={picture} setPicture={setPicture} />
-      <form className='flex flex-col items-start' action={action}>
-        <label htmlFor='username'>Nom d'utilisateur *</label>
-        <Input className='w-72' variant='bordered' name='username' value={username} onChange={e => setUsername(e.target.value)} />
+    <div className="flex flex-col gap-3  w-full px-1">
+      <h1 className="text-left text-2xl font-bold mb-3">Profil</h1>
+      <AddPicture
+        picture={picture}
+        setPicture={setPicture}
+        imageUrl={data?.user?.image!}
+      />
+      <form className="flex flex-col items-start" action={action}>
+        <label htmlFor="username">Nom d'utilisateur *</label>
+        <Input
+          className="w-72"
+          variant="bordered"
+          name="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
         {state?.username && (
-          <p>
-            {state.username.join(', ')}
-          </p>
+          <p className="error_message">{state.username.join(", ")}</p>
         )}
-        <Button type='submit' className='button_main mt-3'>Enregistrer les modifications</Button>
+        <div className="flex justify-between items-center w-full  mt-3">
+          <Button type="submit" className="button_main">
+            Enregistrer les modifications
+          </Button>
+          <Link
+            className="font-semibold underline text-sm"
+            href={`/profile/${data?.user?.id}`}
+          >
+            Accéder à mon profil public
+          </Link>
+        </div>
+      </form>
+      <Divider className="my-4" />
+      <div className="flex justify-between items-center">
+        <p className="font-semibold">Espace candidat</p>
+        <Link
+          className="font-semibold underline text-sm"
+          href={"/profil-candidat"}
+        >
+          Accéder à mon profil candidat
+        </Link>
+      </div>
+      <Divider className="my-4" />
+      <div className="flex justify-between items-center">
+        <p className="font-semibold">Espace locataire</p>
+        <Link
+          className="font-semibold underline text-sm"
+          href={"/profil-locataire"}
+        >
+          Accéder à mon profil candidat
+        </Link>
+      </div>
+      <Divider className="my-4" />
+      <div className="flex justify-between items-center">
+        <p className="font-semibold">Espace bailleur</p>
+        <Link
+          className="font-semibold underline text-sm"
+          href={"/profil-bailleur"}
+        >
+          Accéder à mon profil candidat
+        </Link>
+      </div>
+      <Divider className="my-4" />
+      <form
+        className="flex justify-start items-start w-full"
+        
+      >
+        <Button onClick={() => signOut({ redirect: true})} className="button_secondary">
+          Me déconnecter
+        </Button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

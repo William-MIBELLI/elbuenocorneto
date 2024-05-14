@@ -78,6 +78,8 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const updateUser = async (value: Partial<InsertUser>, id: string) => {
+
+  console.log('VALUE DANS AUTH REQUEST : ', value);
   try {
     const db = getDb();
     const user = await db.update(users).set(value).where(eq(users.id, id)).returning().then(r => r[0]);

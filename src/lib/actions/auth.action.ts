@@ -1,8 +1,12 @@
 "use server";
 
-import { createUserOnDb, findUserByEmail, updateUser } from "../requests/auth.requests";
+import {
+  createUserOnDb,
+  findUserByEmail,
+  updateUser,
+} from "../requests/auth.requests";
 import { passwordSchema, signUpSchema } from "../zod";
-import { auth, signIn } from "@/auth";
+import { auth, signIn, unstable_update } from "@/auth";
 import { z } from "zod";
 import {
   IGeometry,
@@ -11,14 +15,17 @@ import {
 } from "@/interfaces/ILocation";
 import "dotenv/config";
 import { IUserSignup } from "@/interfaces/IUser";
-import { mapLocationForStorage } from './location.action';
-import { createLocationOnDB } from '../requests/location.request';
-import { uploadImageToCloud } from '../requests/picture.request';
+import { mapLocationForStorage } from "./location.action";
+import { createLocationOnDB } from "../requests/location.request";
+import { uploadImageToCloud } from "../requests/picture.request";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export const signUpUser = async (data: {user: IUserSignup, picture: any}  , initialState: {}, fd: FormData) => {
-
+export const signUpUser = async (
+  data: { user: IUserSignup; picture: any },
+  initialState: {},
+  fd: FormData
+) => {
   const { address, confirm, email, name, password, phone } = data.user;
   let imageUrl: string | null = null;
 
@@ -36,15 +43,15 @@ export const signUpUser = async (data: {user: IUserSignup, picture: any}  , init
     password,
     confirm,
     name,
-    phone
-  })
+    phone,
+  });
   if (!parsedUser.success) {
     const err = parsedUser.error.flatten().fieldErrors;
     return { ...initialState, _form: err };
   }
 
   //ON CHECK SI LADRESSE MAIL EST LIBRE
-  const existingUser = await findUserByEmail(email)
+  const existingUser = await findUserByEmail(email);
 
   //ON CHECK ET ON MAP LA LOCATION
   const locationData = mapLocationForStorage(address!);
@@ -53,29 +60,43 @@ export const signUpUser = async (data: {user: IUserSignup, picture: any}  , init
     //ON CREE LA LOCATION ET ON RECUPERE L'ID
     const location = await createLocationOnDB(locationData);
 
-    if (!location) throw new Error('get null instead of location in signupaction');
-    
+    if (!location)
+      throw new Error("get null instead of location in signupaction");
+
     //ON CREE LUSER AVEC l'ID DE LA LOCATION
-    const user = await createUserOnDb(email, password, name, phone, location.id, imageUrl);
+    const user = await createUserOnDb(
+      email,
+      password,
+      name,
+      phone,
+      location.id,
+      imageUrl
+    );
 
-    if (!user) throw new Error('get null instead of user in signupaction');
-
+    if (!user) throw new Error("get null instead of user in signupaction");
   } catch (error) {
-    console.log('ERROR SIGNUP ACTION', error);
-    return { ...initialState, _form: 'Something goes wrong.' };
+    console.log("ERROR SIGNUP ACTION", error);
+    return { ...initialState, _form: "Something goes wrong." };
   }
 
   //ON REDIRIGE VERS HOME
   await signIn("credentials", {
-        email: email.toLowerCase(),
-        password,
-        redirectTo: "/",
-      });
+    email: email.toLowerCase(),
+    password,
+    redirectTo: "/",
+  });
 
-  return {}
-}
+  return {};
+};
 
-export const checkEmailAvaibilityAndSanitize = async (initialState: {email: string[] | undefined, isEmailOK: boolean, sanitizedEmail: string | undefined }, fd: FormData) => {
+export const checkEmailAvaibilityAndSanitize = async (
+  initialState: {
+    email: string[] | undefined;
+    isEmailOK: boolean;
+    sanitizedEmail: string | undefined;
+  },
+  fd: FormData
+) => {
   //ON CHECK SI LADRESSE FOURNIE EST VALIDE
   try {
     const parsedEmail = z
@@ -83,11 +104,11 @@ export const checkEmailAvaibilityAndSanitize = async (initialState: {email: stri
         email: z.string().email("please provide a valid email address"),
       })
       .safeParse({
-        email: fd.get('email'),
+        email: fd.get("email"),
       });
     if (!parsedEmail.success) {
-      const err = parsedEmail.error.flatten().fieldErrors.email
-      return {...initialState, email: err};
+      const err = parsedEmail.error.flatten().fieldErrors.email;
+      return { ...initialState, email: err };
     }
 
     //ON CHECK LA DB POUR VOIR SI LADRESSE EMAIL NEST PAS DEJA UTILISEE
@@ -95,14 +116,21 @@ export const checkEmailAvaibilityAndSanitize = async (initialState: {email: stri
     const existingUser = await findUserByEmail(email.toLowerCase());
 
     if (existingUser) {
-      return {...initialState, email: ["This address is already associated with an account."]};
+      return {
+        ...initialState,
+        email: ["This address is already associated with an account."],
+      };
     }
 
     //SI TOUT EST, ON RETURN LADRESSE EN LOWERCASE
-    return {...initialState, isEmailOK: true, sanitizedEmail: email.toLowerCase()};
+    return {
+      ...initialState,
+      isEmailOK: true,
+      sanitizedEmail: email.toLowerCase(),
+    };
   } catch (error) {
     console.log("ERROR CHECKING EMAIL : ", error);
-    return {...initialState, email: ['Something wents wrong.']};
+    return { ...initialState, email: ["Something wents wrong."] };
   }
 };
 
@@ -128,7 +156,7 @@ export const checkPassword = async (
     ...initialState,
     status: true,
     validatePassword: parsedPassword.data.password,
-    validateConfirm: parsedPassword.data.confirm
+    validateConfirm: parsedPassword.data.confirm,
   };
 };
 interface IPhoneState {
@@ -194,62 +222,96 @@ export const fetchAddressFromAPI = async (keyword: string) => {
   }
 };
 
-export const checkUsername = async (initialState: {isValidUsername: boolean, username: string[] | undefined, name: string | undefined}, fd: FormData) => {
-  const parsedUsername = z.object({
-    username: z
-      .string()
-      .trim()
-      .min(4, "Your username need atleast 4 characters.")
-      .max(20, "Your username can't exceed 20 characters.")
-  }).safeParse({ username: fd.get('username') });
-  if (!parsedUsername.success) {
-    const err = parsedUsername.error.flatten().fieldErrors.username
-    return {...initialState, username: err};
-  }
-  return { ...initialState, isValidUsername: true, name: parsedUsername.data.username }
-};
-
-export const updateUserProfile = async (data: {picture: string | undefined, id: string}, initialState: { username: string[] | undefined, done: boolean, newName: string | null}, fd: FormData) => {
-  console.log('UPDATE USER ACTION');
-  try {
-    const { picture, id } = data;
-    let imageUrl: string | null = null;
-
-    //SI LUSER A CHANGE DE PHOTO DE PROFIL, ON LUPLOAD 
-    if (picture) {
-      const res = await uploadImageToCloud(picture)
-      if (res) {
-        imageUrl = res.url;
-      }
-    }
-
-    //ON CHECK SI LUSERNAME EST VALIDE
-    const parsedUsername = z.object({
+export const checkUsername = async (
+  initialState: {
+    isValidUsername: boolean;
+    username: string[] | undefined;
+    name: string | undefined;
+  },
+  fd: FormData
+) => {
+  const parsedUsername = z
+    .object({
       username: z
         .string()
         .trim()
         .min(4, "Your username need atleast 4 characters.")
-        .max(20, "Your username can't exceed 20 characters.")
-    }).safeParse({ username: fd.get('username') });
+        .max(20, "Your username can't exceed 20 characters."),
+    })
+    .safeParse({ username: fd.get("username") });
+  if (!parsedUsername.success) {
+    const err = parsedUsername.error.flatten().fieldErrors.username;
+    return { ...initialState, username: err };
+  }
+  return {
+    ...initialState,
+    isValidUsername: true,
+    name: parsedUsername.data.username,
+  };
+};
+
+export const updateUserProfile = async (
+  data: {
+    picture: string | undefined;
+    id: string;
+    actualImg: string | null | undefined;
+  },
+  initialState: {
+    username: string[] | undefined;
+    done: boolean;
+    newName: string | null;
+    newImageUrl: string | undefined | null;
+  },
+  fd: FormData
+) => {
+  console.log("UPDATE USER ACTION");
+  try {
+    const { picture, id, actualImg } = data;
+    let imageUrl: string | null = null;
+
+    //SI LUSER A CHANGE DE PHOTO DE PROFIL, ON LUPLOAD
+    if (picture) {
+      const res = await uploadImageToCloud(picture);
+      if (res) {
+        imageUrl = res.url;
+        // const update = await unstable_update({ user: { image: imageUrl } });
+        // console.log("UPDATE AVEC UNSTABLE ", update);
+      }
+    }
+
+    //ON CHECK SI LUSERNAME EST VALIDE
+    const parsedUsername = z
+      .object({
+        username: z
+          .string()
+          .trim()
+          .min(4, "Your username need atleast 4 characters.")
+          .max(20, "Your username can't exceed 20 characters."),
+      })
+      .safeParse({ username: fd.get("username") });
 
     if (!parsedUsername.success) {
-      const err = parsedUsername.error.flatten().fieldErrors.username
-      return {...initialState, username: err};
+      const err = parsedUsername.error.flatten().fieldErrors.username;
+      return { ...initialState, username: err };
     }
 
     //ON CALL LA DB POUR UPDATE
-    const { username } = parsedUsername.data
-    const updatedUser = await updateUser({ image: imageUrl, name: username }, id);
+    const { username } = parsedUsername.data;
+
+    const updatedUser = await updateUser(
+      { image: imageUrl ?? actualImg, name: username },
+      id
+    );
 
     //SI LUPDATE EST OK, ON REVALIDE LA ROUTE
     if (updatedUser) {
-      console.log('ONR EVALIDE LE PATH')
-      revalidatePath('/')
+      console.log("ONR EVALIDE LE PATH");
+      revalidatePath("/");
     }
-    return { ...initialState, done: true, newName: username };
+    return { ...initialState, done: true, newName: username, newImageUrl: imageUrl ?? actualImg };
   } catch (error) {
-    console.log('ERROR UPDATEUSER ACTION : ', error);
-    return {...initialState};
+    console.log("ERROR UPDATEUSER ACTION : ", error);
+    return { ...initialState };
   }
   //redirect('/dashboard')
-}
+};
