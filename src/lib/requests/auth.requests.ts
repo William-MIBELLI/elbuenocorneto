@@ -107,7 +107,9 @@ export const deleteUserOnDB = async (id: string): Promise<boolean> => {
     //   db.select().from(products).where(eq(products.userId, id))
     // )
     const deletedUser = await db.delete(users).where(eq(users.id, id)).returning().then(r => r[0]);
-    console.log('use delleted  ', deletedUser);
+    
+    if (!deletedUser) throw new Error('No user to delte with this id.');
+    
     return true;
   } catch (error) {
     console.log('ERROR DELETE USER DB ', error);

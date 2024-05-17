@@ -171,10 +171,10 @@ export type DeliveryInsert = typeof deliveries.$inferInsert;
 export const productDeliveryLink = pgTable("product_delivery_link", {
   productId: text("product_id")
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, { onDelete: 'cascade'}),
   deliveryId: text("delivery_id")
     .notNull()
-    .references(() => deliveries.id),
+    .references(() => deliveries.id, { onDelete: 'cascade'}),
 });
 
 export const pdlRelations = relations(productDeliveryLink, ({ one }) => ({

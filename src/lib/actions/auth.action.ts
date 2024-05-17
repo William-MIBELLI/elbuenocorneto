@@ -372,7 +372,7 @@ export const deleteUserAction = async (initialState: {success: boolean, error?: 
 
     if (session.user.email?.toLowerCase() !== email) throw new Error('email doesnt match.');
 
-    const success = await deleteUserOnDB(email);
+    const success = await deleteUserOnDB(user.id);
     
     return {...initialState, success}
   } catch (error) {

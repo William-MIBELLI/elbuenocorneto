@@ -1,4 +1,4 @@
-import type { NextAuthConfig } from "next-auth";
+import type { NextAuthConfig, Session } from "next-auth";
 
 export const authConfig = {
   pages: {
@@ -38,10 +38,9 @@ export const authConfig = {
       }
 
       //ON MET A JOUR LUSERNAME POUR REFRESH l'UI
-      if (trigger === 'update' && session) {
-        token = {...token, name: session.user.name, picture: session.user.image};
+      if (trigger === 'update' && session as Session) {
+        token = {...token, name: session.user.name, picture: session.user.image, email: session.user.email };
       }
-
       return token
     },
   },
