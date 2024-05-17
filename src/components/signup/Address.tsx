@@ -1,16 +1,17 @@
 import { Button, Input } from "@nextui-org/react";
-import React, {  FC, useRef, useState } from "react";
-import { useFormState } from "react-dom";
-import { checkAddress, fetchAddressFromAPI } from "@/lib/actions/auth.action";
+import React, { FC, useRef, useState } from "react";
 import { IMappedResponse } from "@/interfaces/ILocation";
 import { useSignUpContext } from "@/context/signup.context";
+import AddressList from "../adress-list/AddressList";
+import { LocationInsert, LocationSelect } from "@/drizzle/schema";
+import { fetchAddressFromAPI } from "@/lib/actions/location.action";
 
 interface IProps {}
 const Address: FC<IProps> = () => {
   const { userValue, setStep, setUserValue, step } = useSignUpContext();
-  const [state, action] = useFormState(checkAddress, { address: undefined });
+  //const [state, action] = useFormState(checkAddress, { address: undefined });
   const [keyword, setKeyword] = useState("");
-  const [list, setList] = useState<IMappedResponse[]>([]);
+  const [list, setList] = useState<LocationInsert[]>([]);
   const lastTimeTyping = useRef<number>();
 
   const onChangeHandler = async (
@@ -34,10 +35,10 @@ const Address: FC<IProps> = () => {
     }, timer);
   };
 
-  const onClickHandler = (item: IMappedResponse) => {
-    setUserValue({ ...userValue, address: item })
+  const onClickHandler = (item: LocationInsert) => {
+    setUserValue({ ...userValue, address: item });
     setStep(step + 1);
-  }
+  };
 
   return (
     <form className="flex flex-col gap-3">
@@ -56,22 +57,18 @@ const Address: FC<IProps> = () => {
             }}
           />
         </div>
-        {list.length ?
-          list.map((item) => (
-            <div
-              onClick={() => onClickHandler(item)}
-              className="py-2 my-1 border-white border-1  cursor-pointer rounded-lg hover:border-orange-300 hover:bg-orange-100"
-              key={Math.random()}
-            >
-              {item.properties.label}
-            </div>
-          )) : (
-            <p className="text-xs my-3">
-            Commencez a renseigner votre adresse et selectionnez la ensuite dans la liste.
+        {list.length ? (
+          <AddressList list={list} onClickHandler={onClickHandler} />
+        ) : (
+          <p className="text-xs my-3">
+            Commencez a renseigner votre adresse et selectionnez la ensuite dans
+            la liste.
           </p>
-          )}
+        )}
       </div>
-      <Button onClick={() => setStep(step - 1)} className="button_secondary">Précédent</Button>
+      <Button onClick={() => setStep(step - 1)} className="button_secondary">
+        Précédent
+      </Button>
     </form>
   );
 };

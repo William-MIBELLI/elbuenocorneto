@@ -2,10 +2,12 @@
 
 import {
   createUserOnDb,
+  deleteUserOnDB,
   findUserByEmail,
+  loginUser,
   updateUser,
 } from "../requests/auth.requests";
-import { passwordSchema, signUpSchema } from "../zod";
+import { informationsSchema, loginSchema, passwordSchema, signUpSchema } from "../zod";
 import { auth, signIn, unstable_update } from "@/auth";
 import { z } from "zod";
 import {
@@ -20,6 +22,8 @@ import { createLocationOnDB } from "../requests/location.request";
 import { uploadImageToCloud } from "../requests/picture.request";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { ReceiptIndianRupeeIcon } from "lucide-react";
+import { LocationInsert, SelectUser } from "@/drizzle/schema";
 
 export const signUpUser = async (
   data: { user: IUserSignup; picture: any },
@@ -54,11 +58,11 @@ export const signUpUser = async (
   const existingUser = await findUserByEmail(email);
 
   //ON CHECK ET ON MAP LA LOCATION
-  const locationData = mapLocationForStorage(address!);
+  //const locationData = mapLocationForStorage(address!);
 
   try {
     //ON CREE LA LOCATION ET ON RECUPERE L'ID
-    const location = await createLocationOnDB(locationData);
+    const location = await createLocationOnDB(address as LocationInsert);
 
     if (!location)
       throw new Error("get null instead of location in signupaction");
@@ -90,10 +94,11 @@ export const signUpUser = async (
 };
 
 export const checkEmailAvaibilityAndSanitize = async (
+  isUpdate: boolean,
   initialState: {
-    email: string[] | undefined;
-    isEmailOK: boolean;
-    sanitizedEmail: string | undefined;
+    email?: string[] | undefined;
+    isEmailOK?: boolean;
+    sanitizedEmail?: string | undefined;
   },
   fd: FormData
 ) => {
@@ -112,9 +117,8 @@ export const checkEmailAvaibilityAndSanitize = async (
     }
 
     //ON CHECK LA DB POUR VOIR SI LADRESSE EMAIL NEST PAS DEJA UTILISEE
-    const { email } = parsedEmail.data;
-    const existingUser = await findUserByEmail(email.toLowerCase());
-
+    const  email  = parsedEmail.data.email.toLowerCase();
+    const existingUser = await findUserByEmail(email)
     if (existingUser) {
       return {
         ...initialState,
@@ -122,11 +126,22 @@ export const checkEmailAvaibilityAndSanitize = async (
       };
     }
 
-    //SI TOUT EST, ON RETURN LADRESSE EN LOWERCASE
+    //SI C'EST UNE UPDATE, ON MET A JOUR DANS LA DB
+    if (isUpdate) {
+
+      //SI ON A PAD D'ID ON TRHOW UN ERREUR
+      const id = fd.get('id')?.valueOf().toString();
+      if (!id) throw new Error('NO ID FOR UPDATE : ');
+
+      //SINON ON UPDATE L'USER
+      const updateduser = await updateUser({email}, id);
+    }
+
+    //SINON, ON RETURN LADRESSE EN LOWERCASE
     return {
       ...initialState,
       isEmailOK: true,
-      sanitizedEmail: email.toLowerCase(),
+      sanitizedEmail: email,
     };
   } catch (error) {
     console.log("ERROR CHECKING EMAIL : ", error);
@@ -191,36 +206,7 @@ export const checkAddress = async (
   return { address: undefined };
 };
 
-interface IResponse {
-  features: {
-    type: string;
-    geometry: IGeometry;
-    properties: IProperties;
-  }[];
-  [key: string]: any;
-}
 
-export const fetchAddressFromAPI = async (keyword: string) => {
-  try {
-    const sanitizedKeys = keyword.replaceAll(" ", "+");
-    const res = await fetch(
-      `https://api-adresse.data.gouv.fr/search/?q=${sanitizedKeys}&autocomplete=0`
-    );
-
-    if (res.status !== 200) {
-      throw new Error();
-    }
-    const data: IResponse = await res.json();
-    const mappedResponse: IMappedResponse[] = data.features.map((item) => {
-      const [lng, lat] = item.geometry.coordinates;
-      return { properties: item.properties, geometry: { lng, lat } };
-    });
-    return mappedResponse;
-  } catch (error) {
-    console.log("ERROR FETCHING FROM API ADDRESS : ", error);
-    return [];
-  }
-};
 
 export const checkUsername = async (
   initialState: {
@@ -308,10 +294,89 @@ export const updateUserProfile = async (
       console.log("ONR EVALIDE LE PATH");
       revalidatePath("/");
     }
-    return { ...initialState, done: true, newName: username, newImageUrl: imageUrl ?? actualImg };
+    return {
+      ...initialState,
+      done: true,
+      newName: username,
+      newImageUrl: imageUrl ?? actualImg,
+    };
   } catch (error) {
     console.log("ERROR UPDATEUSER ACTION : ", error);
     return { ...initialState };
   }
   //redirect('/dashboard')
 };
+
+export const updateUserInformations = async (
+  initialState: {
+    gender?: string[] | undefined;
+    lastname?: string[] | undefined;
+    firstname?: string[] | undefined;
+    birthday?: string[] | undefined;
+    success?: boolean,
+    updatedUser?: SelectUser
+  },
+  fd: FormData
+) => {
+  try {
+    const parsedInfos = informationsSchema.partial().safeParse({
+      gender: fd.get("gender"),
+      lastname: fd.get("lastname"),
+      firstname: fd.get("firstname"),
+      birthday: fd.get("birthday")?.valueOf()?.toString().length === 0 ? null : fd.get('birthday'),
+    });
+    for (const pair of fd.entries()) {
+      console.log(pair[0], pair[1], 'TYPE : ', typeof pair[1]);
+    }
+    
+    if (!parsedInfos.success) {
+      const err = parsedInfos.error.flatten().fieldErrors;
+      console.log('BIRTHDAY : ', fd.get('birthday')?.valueOf().toString().length)
+      return { ...err, success: false };
+    }
+    const { birthday } = parsedInfos.data;
+    const session = await auth();
+
+    if (!session?.user?.id) throw new Error('CANT RETRIEVE USERID IN INFO UPDATE ACTION.');
+
+    const u = await updateUser({...parsedInfos.data, birthday:  birthday ?new Date(birthday) : null}, session.user.id);
+    if (!u) throw new Error('Something goes wrong.');
+    
+    return { ...initialState, success: true, updatedUser: u };
+  } catch (error) {
+    console.log("ERROR UPDATE INFOS ACTION : ", error);
+    return {...initialState, success: false};
+  }
+};
+
+export const deleteUserAction = async (initialState: {success: boolean, error?: string} = {success: false}, fd: FormData) => {
+  try {
+
+    //ON CHECK LES INPUTS
+    const parsedCredentials = loginSchema.safeParse({
+      email: fd.get('email'),
+      password: fd.get('password')
+    })
+
+    if (!parsedCredentials.success) throw new Error('form input issues')
+    
+    const { password } = parsedCredentials.data;
+    const email = parsedCredentials.data.email.toLowerCase();
+    const user = await loginUser(email, password);
+
+    if (!user) throw new Error('no user on db');
+
+    const session = await auth()
+
+    if (!session?.user) throw new Error('no user in session');
+
+    if (session.user.email?.toLowerCase() !== email) throw new Error('email doesnt match.');
+
+    const success = await deleteUserOnDB(email);
+    
+    return {...initialState, success}
+  } catch (error) {
+    console.log('ERROR DELET USER ACTION ', error);
+    return { ...initialState, error: 'Something goes wrong', success: false };
+  }
+}

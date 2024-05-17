@@ -6,9 +6,10 @@ import React, { useEffect } from "react";
 import { useFormState } from "react-dom";
 import ButtonsGroup from "./ButtonsGroup";
 import { useSignUpContext } from "@/context/signup.context";
+import Link from "next/link";
 
 const Email = () => {
-  const [state, action] = useFormState(checkEmailAvaibilityAndSanitize, {
+  const [state, action] = useFormState(checkEmailAvaibilityAndSanitize.bind(null, false), {
     email: [],
     isEmailOK: false,
     sanitizedEmail: undefined,
@@ -51,6 +52,12 @@ const Email = () => {
         personnelles, les destinataires, le responsable du traitement, les
         durées de conservation, les coordonnées du PDO et mes droits.
       </p>
+      <div className="flex gap-3 justify-center items-center w-full mt-3">
+        <p className="text-sm">
+          Vous avez déjà un compte ?
+        </p>
+        <Link className="font-semibold underline text-sm" href={'/auth/login'}>Se connecter</Link>
+      </div>
     </form>
   );
 };

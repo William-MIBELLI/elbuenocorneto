@@ -1,7 +1,7 @@
 "use server"
 import { getDb } from "@/drizzle/db";
 import { hashPassword, isPasswordMatching } from "../password";
-import { InsertUser, SelectUser, users } from "@/drizzle/schema";
+import { InsertUser, SelectUser, products, users } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4} from 'uuid'
 
@@ -79,13 +79,38 @@ export const loginUser = async (email: string, password: string) => {
 
 export const updateUser = async (value: Partial<InsertUser>, id: string) => {
 
-  console.log('VALUE DANS AUTH REQUEST : ', value);
+ 
+  const obj: { [key: string]: any } = value;
+
+  //ON MAP LES VALUES RECUES POUR EVITER LES STRINGS VIDES
+  Object.keys(obj).forEach(k => {
+    if ((typeof obj[k]  === "string" && !obj[k].length) || obj[k] === undefined) {
+      return obj[k] = null
+    }
+  })
+
   try {
     const db = getDb();
-    const user = await db.update(users).set(value).where(eq(users.id, id)).returning().then(r => r[0]);
+    const user = await db.update(users).set(obj as Partial<InsertUser>).where(eq(users.id, id)).returning().then(r => r[0]);
+    console.log('UPDATE USER : ', user);
     return user;
   } catch (error) {
     console.log('ERROR UPDATING USER : ', error);
     return null;
+  }
+}
+
+export const deleteUserOnDB = async (id: string): Promise<boolean> => {
+  try {
+    const db = getDb();
+    // const associatedProduct = db.$with('associated_product').as(
+    //   db.select().from(products).where(eq(products.userId, id))
+    // )
+    const deletedUser = await db.delete(users).where(eq(users.id, id)).returning().then(r => r[0]);
+    console.log('use delleted  ', deletedUser);
+    return true;
+  } catch (error) {
+    console.log('ERROR DELETE USER DB ', error);
+    return false;
   }
 }

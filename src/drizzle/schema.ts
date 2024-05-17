@@ -18,6 +18,8 @@ import type { AdapterAccount } from "next-auth/adapters";
 import { CategoriesType } from "@/interfaces/IProducts";
 import { relations } from "drizzle-orm";
 
+export const genderEnum = pgEnum('gender', ['0', '1', '2']);
+
 export const users = pgTable("user", {
   id: text("id").primaryKey(),
   name: varchar("name", { length: 20 }).notNull(),
@@ -33,6 +35,10 @@ export const users = pgTable("user", {
   createdAt: timestamp("created_at").defaultNow(),
   phone: varchar("phone", { length: 10 }),
   phoneVerified: timestamp("phone_verified"),
+  lastname: text("lastname"),
+  firstname: text("firstname"),
+  gender: genderEnum('gender'),
+  birthday: timestamp('birthday'),
 });
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -187,7 +193,7 @@ export type DeliveryLinkSelect = typeof productDeliveryLink.$inferSelect;
 
 export const locations = pgTable("location", {
   id: text("id").primaryKey().notNull(),
-  label: text("label"),
+  label: text("label").notNull(),
   streetName: text("street_name"),
   postcode: integer("postcode").notNull(),
   city: text("city").notNull(),

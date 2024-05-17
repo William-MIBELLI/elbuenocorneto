@@ -50,7 +50,7 @@ const AddPicture: FC<IProps> = ({ setPicture, picture, imageUrl }) => {
   };
 
   return (
-    <div className="flex items-center gap-6 mb-4">
+    <div className="flex items-center gap-6 mb-4 max-h-full">
       <div
         onClick={onClickHandler}
         className="p-5  bg-gray-600 cursor-pointer text-white rounded-full w-28 h-28 flex flex-col justify-center items-center text-xs font-semibold relative"
@@ -75,19 +75,18 @@ const AddPicture: FC<IProps> = ({ setPicture, picture, imageUrl }) => {
         </Button>
         <p>Ajouter une photo</p>
       </div>
-      <div className="flex-grow">
+      <div className="flex-grow h-28 ">
         {!picture ? (
           <p className="text-sm text-left">
             Avec une photo, vous avez de quoi personnaliser votre profil et
             rassurer les autres membres !
           </p>
         ) : (
-            <div>
+            <div className="relative h-28 w-28">
               <Image
                 src={picture}
                 alt="preview-picture"
-                width={130}
-                height={130}
+                fill
                 className="mx-auto rounded-full"
               />
             </div>

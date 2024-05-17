@@ -41,6 +41,8 @@ const ProductCard: FC<IProps> = ({ productData }) => {
             alt="iphone"
             className="rounded-lg h-full w-full"
             fill
+            sizes="w-full"
+            priority
           />
         </div>
         <p>{title}</p>

@@ -80,7 +80,7 @@ const Dashboard = async () => {
     <div className="w-full flex flex-col items-start gap-4">
       {/* HEADER */}
 
-      <div className="w-full flex gap-4">
+      <div className="w-full flex gap-4 md:flex-row flex-col">
         <div className="border-gray border-1 flex justify-between flex-grow p-6 rounded-lg">
           <div className="flex items-center gap-2 ">
             <div className="relative rounded-full overflow-hidden h-28 w-28">
@@ -107,7 +107,7 @@ const Dashboard = async () => {
         <div className="flex font-semibold relative shadow-dashboard_card p-6 rounded-xl overflow-hidden">
           <div className="bg-orange-300 w-40  h-40 rounded-full absolute -top-10 -left-28 "> </div>
           <div className="bg-gray-200 w-40 opacity-70  h-40 rounded-full absolute -bot-10 -left-28 "> </div>
-          <div className="flex flex-col items-start gap-3 bg-transparent ml-14">
+          <div className="flex md:flex-col flex-row justify-center items-center md:items-start gap-3 bg-transparent ml-14">
             <h3>Porte-monnaie</h3>
             <p>0 €</p>
             <p className="font-normal text-sm">Solde disponible</p>

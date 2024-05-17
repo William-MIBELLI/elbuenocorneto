@@ -51,3 +51,19 @@ export const getUserById = async (id: string) => {
     return null;
   }
 };
+
+export const getUserForUpdate = async (id: string) => {
+  try {
+    const db = getDb();
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+      with: {
+        location: true
+      }
+    })
+    return user ?? null;
+  } catch (error) {
+    console.log('ERROR FETCHING USER FOR UPDATE : ', error);
+    return null;
+  }
+}

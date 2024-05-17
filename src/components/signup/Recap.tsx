@@ -25,9 +25,9 @@ const Recap: FC<IProps> = () => {
     return <div>Pas daddress 😢</div>;
   }
   const location = {
-    coordonates: address.geometry,
-    city: address.properties.city,
-    postcode: +address.properties.postcode,
+    coordonates: address.coordonates!,
+    city: address.city,
+    postcode: +address.postcode,
   };
 
   const { GOOGLE_API_KEY } = process.env

@@ -9,6 +9,7 @@ import { updateUserProfile } from "@/lib/actions/auth.action";
 import { signOut, useSession } from "next-auth/react";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import SubmitButton from "../submit-button/SubmitButton";
 
 interface IProps {
   //user: SelectUser
@@ -80,9 +81,7 @@ const Header: FC<IProps> = () => {
           <p className="error_message">{state.username.join(", ")}</p>
         )}
         <div className="flex justify-between items-center w-full  mt-3">
-          <Button type="submit" className="button_main">
-            Enregistrer les modifications
-          </Button>
+          <SubmitButton text="Enregistrer les modifications"/>
           <Link
             className="font-semibold underline text-sm"
             href={`/profile/${data?.user?.id}`}
@@ -108,7 +107,7 @@ const Header: FC<IProps> = () => {
           className="font-semibold underline text-sm"
           href={"/profil-locataire"}
         >
-          Accéder à mon profil candidat
+          Accéder à mon profil locataire
         </Link>
       </div>
       <Divider className="my-4" />
@@ -118,7 +117,7 @@ const Header: FC<IProps> = () => {
           className="font-semibold underline text-sm"
           href={"/profil-bailleur"}
         >
-          Accéder à mon profil candidat
+          Accéder à mon profil bailleur
         </Link>
       </div>
       <Divider className="my-4" />

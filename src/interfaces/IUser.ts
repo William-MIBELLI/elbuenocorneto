@@ -1,4 +1,4 @@
-import { SelectUser } from "@/drizzle/schema";
+import { LocationInsert, SelectUser } from "@/drizzle/schema";
 import { ILocation, IMappedResponse } from "./ILocation";
 
 export interface IUser {
@@ -15,6 +15,8 @@ export interface IUser {
 }
 
 export type IUserSignup = Required<Pick<IUser, 'email' | 'name' | 'phone' | 'password'>> & {
-  address: IMappedResponse | undefined;
+  address: LocationInsert | undefined;
   confirm: string;
 };
+
+export const GENDER = ['0', '1', '2'];

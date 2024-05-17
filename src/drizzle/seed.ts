@@ -202,6 +202,7 @@ export const insertLocation = async (count: number) => {
         id: uuidv4(),
         city: fakerFR.location.city(),
         postcode: +fakerFR.location.zipCode(),
+        label: fakerFR.location.street(),
         coordonates: {
           lat,
           lng,

@@ -1,3 +1,4 @@
+import { GENDER } from "@/interfaces/IUser";
 import { z } from "zod";
 
 export const loginSchema = z.object({
@@ -41,3 +42,10 @@ export const passwordSchema = z
     message: "Password have to match.",
     path: ["confirm"],
   });
+
+export const informationsSchema = z.object({
+  gender: z.enum(['1', '2', '0']).optional(),
+  lastname: z.string().max(32, "C'est cher le stockage... moins de 32 caractères svp. 👀").optional(),
+  firstname: z.string().max(32, "C'est cher le stockage... moins de 32 caractères svp. 👀").optional(),
+  birthday: z.string().date('PB AVEC LA DATE').nullable()
+}).partial()
