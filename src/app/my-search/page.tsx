@@ -1,8 +1,11 @@
+import { Input } from '@nextui-org/react'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>MES RECHERCHES</div>
+    <div>
+      <Input type='number'/>
+    </div>
   )
 }
 

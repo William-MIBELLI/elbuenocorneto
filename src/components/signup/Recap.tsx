@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Button } from "@nextui-org/react";
 import { Camera, Plus } from "lucide-react";
 import AddPicture from "../profil-picture/AddPicture";
+import { usePathname } from "next/navigation";
 
 interface IProps {}
 
@@ -16,11 +17,16 @@ const Recap: FC<IProps> = () => {
   const { userValue, setPicture, picture } = useSignUpContext();
   const { address, email, name, phone } = userValue;
 
+  const path = usePathname().split('/');
+  console.log('PATH DANS RECAP : ', path);
+
+  const callbackurl = path.length > 2 ? `/${path[3]}` : '/';
+
   useEffect(() => {
     console.log('PICTURE : ', picture);
   }, [picture]);
 
-  const [state, action] = useFormState(signUpUser.bind(null, {user: userValue, picture}), {});
+  const [state, action] = useFormState(signUpUser.bind(null, {user: userValue, picture, callbackurl }), {});
   if (!address) {
     return <div>Pas daddress 😢</div>;
   }

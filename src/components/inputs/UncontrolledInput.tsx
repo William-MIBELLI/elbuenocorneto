@@ -5,7 +5,7 @@ interface IProps {
   name: string;
   label: string;
   required?: boolean;
-  type?: 'text' | 'password' | 'email' | 'search' | 'numeric';
+  type?: 'text' | 'password' | 'email' | 'search' | 'number';
   defaultValue?: string;
 }
 

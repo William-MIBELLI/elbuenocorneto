@@ -7,6 +7,9 @@ import Username from "@/components/signup/Username";
 import { useSignUpContext } from "@/context/signup.context";
 import React from "react";
 
+interface IProps {
+
+}
 const Base = () => {
   const { step } = useSignUpContext();
   return (

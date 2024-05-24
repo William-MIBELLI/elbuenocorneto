@@ -1,18 +1,24 @@
 "use client";
 import { login } from "@/lib/actions";
 import { Button, Input } from "@nextui-org/react";
-import { EyeOff, Eye, MoveRight } from "lucide-react";
+import {  MoveRight } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import React, { useState } from "react";
+import React, { FC } from "react";
 import { useFormState } from "react-dom";
 import PasswordInput from "../inputs/PasswordInput";
+import { usePathname } from "next/navigation";
 
-const LoginForm = () => {
+interface IProps {
+  callbackUrl?: string;
+}
 
-  const [state, formAction] = useFormState(login, { error: "" });
-  const session = useSession();
-  // console.log('session : ', session);
+const LoginForm: FC<IProps> = ({ callbackUrl = '/' }) => {
+
+  const [state, formAction] = useFormState(login.bind(null, callbackUrl), { error: "" });
+  const path = usePathname()
+
+  console.log('PATH : ', path, callbackUrl);
+
 
   return (
     <form action={formAction}>

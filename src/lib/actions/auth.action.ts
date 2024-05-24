@@ -26,7 +26,7 @@ import { ReceiptIndianRupeeIcon } from "lucide-react";
 import { LocationInsert, SelectUser } from "@/drizzle/schema";
 
 export const signUpUser = async (
-  data: { user: IUserSignup; picture: any },
+  data: { user: IUserSignup; picture: any, callbackurl: string },
   initialState: {},
   fd: FormData
 ) => {
@@ -87,7 +87,7 @@ export const signUpUser = async (
   await signIn("credentials", {
     email: email.toLowerCase(),
     password,
-    redirectTo: "/",
+    redirectTo: data.callbackurl,
   });
 
   return {};

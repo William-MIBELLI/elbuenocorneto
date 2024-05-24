@@ -13,6 +13,7 @@ import {
   real,
   decimal,
   varchar,
+  boolean
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 import { CategoriesType } from "@/interfaces/IProducts";
@@ -204,3 +205,13 @@ export const locations = pgTable("location", {
 
 export type LocationInsert = typeof locations.$inferInsert;
 export type LocationSelect = typeof locations.$inferSelect;
+
+export const AttributeType = pgEnum('attribute_type', [ 'text', 'select', 'number'])
+
+export const attributes = pgTable('attribute', {
+  id: text('id').primaryKey().notNull(),
+  type: AttributeType('attribute_type').notNull(),
+  label: text('label').notNull(),
+  required: boolean('required').notNull(),
+  
+})

@@ -49,3 +49,4 @@ export const informationsSchema = z.object({
   firstname: z.string().max(32, "C'est cher le stockage... moins de 32 caractères svp. 👀").optional(),
   birthday: z.string().date('PB AVEC LA DATE').nullable()
 }).partial()
+

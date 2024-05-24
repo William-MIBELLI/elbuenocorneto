@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 
 export const login = async (
+  callbackUrl: string,
   intialState: { error: string },
   formData: FormData
 ) => {
@@ -23,7 +24,7 @@ export const login = async (
   const { email, password } = parsedCredentials.data;
 
   try {
-    await signIn("credentials", { email, password, redirectTo: '/' });
+    await signIn("credentials", { email, password, redirectTo: `/${callbackUrl}` });
     return { error: "All good 😀" };
   } catch (error) {
     if (error instanceof AuthError) {
