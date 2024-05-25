@@ -148,3 +148,8 @@ export type ICard = ProductSelect & {
 } & { pdl: Pick<DeliveryLinkSelect, "deliveryId">[] } & {
   images: Pick<ImageSelect, "url">[];
 } & { location: Pick<LocationSelect, "city" | "postcode"> };
+
+export interface IProductImage {
+  file: File;
+  url: string;
+}

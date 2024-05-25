@@ -20,6 +20,8 @@ const Recap: FC<IProps> = () => {
   const path = usePathname().split('/');
   console.log('PATH DANS RECAP : ', path);
 
+
+  // PROBABLEMENT LERREUR DE REDIRECTION AU SIGNUP EST LA
   const callbackurl = path.length > 2 ? `/${path[3]}` : '/';
 
   useEffect(() => {

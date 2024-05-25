@@ -1,7 +1,7 @@
-import { Input } from "@nextui-org/react";
+import { Input, InputProps } from "@nextui-org/react";
 import React, { FC } from "react";
 
-interface IProps {
+interface IProps extends InputProps {
   value: string;
   onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
   name: string;
@@ -17,6 +17,7 @@ const ControlledInput: FC<IProps> = ({
   value,
   type = 'text',
   required = true,
+  ...rest
 }) => {
   return (
     <div className="text-left">
@@ -30,6 +31,7 @@ const ControlledInput: FC<IProps> = ({
         classNames={{
           inputWrapper: "border bg-transparent",
         }}
+        {...rest}
       />
     </div>
   );

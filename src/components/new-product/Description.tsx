@@ -68,6 +68,7 @@ const Description = () => {
         <Textarea
           label="Description de l'annonce"
           name={fields.description.name}
+          defaultValue={product.description}
           labelPlacement="outside"
           variant="bordered"
         />

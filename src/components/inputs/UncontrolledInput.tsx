@@ -1,7 +1,7 @@
-import { Input } from "@nextui-org/react";
+import { Input, InputProps } from "@nextui-org/react";
 import React, { FC } from "react";
 
-interface IProps {
+interface IProps extends InputProps {
   name: string;
   label: string;
   required?: boolean;
@@ -9,12 +9,14 @@ interface IProps {
   defaultValue?: string;
 }
 
+
 const UncontrolledInput: FC<IProps> = ({
   label,
   name,
   type = 'text',
   required = true,
-  defaultValue = undefined
+  defaultValue = undefined,
+  ...rest
 }) => {
   return (
     <div className="flex flex-col items-start">
@@ -27,6 +29,7 @@ const UncontrolledInput: FC<IProps> = ({
         classNames={{
           inputWrapper: "border bg-transparent",
         }}
+        {...rest}
       />
     </div>
   );

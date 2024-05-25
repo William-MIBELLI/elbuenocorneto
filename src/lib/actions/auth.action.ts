@@ -87,7 +87,7 @@ export const signUpUser = async (
   await signIn("credentials", {
     email: email.toLowerCase(),
     password,
-    redirectTo: data.callbackurl,
+    redirectTo: data.callbackurl ?? '/',
   });
 
   return {};

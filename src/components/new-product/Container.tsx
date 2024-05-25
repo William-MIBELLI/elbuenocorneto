@@ -8,6 +8,9 @@ import { Lightbulb } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import PartsButtonsGroup from "./PartsButtonsGroup";
 import Price from "./Price";
+import Images from "./Images";
+import LocationPart from "./LocationPart";
+import Validation from "./Validation";
 
 const Container = () => {
   const { part, setPart, back } = useNewProductContext();
@@ -20,6 +23,12 @@ const Container = () => {
           <Description />
         ) : part === 2 ? (
           <Price />
+        ) : part === 3 ? (
+          <Images />
+        ) : part === 4 ? (
+          <LocationPart />
+        ) : part === 5 ? (
+          <Validation />
         ) : null}
       </div>
       <aside className="flex flex-col gap-3 justify-center items-center w-1/4 text-xs px-8">
