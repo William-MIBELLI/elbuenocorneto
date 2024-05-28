@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonsGroup from "./ButtonsGroup";
 import RecapSection from "./RecapSection";
 import Location from "../map/Location";
@@ -16,19 +16,29 @@ interface IProps {}
 const Recap: FC<IProps> = () => {
   const { userValue, setPicture, picture } = useSignUpContext();
   const { address, email, name, phone } = userValue;
+  const [picFD, setPicFD] = useState<FormData>();
 
-  const path = usePathname().split('/');
-  console.log('PATH DANS RECAP : ', path);
-
+  const path = usePathname().split("/");
+  console.log("PATH DANS RECAP : ", path);
 
   // PROBABLEMENT LERREUR DE REDIRECTION AU SIGNUP EST LA
-  const callbackurl = path.length > 2 ? `/${path[3]}` : '/';
+  const callbackurl = path.length > 2 ? `/${path[3]}` : "/";
 
+  //ON STOCKE l'IMAGE DE L'USER DANS UN FORMDATA POUR LE PASSER AU SERVER-ACTION
   useEffect(() => {
-    console.log('PICTURE : ', picture);
+    console.log("PICTURE : ", picture);
+    if (!picture) {
+      return;
+    }
+    const fd = new FormData();
+    fd.append("file", picture.file);
+    setPicFD(fd);
   }, [picture]);
 
-  const [state, action] = useFormState(signUpUser.bind(null, {user: userValue, picture, callbackurl }), {});
+  const [state, action] = useFormState(
+    signUpUser.bind(null, { user: userValue, pictureFD: picFD, callbackurl }),
+    {}
+  );
   if (!address) {
     return <div>Pas daddress 😢</div>;
   }
@@ -38,7 +48,7 @@ const Recap: FC<IProps> = () => {
     postcode: +address.postcode,
   };
 
-  const { GOOGLE_API_KEY } = process.env
+  const { GOOGLE_API_KEY } = process.env;
 
   return (
     <form className="flex flex-col gap-3" action={action}>
@@ -53,7 +63,7 @@ const Recap: FC<IProps> = () => {
         />
         <Location location={location} API_KEY={GOOGLE_API_KEY!} />
       </div>
-      <AddPicture picture={picture}  setPicture={setPicture}/>
+      <AddPicture picture={picture} setPicture={setPicture} />
       <ButtonsGroup />
     </form>
   );

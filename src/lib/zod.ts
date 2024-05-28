@@ -1,3 +1,6 @@
+import { CategoriesType, ICoordonates, categoriesTypeList } from './../interfaces/IProducts';
+import { LocationInsert, deliveriesEnum } from './../drizzle/schema';
+import { DeliveryType, DeliveryTypeList } from './../interfaces/IDelivery';
 import { GENDER } from "@/interfaces/IUser";
 import { z } from "zod";
 
@@ -50,3 +53,21 @@ export const informationsSchema = z.object({
   birthday: z.string().date('PB AVEC LA DATE').nullable()
 }).partial()
 
+export const productSchema = z.object({
+  userId: z.string().uuid('This user_id is not valid.'),
+  title: z.string().min(4,'Le titre doit avoir au moins 4 caractères.').max(100, 'Le titre doit avoir au maximum 100 caractères.'),
+  price: z.number(),
+  description: z.string().min(10, 'La description doit avoir au moins 10 caractères.').max(2500, 'Maximum 2500 caractères.'),
+  category: z.enum([categoriesTypeList[0], ...categoriesTypeList], { message: "Cette catégorie n'est pas disponible." }),
+  locationId: z.string().uuid()
+})
+export type ProductSchemaType = z.infer<typeof productSchema>
+
+export const locationSchema = z.object({
+  id: z.string().uuid(),
+  city: z.string(),
+  streetName: z.string().optional(),
+  postcode: z.number(),
+  label: z.string(),
+  coordonates: z.object({ lat: z.number(), lng: z.number()})
+})

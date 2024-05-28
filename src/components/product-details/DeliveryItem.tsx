@@ -1,7 +1,4 @@
 import { DeliverySelect } from "@/drizzle/schema";
-import { DeliveryType } from "@/interfaces/IDelivery";
-import { getDeliveryByType } from "@/lib/requests/delivery.request";
-import { Divider } from "@nextui-org/react";
 import Image from "next/image";
 import React, { FC } from "react";
 
@@ -9,7 +6,6 @@ interface IProps {
   delivery: DeliverySelect;
 }
 const DeliveryItem: FC<IProps> = async ({ delivery }) => {
-  //const item = getDeliveryByType(deliveryType);
 
   if (!delivery) return null;
 

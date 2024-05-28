@@ -19,10 +19,9 @@ import {
 import NavItem from "./NavItem";
 import Link from "next/link";
 import Menu from "./Menu";
-import Image from "next/image";
-import hat from "public/hat.svg";
 import SellButton from "../sell-button/SellButton";
 import { useSession } from "next-auth/react";
+import Brand from "./Brand";
 
 export const navItems = [
   {
@@ -70,20 +69,7 @@ const Navbar = () => {
           className="md:hidden"
           onChange={(isOpen) => setIsOpenMenu(isOpen)}
         />
-        <NavbarBrand
-          as={Link}
-          href={"/"}
-          className="relative flex justify-center flex-grow-0"
-        >
-          <p className="text-orange-500 font-bold text-xl">ElBuenoCorneto</p>
-          <Image
-            alt="hat"
-            src={hat}
-            height={25}
-            width={25}
-            className="absolute right-[-15px] top-[-5px] animate-bounce "
-          />
-        </NavbarBrand>
+        <Brand/>
       </NavbarContent>
 
       {/* SEARCH SECTION WITH NEW BUTTON */}

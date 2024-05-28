@@ -1,17 +1,15 @@
-import { uploadImageToCloud } from "@/lib/requests/picture.request";
-import { toBase64 } from "@/lib/utils/image.util";
+import { IProductImage } from "@/interfaces/IProducts";
 import { Button } from "@nextui-org/react";
-import { Camera, FilesIcon, Pencil, Plus } from "lucide-react";
+import { Camera, Pencil, Plus } from "lucide-react";
 import Image from "next/image";
-import React, { Dispatch, FC, useEffect, useRef, useState } from "react";
+import React, { Dispatch, FC, useRef, useState } from "react";
 
 interface IProps {
-  picture: string | undefined;
-  setPicture: Dispatch<string | undefined>;
+  picture: IProductImage | undefined;
+  setPicture: Dispatch<IProductImage>;
   imageUrl?: string;
 }
 const AddPicture: FC<IProps> = ({ setPicture, picture, imageUrl }) => {
-  console.log('ADDPICTURE : ', picture, imageUrl);
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const allowedSize = 1024 * 1024 * 5; //5MO
@@ -33,20 +31,14 @@ const AddPicture: FC<IProps> = ({ setPicture, picture, imageUrl }) => {
     if (file.size > allowedSize) {
       return setError("Le fichier ne doit pas excéder 5Mo.");
     }
-
+    
+    //ON MAP LLLLE FILE EN IPRODUCTIMAGE
+    const url = URL.createObjectURL(file);
+    const fileTosave: IProductImage = { file, url };
+    
     //ON STOCKE LE FILE DANS LE STATE ET ON REMET ERROR A NULL
+    setPicture(fileTosave);
     setError(null);
-
-    //ON LENCODE EN BASE64 ET ON LA STOCKE DANS LE STATE
-    const fr = new FileReader();
-    fr.readAsDataURL(files[0]);
-    fr.onload = () => {
-      const res = fr.result;
-      setPicture(res as string);
-    };
-    // const res = toBase64(file);
-    // console.log('res dans addproducts : ', res);
-    // setPicture(res);
   };
 
   return (
@@ -84,7 +76,7 @@ const AddPicture: FC<IProps> = ({ setPicture, picture, imageUrl }) => {
         ) : (
             <div className="relative h-28 w-28">
               <Image
-                src={picture}
+                src={picture.url}
                 alt="preview-picture"
                 fill
                 className="mx-auto rounded-full"
@@ -99,6 +91,7 @@ const AddPicture: FC<IProps> = ({ setPicture, picture, imageUrl }) => {
         hidden
         ref={inputRef}
         onChange={onChangeHandler}
+         
       />
     </div>
   );

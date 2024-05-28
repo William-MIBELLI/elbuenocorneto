@@ -18,7 +18,7 @@ const nextConfig = {
         pathname: '/dyxcsag7z/image/upload/v1715618753/**'
       },
     ],
-    domains: ['res.cloudinary.com']
+    domains: ['res.cloudinary.com', 'firebasestorage.googleapis.com']
   },
   experimental: {
     serverActions: {

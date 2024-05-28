@@ -8,25 +8,18 @@ import {
   updateUser,
 } from "../requests/auth.requests";
 import { informationsSchema, loginSchema, passwordSchema, signUpSchema } from "../zod";
-import { auth, signIn, unstable_update } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { z } from "zod";
-import {
-  IGeometry,
-  IMappedResponse,
-  IProperties,
-} from "@/interfaces/ILocation";
 import "dotenv/config";
 import { IUserSignup } from "@/interfaces/IUser";
-import { mapLocationForStorage } from "./location.action";
 import { createLocationOnDB } from "../requests/location.request";
-import { uploadImageToCloud } from "../requests/picture.request";
+import { uploadImageOnCloud } from "../requests/picture.request";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { ReceiptIndianRupeeIcon } from "lucide-react";
 import { LocationInsert, SelectUser } from "@/drizzle/schema";
+import { IProductImage } from "@/interfaces/IProducts";
 
 export const signUpUser = async (
-  data: { user: IUserSignup; picture: any, callbackurl: string },
+  data: { user: IUserSignup; pictureFD: FormData | undefined, callbackurl: string },
   initialState: {},
   fd: FormData
 ) => {
@@ -34,9 +27,15 @@ export const signUpUser = async (
   let imageUrl: string | null = null;
 
   //SI IL Y A UNE PHOTO, ON LUPLOAD ET ON RECUPERE L'URL
-  if (data.picture) {
-    const res = await uploadImageToCloud(data.picture);
-    if (res) {
+  if (data.pictureFD) {
+
+    const file = data.pictureFD.get("file") as File
+
+    if (file) {
+      const res = await uploadImageOnCloud(file, '');
+      if (!res) {
+        throw new Error("Impossible de sauvegarder la photo de profil.");
+      }
       imageUrl = res.url;
     }
   }
@@ -238,9 +237,9 @@ export const checkUsername = async (
 
 export const updateUserProfile = async (
   data: {
-    picture: string | undefined;
     id: string;
     actualImg: string | null | undefined;
+    fdFile?: FormData
   },
   initialState: {
     username: string[] | undefined;
@@ -252,17 +251,18 @@ export const updateUserProfile = async (
 ) => {
   console.log("UPDATE USER ACTION");
   try {
-    const { picture, id, actualImg } = data;
+    const {  id, actualImg, fdFile } = data;
     let imageUrl: string | null = null;
 
     //SI LUSER A CHANGE DE PHOTO DE PROFIL, ON LUPLOAD
-    if (picture) {
-      const res = await uploadImageToCloud(picture);
-      if (res) {
-        imageUrl = res.url;
-        // const update = await unstable_update({ user: { image: imageUrl } });
-        // console.log("UPDATE AVEC UNSTABLE ", update);
+    const file = fdFile?.get('file') as File;
+
+    if (file) {
+      const res = await uploadImageOnCloud(file, id)
+      if (!res) {
+        throw new Error("Impossible de sauvegarder la nouvelle photo de profil.");
       }
+      imageUrl = res.url;
     }
 
     //ON CHECK SI LUSERNAME EST VALIDE

@@ -9,9 +9,7 @@ import {
   numeric,
   json,
   text,
-  uuid,
   real,
-  decimal,
   varchar,
   boolean
 } from "drizzle-orm/pg-core";
@@ -160,6 +158,8 @@ export const deliveries = pgTable("deliveries", {
   description: text("description").notNull(),
   price: numeric("price").notNull(),
   iconUrl: text("icon_url").notNull(),
+  requirement: text("requirement"),
+  maxWeight: numeric("max_weight")
 });
 
 export const deliveriesRelations = relations(deliveries, ({ many }) => ({
@@ -194,7 +194,7 @@ export type DeliveryLinkSelect = typeof productDeliveryLink.$inferSelect;
 
 export const locations = pgTable("location", {
   id: text("id").primaryKey().notNull(),
-  label: text("label").notNull(),
+  label: text("label"),
   streetName: text("street_name"),
   postcode: integer("postcode").notNull(),
   city: text("city").notNull(),

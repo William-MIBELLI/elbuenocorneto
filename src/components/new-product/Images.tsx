@@ -8,6 +8,7 @@ import { useNewProductContext } from "@/context/newproduct.context";
 import PartsButtonsGroup from "./PartsButtonsGroup";
 import { IProductImage } from "@/interfaces/IProducts";
 import { setHeapSnapshotNearHeapLimit } from "v8";
+import ImagesDisplayer from "./ImagesDisplayer";
 
 const Images = () => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,19 +47,7 @@ const Images = () => {
     <form onSubmit={onSubmithandler} className="flex flex-col gap-3 text-left">
       <h3 className="font-semibold text-xl">Ajoutez des photos</h3>
       <p>Faites glisser vos photos pour changer leur ordre</p>
-      <div
-        className="grid grid-cols-4 grid-rows-3 w-full text-blue-900 m-2 gap-4"
-        onClick={() => inputRef?.current?.click()}
-      >
-        <ActiveImage />
-        {pictures &&
-          pictures.map(({ url }) => <ImagePreview url={url} key={url} />)}
-        {Array(10 - pictures.length < 0 ? 0 : 10 - pictures.length)
-          .fill(0)
-          .map((item, index) => (
-            <InactiveImage index={index + 1 + pictures.length} />
-          ))}
-      </div>
+      <ImagesDisplayer inputRef={inputRef}/>
       <input
         ref={inputRef}
         hidden

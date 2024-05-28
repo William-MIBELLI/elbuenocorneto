@@ -2,6 +2,7 @@ import { CategoriesType, ICard } from "@/interfaces/IProducts";
 import { getDb } from "@/drizzle/db";
 import {
   ImageSelect,
+  ProductInsert,
   ProductSelect,
   SelectUser,
   deliveries,
@@ -133,3 +134,15 @@ export const getProductsByCategory = async (
     return [];
   }
 };
+
+export const createProductOnDB = async (product: ProductInsert) => {
+  try {
+    const db = getDb();
+    const newProduct = await db.insert(products).values(product).returning().then(r => r[0]);
+    if (!newProduct) throw new Error('Failed to create product on DB');
+    return true;
+  } catch (error) {
+    console.log('ERROR CREATE PRODUCT REQUEST ', error);
+    return false;
+  }
+}

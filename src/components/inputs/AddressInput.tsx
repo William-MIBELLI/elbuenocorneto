@@ -6,8 +6,9 @@ import { Input } from '@nextui-org/react';
 
 interface IProps {
   onClickHandler: (item: LocationInsert) => void
+  required?: boolean;
 }
-const AddressInput: FC<IProps> = ({ onClickHandler }) => {
+const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
 
   const [keyword, setKeyword] = useState("");
   const [list, setList] = useState<LocationInsert[]>([]);
@@ -40,7 +41,7 @@ const AddressInput: FC<IProps> = ({ onClickHandler }) => {
         <div className="w-full flex flex-col items-start">
           <label htmlFor="email">Votre adresse *</label>
           <Input
-            isRequired={true}
+            isRequired={required}
             name="email"
             value={keyword}
             onChange={onChangeHandler}

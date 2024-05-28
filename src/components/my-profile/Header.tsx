@@ -1,6 +1,5 @@
 "use client";
 
-import { SelectUser } from "@/drizzle/schema";
 import React, { FC, useEffect, useState } from "react";
 import AddPicture from "../profil-picture/AddPicture";
 import { Button, Divider, Input, Spinner } from "@nextui-org/react";
@@ -10,36 +9,42 @@ import { signOut, useSession } from "next-auth/react";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import SubmitButton from "../submit-button/SubmitButton";
+import { IProductImage } from "@/interfaces/IProducts";
 
 interface IProps {
   //user: SelectUser
 }
 const Header: FC<IProps> = () => {
-  //const { name, id } = user;
+
   const session = useSession();
   if (session.status === "unauthenticated") {
     console.log("session not gound ??? : ", session);
     return notFound();
   }
 
-  // if (session.status === 'loading') {
-  //   return (
-  //     <div>Loading...</div>
-  //   )
-  // }
 
   const { update, data } = session;
-  const [picture, setPicture] = useState<string | undefined>(undefined);
+  const [picture, setPicture] = useState<IProductImage>();
   const [username, setUsername] = useState(data?.user?.name!);
+  const [fd, setFd] = useState(new FormData());
 
   const [state, action] = useFormState(
     updateUserProfile.bind(null, {
-      picture,
       id: data?.user?.id!,
       actualImg: data?.user?.image,
+      fdFile: fd
     }),
     { username: undefined, done: false, newName: null, newImageUrl: null }
   );
+
+  useEffect(() => {
+    const f = new FormData();
+    if (!picture) {
+      return
+    }
+    f.append('file', picture.file)
+    setFd(f)
+  },[picture])
 
   useEffect(() => {
     if (state.done && state?.newName) {

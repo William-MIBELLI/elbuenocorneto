@@ -1,3 +1,4 @@
+import { IProductImage } from "@/interfaces/IProducts";
 import { IUserSignup } from "@/interfaces/IUser";
 import React, { Dispatch, ReactNode, createContext, useContext, useState } from "react";
 
@@ -15,18 +16,11 @@ type SignupContextType = {
   setUserValue: Dispatch<IUserSignup>;
   step: number;
   setStep: Dispatch<number>;
-  picture: any,
-  setPicture: Dispatch<any>
+  picture: IProductImage | undefined,
+  setPicture: Dispatch<IProductImage>
 };
 
-const SignupContext = createContext<SignupContextType>({
-  userValue: initialValue,
-  setUserValue: () => {},
-  step: 0,
-  setStep: () => { },
-  picture: null,
-  setPicture: () => {}
-});
+const SignupContext = createContext<SignupContextType>({} as SignupContextType);
 
 
 
@@ -37,7 +31,7 @@ export const SignUpProvider = ({ children }: Props) => {
 
   const [step, setStep] = useState<number>(0);
   const [userValue, setUserValue] = useState<IUserSignup>(initialValue);
-  const [picture, setPicture] = useState<any>(null);
+  const [picture, setPicture] = useState<IProductImage | undefined>();
 
   const value: SignupContextType = {
     userValue,

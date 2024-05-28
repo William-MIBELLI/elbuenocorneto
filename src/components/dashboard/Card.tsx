@@ -1,4 +1,4 @@
-import { ICardDashboard } from '@/app/dashboard/page';
+import { ICardDashboard } from '@/app/(regular)/dashboard/page';
 import { BookText } from 'lucide-react'
 import Image from 'next/image';
 import Link from 'next/link';

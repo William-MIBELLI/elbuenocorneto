@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import AuthRequired from "@/components/auth-required/AuthRequired";
 import Container from "@/components/new-product/Container";
 import { NewProductProvider } from "@/context/newproduct.context";
+import { Progress } from "@nextui-org/react";
 
 const page = async () => {
   const session = await auth();
@@ -12,10 +13,8 @@ const page = async () => {
   }
   return (
     <NewProductProvider>
-      <div className="w-full flex flex-col gap-3 items-start ">
-        <h1 className="text-2xl font-bold">Commençons par l'essentiel !</h1>
-        <p className="text-xs">* Champs obligatoire</p>
-        <Container/>
+      <div className="w-full flex flex-col gap-3 items-start">
+        <Container userId={ session.user.id!} />
       </div>
     </NewProductProvider>
   );

@@ -1,9 +1,7 @@
 "use client";
-import React, { Dispatch, FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import UncontrolledInput from "../inputs/UncontrolledInput";
-import { useFormState } from "react-dom";
-import { newProductACTION } from "@/lib/actions/product.request";
-import { getSelectProps, useField, useForm } from "@conform-to/react";
+import {  useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { z } from "zod";
 import {
@@ -25,7 +23,7 @@ interface IProps {
 const Intro: FC<IProps> = () => {
   const [step, setStep] = useState(0);
   const { setPart, setProduct, product, back, setBack, part } =
-  useNewProductContext();
+    useNewProductContext();
   const [cat, setCat] = useState<CategoriesType>();
 
   const [form, fields] = useForm({
@@ -35,7 +33,10 @@ const Intro: FC<IProps> = () => {
           title: z
             .string({ message: "Le titre de l'annonce est requis." })
             .min(4, "Le titre doit contenir au moins 4 caractères."),
-          categories: z.string().array().min(1, 'Vous devez renseigner une catégorie pour votre annonce.'),
+          categories: z
+            .string()
+            .array()
+            .min(1, "Vous devez renseigner une catégorie pour votre annonce."),
         }),
       });
       console.log("RES : ", res);
@@ -75,16 +76,17 @@ const Intro: FC<IProps> = () => {
     if (product.category) {
       setCat(product.category);
     }
-  },[])
+  }, []);
 
   return (
     <form
       id={form.id}
       onSubmit={form.onSubmit}
       noValidate
-      className="flex flex-col gap-3"
+      className="flex flex-col gap-3 text-left"
     >
-      <p>{JSON.stringify(product)}</p>
+      <h1 className="text-2xl font-bold">Commençons par l'essentiel !</h1>
+      <p className="text-xs">* Champs obligatoire</p>
       <UncontrolledInput
         label="Quel est le titre de l'annonce ? *"
         name={fields.title.name}
@@ -149,11 +151,11 @@ const Intro: FC<IProps> = () => {
             ))}
           </Select>
           <p className="error_message">
-            {fields.categories.errors?.join(', ')}
+            {fields.categories.errors?.join(", ")}
           </p>
         </div>
       )}
-      <PartsButtonsGroup disable={(cat !== undefined)} />
+      <PartsButtonsGroup disable={cat !== undefined} />
     </form>
   );
 };

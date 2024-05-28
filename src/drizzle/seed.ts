@@ -144,6 +144,7 @@ export const insertDeliveries = async () => {
         ...item,
         id: (index + 1).toString(),
         price: item.price.toString(),
+        maxWeight: item.maxWeight.toString()
       };
     });
     await db.insert(deliveries).values(list);

@@ -31,13 +31,16 @@ const Address: FC<IProps> = ({ user }) => {
     { success: false, address: null }
   );
 
+
   useEffect(() => {
     if (state?.address && state?.success) {
-      setOriginalLoc(state.address.label);
+      setOriginalLoc(state.address.label!);
       addressToSave.current = null;
     }
   }, [state]);
 
+
+  //ON FETCH L'API ADDRESS 500MS APRES LE DERNIER INPUT DE L'USER POUR EVITER TROP DE REQUETES
   const onChangehandler = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -45,7 +48,7 @@ const Address: FC<IProps> = ({ user }) => {
     state.success = false;
     lastTimeTyping.current = Date.now();
     setInputValue(value);
-    if (value.length > 4) {
+    if (value.length > 3) {
       setTimeout(async () => {
         const now = Date.now();
         const diff = now - lastTimeTyping.current!;
@@ -53,7 +56,7 @@ const Address: FC<IProps> = ({ user }) => {
           const list = await fetchAddressFromAPI(value);
           setList(list);
         }
-      }, 1000);
+      }, 500);
     }
   };
 
