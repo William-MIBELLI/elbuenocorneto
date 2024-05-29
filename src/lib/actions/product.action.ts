@@ -75,7 +75,7 @@ export const createProductACTION = async (
     //ON UPLOAD LES PHOTO SUR LE CLOUD ET ON RECUP LES URLS
     const pictures = data.files.getAll('file') as File[];
     
-    if (pictures) {
+    if (pictures.length) {
       const images = await uploadMultipleImagesOnCloud(pictures, data.product.id);
   
       if (!images || !images.length) throw new Error('Impossible de sauvegarder les images de l\'annonce.');

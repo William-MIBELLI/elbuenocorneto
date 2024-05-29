@@ -20,7 +20,10 @@ type NewProductContextType = {
   selected: string[];
   setSelected: Dispatch<string[]>;
   deliveries: DeliverySelect[],
-  setDeliveries: Dispatch<DeliverySelect[]>
+  setDeliveries: Dispatch<DeliverySelect[]>;
+  isComplete: boolean;
+  setIsComplete: Dispatch<boolean>;
+  totalPart: number
 }
 
 const NewProductContext = createContext<NewProductContextType>({} as NewProductContextType)
@@ -39,6 +42,7 @@ export const NewProductProvider = ({ children }: Props) => {
   const [progress, setProgress] = useState<number>((part + 1) / totalPart * 100);
   const [selected, setSelected] = useState<string[]>([]);
   const [deliveries, setDeliveries] = useState<DeliverySelect[]>([]);
+  const [isComplete, setIsComplete] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -62,7 +66,7 @@ export const NewProductProvider = ({ children }: Props) => {
     location, setLocation,
     progress,
     selected, setSelected,
-    deliveries, setDeliveries
+    deliveries, setDeliveries,isComplete, setIsComplete, totalPart
   } 
   
 
