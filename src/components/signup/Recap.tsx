@@ -1,13 +1,9 @@
 import React, { FC, useEffect, useState } from "react";
 import ButtonsGroup from "./ButtonsGroup";
 import RecapSection from "./RecapSection";
-import Location from "../map/Location";
 import { useFormState } from "react-dom";
 import { signUpUser } from "@/lib/actions/auth.action";
 import { useSignUpContext } from "@/context/signup.context";
-import Image from "next/image";
-import { Button } from "@nextui-org/react";
-import { Camera, Plus } from "lucide-react";
 import AddPicture from "../profil-picture/AddPicture";
 import { usePathname } from "next/navigation";
 
@@ -22,7 +18,7 @@ const Recap: FC<IProps> = () => {
   console.log("PATH DANS RECAP : ", path);
 
   // PROBABLEMENT LERREUR DE REDIRECTION AU SIGNUP EST LA
-  const callbackurl = path.length > 2 ? `/${path[3]}` : "/";
+  const callbackurl = path[3] ? `/${path[3]}` : "/";
 
   //ON STOCKE l'IMAGE DE L'USER DANS UN FORMDATA POUR LE PASSER AU SERVER-ACTION
   useEffect(() => {
@@ -61,7 +57,10 @@ const Recap: FC<IProps> = () => {
           value={phone!}
           toStep={2}
         />
-        <Location location={location} API_KEY={GOOGLE_API_KEY!} />
+        <RecapSection label="Votre adresse" value={`${location?.postcode} - ${location?.city}`} toStep={3} />
+        {/* DISABLE LOCATION ATM, ISSUE IN PRODUCTTION */}
+        {/* <Location location={location} API_KEY={GOOGLE_API_KEY!} /> */}
+        
       </div>
       <AddPicture picture={picture} setPicture={setPicture} />
       <ButtonsGroup />
