@@ -110,10 +110,10 @@ export const createProductACTION = async (
     }
 
     //ON AJOUTE LES DELIVERIES S'IL Y EN A
-    if (data.selected) {
+    if (data.selected.length) {
       const res = await insertPDLOnDB(data.product.id, data.selected);
       if (!res) {
-        return {...initialState, selected: "Un problème est survenu lors de l'enregistrement de vos options de livraisons."}
+        return {...initialState, success: true, selected: "Un problème est survenu lors de l'enregistrement de vos options de livraisons."}
       }
     }
 

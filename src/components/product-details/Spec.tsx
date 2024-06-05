@@ -1,16 +1,18 @@
 import { LucideIcon } from 'lucide-react';
 import React, { FC } from 'react'
+import SpecIconDisplayer from './SpecIconDisplayer';
+import {  attrNameType } from '@/drizzle/schema';
 
 interface IProps {
   label: string;
   content: string;
-  Icon: LucideIcon;
+  name: attrNameType;
 }
-const Spec: FC<IProps> = ({ label, content, Icon}) => {
+const Spec: FC<IProps> = ({ label, content, name }) => {
   return (
     <div className='flex gap-2 justify-start items-start '>
       <div className='bg-gray-300 rounded-full p-1.5'>
-        <Icon size={15}/>
+        <SpecIconDisplayer name={name} />
       </div>
       <div className='flex flex-col items-start'>
         <p className='text-xs'>

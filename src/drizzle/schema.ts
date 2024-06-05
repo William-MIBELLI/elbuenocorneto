@@ -74,6 +74,8 @@ export const AttributeNameEnum = pgEnum("attribute_name_enum", [
   'wage'
 ]);
 
+export type attrNameType = typeof AttributeNameEnum.enumValues[number]
+
 export const users = pgTable("user", {
   id: text("id").primaryKey(),
   name: varchar("name", { length: 20 }).notNull(),

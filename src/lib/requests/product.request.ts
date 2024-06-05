@@ -35,6 +35,9 @@ export const getProductDetailsById = async (id: string) => {
       const sq = db.select().from(attributeCategoryJONC).where(eq(attributeCategoryJONC.categoryType, c.type)).as('sq')
       const a = await tx.select().from(attributesTable).rightJoin(sq, eq(sq.attributeName, attributesTable.name));
       
+      //const subq = db.select().from(attributesTable).where(eq())
+      const attrs = await tx.select().from(productAttributeJONC).leftJoin(attributesTable, eq(productAttributeJONC.attributeId, attributesTable.id)).where(eq(productAttributeJONC.productId, p[0].id));
+
       const u: SelectUser[] = await tx
         .select()
         .from(users)
@@ -66,7 +69,7 @@ export const getProductDetailsById = async (id: string) => {
         del: d.map((item) => item.deliveries),
         location: l[0],
         category: c, 
-        attributes: a
+        attributes: attrs
       };
     });
 

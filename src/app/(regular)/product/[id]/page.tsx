@@ -37,12 +37,13 @@ const page: FC<IProps> = async ({ params: { id } }) => {
     price = 0,
     createdAt,
     description,
+    state
   } = data.product;
 
   const { del, location, attributes, category } = data;
 
   console.log('CATEGORIE : ', category.type)
-  attributes.forEach(item => console.log('ATRR : ', item.attribute?.name))
+  attributes.forEach(item => console.log('ATRR : ', item.attribute?.label))
 
 
   const { GOOGLE_API_KEY } = process.env;
@@ -112,7 +113,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
         <Divider className="my-4" />
         <Description description={description as string} />
         <Divider className="my-4" />
-        <Specs />
+        <Specs attributes={attributes} />
         <Divider className="my-4" />
         {del.length ? (
           <Delivery deliveryList={del} />
