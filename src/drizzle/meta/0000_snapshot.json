@@ -1,10 +1,8 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
-  "version": "5",
-  "dialect": "pg",
+  "version": "6",
+  "dialect": "postgresql",
   "tables": {
-    "_prisma_migrations": {
+    "public._prisma_migrations": {
       "name": "_prisma_migrations",
       "schema": "",
       "columns": {
@@ -64,7 +62,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Session": {
+    "public.Session": {
       "name": "Session",
       "schema": "",
       "columns": {
@@ -113,22 +111,22 @@
         "Session_userId_fkey": {
           "name": "Session_userId_fkey",
           "tableFrom": "Session",
-          "tableTo": "User",
-          "schemaTo": "public",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
+          "schemaTo": "public",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Authenticator": {
+    "public.Authenticator": {
       "name": "Authenticator",
       "schema": "",
       "columns": {
@@ -200,22 +198,22 @@
         "Authenticator_userId_fkey": {
           "name": "Authenticator_userId_fkey",
           "tableFrom": "Authenticator",
-          "tableTo": "User",
-          "schemaTo": "public",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
+          "schemaTo": "public",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "User": {
+    "public.User": {
       "name": "User",
       "schema": "",
       "columns": {
@@ -282,7 +280,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "VerificationToken": {
+    "public.VerificationToken": {
       "name": "VerificationToken",
       "schema": "",
       "columns": {
@@ -318,7 +316,7 @@
       },
       "uniqueConstraints": {}
     },
-    "Account": {
+    "public.Account": {
       "name": "Account",
       "schema": "",
       "columns": {
@@ -407,16 +405,16 @@
         "Account_userId_fkey": {
           "name": "Account_userId_fkey",
           "tableFrom": "Account",
-          "tableTo": "User",
-          "schemaTo": "public",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
+          "schemaTo": "public",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -437,5 +435,7 @@
     "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": ""
 }

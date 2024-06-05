@@ -37,11 +37,12 @@ const page: FC<IProps> = async ({ params: { id } }) => {
     price = 0,
     createdAt,
     description,
-    category
-    
   } = data.product;
 
-  const { del, location } = data;
+  const { del, location, attributes, category } = data;
+
+  console.log('CATEGORIE : ', category.type)
+  attributes.forEach(item => console.log('ATRR : ', item.attribute?.name))
 
 
   const { GOOGLE_API_KEY } = process.env;
@@ -131,7 +132,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
           <p>Signaler l'annonce</p>
         </div>
         <Divider className="my-4" />
-        <CardSlider category={category} title="Ces annonces peuvent vous intéresser"/>
+        <CardSlider category={data.category.type} title="Ces annonces peuvent vous intéresser"/>
       </main>
       <aside className=" w-full lg:w-1/3 ">
         <Seller userId={data.user.id} />

@@ -1,19 +1,13 @@
-import { Camera, Plus } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import ActiveImage from "./ActiveImage";
-import InactiveImage from "./InactiveImage";
-import Image from "next/image";
-import ImagePreview from "./ImagePreview";
 import { useNewProductContext } from "@/context/newproduct.context";
 import PartsButtonsGroup from "./PartsButtonsGroup";
 import { IProductImage } from "@/interfaces/IProducts";
-import { setHeapSnapshotNearHeapLimit } from "v8";
 import ImagesDisplayer from "./ImagesDisplayer";
 
 const Images = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { pictures, setPictures, part, setPart } = useNewProductContext();
+  const { pictures, setPictures, setPart } = useNewProductContext();
 
   const onClickHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
@@ -40,7 +34,7 @@ const Images = () => {
 
   const onSubmithandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPart(part + 1);
+    setPart('deliveries');
   }
 
   return (

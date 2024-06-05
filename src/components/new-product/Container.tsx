@@ -1,5 +1,5 @@
 "use client";
-import { useNewProductContext } from "@/context/newproduct.context";
+import { PartType, useNewProductContext } from "@/context/newproduct.context";
 import React, { FC, useEffect, useState } from "react";
 import Intro from "./Intro";
 import Description from "./Description";
@@ -12,37 +12,39 @@ import Validation from "./Validation";
 import Deliveries from "./Deliveries";
 import { v4 as uuidV4 } from "uuid";
 import Success from "./Success";
+import Attributes from "./Attributes";
 
-const tips = [
-  [
+const tips: Partial<Record<PartType, string[]>> = {
+  title: [
     "Votre annonce sera trouvée plus facilement !",
     "Vous aurez 50% de chances en plus d'être contacté si votre annonce est dans la bonne catégorie",
   ],
-  [
+  description: [
     "Mettez en valeur votre annonce !",
     "Plus il y a de détails, plus vos futurs contacts vous trouveront rapidement.",
   ],
-  [
+  price: [
     "Vous le savez, le prix est important. Soyez juste, mais ayez en tête une marge de négociation si besoin",
   ],
-  ["10 photos dans une annonce augmentent de 30% le nombre de contacts "],
-  [
+  images: [
+    "10 photos dans une annonce augmentent de 30% le nombre de contacts ",
+  ],
+  location: [
     "Pour des raisons de confidentialité, si vous renseignez votre adresse exacte, celle-ci n’apparaîtra jamais sur votre annonce.",
   ],
-  [
+  deliveries: [
     "Vous le savez, le prix est important, autant pour vous que pour l’acheteur.",
     "En activant la livraison, profitez du paiement en ligne sécurisé.",
   ],
-  [
+  validation: [
     "Tout à l'air bon !",
     "Vous pourrez à tout moment modifier votre annonce depuis votre compte.",
   ],
-  [
+  success: [
     "Bravo !",
-    "Votre annonce est maintenant en ligne. vous pouvez la modifier depuis votre profil."
-  ]
-];
-
+    "Votre annonce est maintenant en ligne. vous pouvez la modifier depuis votre profil.",
+  ],
+};
 interface IProps {
   userId: string;
 }
@@ -60,44 +62,46 @@ const Container: FC<IProps> = ({ userId }) => {
         radius="none"
         value={progress}
         aria-label="progression status"
-        className="absolute w-screen left-0"
+        className="absolute w-full left-0 "
         classNames={{
           indicator: ["bg-main rounded-r-lg"],
         }}
       />
       <div className="w-3/4 shadow-lg p-6 flex flex-col gap-3">
-        {part === 0 ? (
+        {part === "title" ? (
           <Intro />
-        ) : part === 1 ? (
+        ) : part === "description" ? (
           <Description />
-        ) : part === 2 ? (
+        ) : part === "price" ? (
           <Price />
-        ) : part === 3 ? (
+        ) : part === "images" ? (
           <Images />
-        ) : part === 4 ? (
+        ) : part === "location" ? (
           <LocationPart />
-        ) : part === 5 ? (
+        ) : part === "deliveries" ? (
           <Deliveries />
-        ) : part === 6 ? (
+        ) : part === "validation" ? (
           <Validation />
-        ) : part === 7 ? (
+        ) : part === "success" ? (
           <Success />
+        ) : part === "attributes" ? (
+          <Attributes />
         ) : null}
       </div>
       <aside className="flex flex-col gap-3 justify-center items-center w-1/4 text-xs px-8">
         <div className="flex w-full justify-center items-center">
           <hr
             className={`border-1.5 ${
-              part === 0 ? "border-main" : "border-blue-900"
+              part === "title" ? "border-main" : "border-blue-900"
             } flex-auto`}
           />
           <Lightbulb
-            className={part === 0 ? "text-main" : "text-blue-900"}
+            className={part === "title" ? "text-main" : "text-blue-900"}
             size={25}
           />
           <hr
             className={`border-1.5 ${
-              part === 0 ? "border-main" : "border-blue-900"
+              part === "title" ? "border-main" : "border-blue-900"
             } flex-auto`}
           />
         </div>

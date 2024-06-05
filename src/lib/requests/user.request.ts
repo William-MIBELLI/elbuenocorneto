@@ -13,9 +13,10 @@ export const getUserForProfile = async (id: string) => {
           columns: {
             title: true,
             price: true,
-            category: true,
+            categoryType: true,
             id: true,
-            createdAt: true
+            createdAt: true,
+            state: true
           },
           with:{
             images: { limit: 1 },

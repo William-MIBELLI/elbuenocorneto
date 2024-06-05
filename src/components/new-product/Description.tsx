@@ -1,46 +1,56 @@
 import { useNewProductContext } from "@/context/newproduct.context";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UncontrolledInput from "../inputs/UncontrolledInput";
-import { Textarea } from "@nextui-org/react";
-import ControlledInput from "../inputs/ControlledInput";
+import { Select, SelectItem, Textarea } from "@nextui-org/react";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { z } from "zod";
 import PartsButtonsGroup from "./PartsButtonsGroup";
+import { StateEnum } from "@/drizzle/schema";
 
 const Description = () => {
-  const { product, setProduct, setPart, part } = useNewProductContext();
+  const { product, setProduct, setPart } = useNewProductContext();
+  const [state, setState] = useState<string>();
   const MIN = 10;
   const MAX = 2500;
-  const TITLE_MIN = 5;
-  const TITLE_MAX = 100;
+
+  //SI L'USER REVIENT SUR LA PAGE, ON DISPLAY LE STATE DEJA SELECTIONNE
+  useEffect(() => {
+    if (product.state) {
+      setState(product.state)
+    }
+  },[product])
 
   const [form, fields] = useForm({
     onValidate({ formData }) {
-      // console.log('FIELDS : ', fields.title.value);
       const res = parseWithZod(formData, {
         schema: z.object({
-          title: z
-            .string({ message: "Le titre de l'annonce est requis." })
-            .min(4, "Le titre doit contenir au moins 4 caractères."),
+          state: z
+            .string({ message: "L'état est requis" })
+            .refine((val) => StateEnum.enumValues.find((item) => item === val)),
           description: z
             .string({ message: "Une description est requise." })
             .min(10, "La description doit contenir 10 caractères au minimum."),
         }),
       });
-      console.log("RES : ", res);
+
       return res;
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     onSubmit(event) {
       event.preventDefault();
+      const state = StateEnum.enumValues.find(
+        (item) => item === fields.state.value
+      );
+      console.log("STATE DANS SUBMIT : ", state);
       setProduct({
         ...product,
-        title: fields.title.value,
+        state,
         description: fields.description.value,
       });
-      setPart(part + 1);
+
+      setPart("attributes");
     },
   });
 
@@ -53,24 +63,29 @@ const Description = () => {
     >
       <h3 className="text-xl font-semibold text-left">Décrivez votre bien</h3>
       <div>
-        <UncontrolledInput
-          label="Titre de l'annonce *"
-          type="text"
-          name={fields.title.name}
-          defaultValue={product.title}
-        />
+        <label className="text-left" htmlFor="state">Etat *</label>
+        <Select
+          aria-label="Etat"
+          name={fields.state.name}
+          selectedKeys={[state!]}
+          value={state}
+          onChange={e => setState(e.target.value)}
+        >
+          {StateEnum.enumValues.map((val) => (
+            <SelectItem key={val} value={val}>
+              {val}
+            </SelectItem>
+          ))}
+        </Select>
         <div className="flex justify-between">
           <p className="error_message text-left">
-            {fields.title.errors?.join(", ")}
-          </p>
-          <p className="text-xs text-right mt-1">
-            {fields.title.value ? fields.title.value.length : 0} / {TITLE_MAX}
+            {fields.state.errors?.join(", ")}
           </p>
         </div>
       </div>
       <div>
         <Textarea
-          label="Description de l'annonce"
+          label="Description de l'annonce *"
           name={fields.description.name}
           defaultValue={product.description}
           labelPlacement="outside"
@@ -102,7 +117,7 @@ const Description = () => {
         disable={
           !!fields.description.value &&
           fields.description.value.length >= MIN &&
-          !fields.title.errors
+          !fields.state.errors
         }
       />
     </form>

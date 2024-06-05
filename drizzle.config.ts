@@ -22,9 +22,13 @@ import { defineConfig } from 'drizzle-kit';
  
 export default defineConfig({
   schema: './src/drizzle/schema.ts',
-  driver: 'pg',
+  dialect: 'postgresql',
   out: './src/drizzle',
   dbCredentials: {
-    connectionString: process.env.POSTGRES_URL!,
+    url: process.env.POSTGRES_URL!,
   },
+  migrations: {
+    schema: 'public'
+  }
+
 });

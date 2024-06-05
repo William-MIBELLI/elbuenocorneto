@@ -1,10 +1,8 @@
 {
-  "id": "b52820de-0b10-4b06-a189-88e4d0dc3bd5",
-  "prevId": "4f17da3f-b473-4978-b51c-0623f3a1c7f0",
-  "version": "5",
-  "dialect": "pg",
+  "version": "6",
+  "dialect": "postgresql",
   "tables": {
-    "account": {
+    "public.account": {
       "name": "account",
       "schema": "",
       "columns": {
@@ -80,15 +78,15 @@
         "account_userId_user_id_fk": {
           "name": "account_userId_user_id_fk",
           "tableFrom": "account",
-          "tableTo": "user",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -102,7 +100,7 @@
       },
       "uniqueConstraints": {}
     },
-    "deliveries": {
+    "public.deliveries": {
       "name": "deliveries",
       "schema": "",
       "columns": {
@@ -148,7 +146,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "image": {
+    "public.image": {
       "name": "image",
       "schema": "",
       "columns": {
@@ -176,21 +174,21 @@
         "image_product_id_product_id_fk": {
           "name": "image_product_id_product_id_fk",
           "tableFrom": "image",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "location": {
+    "public.location": {
       "name": "location",
       "schema": "",
       "columns": {
@@ -230,7 +228,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "product_delivery_link": {
+    "public.product_delivery_link": {
       "name": "product_delivery_link",
       "schema": "",
       "columns": {
@@ -252,34 +250,34 @@
         "product_delivery_link_product_id_product_id_fk": {
           "name": "product_delivery_link_product_id_product_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "product_delivery_link_delivery_id_deliveries_id_fk": {
           "name": "product_delivery_link_delivery_id_deliveries_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "deliveries",
           "columnsFrom": [
             "delivery_id"
           ],
+          "tableTo": "deliveries",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "product": {
+    "public.product": {
       "name": "product",
       "schema": "",
       "columns": {
@@ -358,21 +356,21 @@
         "product_username_user_name_fk": {
           "name": "product_username_user_name_fk",
           "tableFrom": "product",
-          "tableTo": "user",
           "columnsFrom": [
             "username"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "name"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "session": {
+    "public.session": {
       "name": "session",
       "schema": "",
       "columns": {
@@ -400,21 +398,21 @@
         "session_userId_user_id_fk": {
           "name": "session_userId_user_id_fk",
           "tableFrom": "session",
-          "tableTo": "user",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "user": {
+    "public.user": {
       "name": "user",
       "schema": "",
       "columns": {
@@ -466,7 +464,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "verificationToken": {
+    "public.verificationToken": {
       "name": "verificationToken",
       "schema": "",
       "columns": {
@@ -504,20 +502,23 @@
     }
   },
   "enums": {
-    "type": {
+    "public.type": {
       "name": "type",
-      "values": {
-        "colissimo": "colissimo",
-        "laposte": "laposte",
-        "mondialrelay": "mondialrelay",
-        "chronopost": "chronopost"
-      }
+      "schema": "public",
+      "values": [
+        "colissimo",
+        "laposte",
+        "mondialrelay",
+        "chronopost"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "b52820de-0b10-4b06-a189-88e4d0dc3bd5",
+  "prevId": "4f17da3f-b473-4978-b51c-0623f3a1c7f0"
 }

@@ -12,7 +12,7 @@ const orderBy = [
 
 
 export interface ProductDataForList {
-  product: Pick<ProductSelect, "id" | "title" | "createdAt" | "price" | "category">;
+  product: Pick<ProductSelect, "id" | "title" | "createdAt" | "price" | "categoryType" | "state">;
   images: ImageSelect[],
   location: LocationSelect
 }

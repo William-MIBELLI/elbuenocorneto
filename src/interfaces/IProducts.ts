@@ -1,4 +1,6 @@
 import {
+  AttributeInsert,
+  CategoryInsert,
   DeliveryLinkSelect,
   ImageSelect,
   LocationSelect,
@@ -7,67 +9,90 @@ import {
 } from "@/drizzle/schema";
 import { DeliveryType } from "./IDelivery";
 import { ILocation } from "./ILocation";
+import { v4 as uuidV4 } from "uuid";
+import carBrand from '../../car_brand.json'
 
 export const categoriesList: ICategoriesList = {
   immobilier: {
     label: "Immobilier",
     imageUrl: "immobilier",
-    id: 1,
+    id: uuidV4(),
     target: "immobilier",
+    type: 'immobilier',
+    parentId: null
   },
   vehicule: {
     label: "Véhicule",
     imageUrl: "voiture",
-    id: 2,
+    id: uuidV4(),
     target: "vehicule",
+    type: 'vehicule',
+    parentId: null
   },
   vacance: {
     label: "Locations de vacances",
     imageUrl: "vacance",
-    id: 3,
+    id: uuidV4(),
     target: "vacance",
+    type: 'vacance',
+    parentId: null
+    
   },
   job: {
     label: "Emploi",
     imageUrl: "job",
-    id: 4,
+    id: uuidV4(),
     target: "job",
+    type: 'job',
+    parentId: null
   },
   mode: {
     label: "Mode",
     imageUrl: "mode",
-    id: 5,
+    id: uuidV4(),
     target: "mode",
+    type: 'mode',
+    parentId: null
   },
   jardin: {
     label: "Maison & Jardin",
     imageUrl: "decoration",
-    id: 6,
+    id: uuidV4(),
     target: "jardin",
+    type: 'jardin',
+    parentId: null
   },
   famille: {
     label: "Famille",
     imageUrl: "ameublement",
-    id: 7,
+    id: uuidV4(),
     target: "famille",
+    type : 'famille',
+    parentId: null
   },
   electronique: {
     label: "Electronique",
     imageUrl: "informatique",
-    id: 8,
+    id: uuidV4(),
     target: "electronique",
+    type :'electronique',
+    parentId: null
   },
   loisir: {
     label: "Loisirs",
     imageUrl: "livres",
-    id: 9,
+    id: uuidV4(),
     target: "loisir",
+    type: 'loisir',
+    parentId: null
   },
   autre: {
     label: "Autres",
     imageUrl: "autre",
-    id: 10,
+    id: uuidV4(),
     target: "autre",
+    type: 'autre',
+    parentId: null
   },
 };
 
@@ -97,13 +122,13 @@ export const categoriesTypeList: CategoriesType[] = [
 ];
 
 export type ICategoriesList = {
-  [key in CategoriesType]: ICategory;
+  [key in CategoriesType]: CategoryInsert;
 };
 
 export interface ICategory {
   label: string;
   imageUrl: string;
-  id: number;
+  id: string;
   target: CategoriesType;
 }
 
@@ -153,3 +178,131 @@ export interface IProductImage {
   file: File;
   url: string;
 }
+
+const yearValues = new Array(30).fill(' ').map((_item, index) => {
+  const date = new Date().getFullYear();
+  return (date - index).toString();
+})
+
+export const attributesList: Omit<AttributeInsert, 'id'>[] = [
+  {
+    name: 'carBrand',
+    label: 'Marque',
+    type: 'select',
+    possibleValue: Object.keys(carBrand).map(k => k)
+  },
+  {
+    name: 'year',
+    label: 'Année de fabrication',
+    type: 'select',
+    possibleValue: yearValues
+  },
+  {
+    name: 'milling',
+    label: 'Kilométrage',
+    type: 'number'
+  }, 
+  {
+    name: 'fuel',
+    label: 'carburant',
+    type: 'select',
+    possibleValue: ['Essence', 'Diesel', 'GPL', 'Hybride', 'Electrique', 'Autre']
+  },
+  {
+    name: 'power',
+    label: 'Puissance',
+    type: 'number',
+    required: false
+  },
+  {
+    name: 'doors',
+    label: 'Nombre de portes',
+    type: 'select',
+    possibleValue: ['3', '5', 'Autre'],
+    required: false
+  },
+  {
+    name: 'livingSpace',
+    label: 'Surface habitable',
+    type: 'number'
+  },
+  {
+    name: 'habitationType',
+    label: "Type d'habitation",
+    type: 'select',
+    possibleValue: ['Appartement', 'Maison individuelle', 'Co-propriété', 'Autre']
+  },
+  {
+    name: 'garden',
+    label: 'jardin',
+    type: 'boolean'
+  },
+  {
+    name: 'color',
+    label: 'Couleur',
+    type: 'text',
+    required: false
+  },
+  {
+    name: 'clothMaterial',
+    label: 'Tissu',
+    type: 'select',
+    possibleValue: ['Coton', 'Polyamide', 'Cuir', 'Simili-cuir', 'Autre']
+  },
+  {
+    name: 'objectMaterial',
+    label: 'Matière',
+    type: "select",
+    possibleValue: ['plastique', 'Bois', 'Métal', 'Composite', 'Autre']
+  },
+  {
+    name: 'model',
+    label: 'Modèle',
+    type: 'text'
+  },
+  {
+    name: 'size',
+    label: 'Taille',
+    type: 'select',
+    possibleValue: ['S', 'M', 'L', 'XL', '2XL']
+  },
+  {
+    name: 'age',
+    label: "Tranche d'age",
+    type: 'select',
+    possibleValue: ['0-3', '3-8', '8-11', '11-14', '14-18', '18+'],
+    required: false
+  },
+  {
+    name: 'stockage',
+    label: 'Capacité',
+    type: 'select',
+    possibleValue: ['32', '64', '128', '256', '512', 'Plus'],
+    required: false
+  },
+  {
+    name: 'memory',
+    label: 'Memoire vive',
+    type: 'select',
+    possibleValue: ['2', '4', '8', '16', '32', 'Plus'],
+    required: false
+  },
+  {
+    name: 'contractType',
+    label: 'Type de contrat',
+    type: 'select',
+    possibleValue: [ 'CDI', 'CDD', 'Interim', 'Freelance', 'Alternance', 'Stage', 'Autre']
+  },
+  {
+    name: 'wage',
+    label: 'Salaire',
+    type: 'number',
+    required: false
+  },
+  {
+    name: 'brand',
+    label: 'Marque',
+    type: 'text'
+  }
+
+]

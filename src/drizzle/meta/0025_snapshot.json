@@ -1,10 +1,8 @@
 {
-  "id": "5f792031-d4d1-43f5-bc51-e8f1afae10a7",
-  "prevId": "a5d90bd7-d398-4993-8ff9-feef49b0dead",
-  "version": "5",
-  "dialect": "pg",
+  "version": "6",
+  "dialect": "postgresql",
   "tables": {
-    "account": {
+    "public.account": {
       "name": "account",
       "schema": "",
       "columns": {
@@ -80,15 +78,15 @@
         "account_userId_user_id_fk": {
           "name": "account_userId_user_id_fk",
           "tableFrom": "account",
-          "tableTo": "user",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -102,7 +100,7 @@
       },
       "uniqueConstraints": {}
     },
-    "deliveries": {
+    "public.deliveries": {
       "name": "deliveries",
       "schema": "",
       "columns": {
@@ -148,7 +146,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "image": {
+    "public.image": {
       "name": "image",
       "schema": "",
       "columns": {
@@ -176,21 +174,21 @@
         "image_product_id_product_id_fk": {
           "name": "image_product_id_product_id_fk",
           "tableFrom": "image",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "location": {
+    "public.location": {
       "name": "location",
       "schema": "",
       "columns": {
@@ -237,7 +235,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "product_delivery_link": {
+    "public.product_delivery_link": {
       "name": "product_delivery_link",
       "schema": "",
       "columns": {
@@ -259,34 +257,34 @@
         "product_delivery_link_product_id_product_id_fk": {
           "name": "product_delivery_link_product_id_product_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "product_delivery_link_delivery_id_deliveries_id_fk": {
           "name": "product_delivery_link_delivery_id_deliveries_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "deliveries",
           "columnsFrom": [
             "delivery_id"
           ],
+          "tableTo": "deliveries",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "product": {
+    "public.product": {
       "name": "product",
       "schema": "",
       "columns": {
@@ -345,34 +343,34 @@
         "product_user_id_user_id_fk": {
           "name": "product_user_id_user_id_fk",
           "tableFrom": "product",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_location_id_location_id_fk": {
           "name": "product_location_id_location_id_fk",
           "tableFrom": "product",
-          "tableTo": "location",
           "columnsFrom": [
             "location_id"
           ],
+          "tableTo": "location",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "session": {
+    "public.session": {
       "name": "session",
       "schema": "",
       "columns": {
@@ -400,21 +398,21 @@
         "session_userId_user_id_fk": {
           "name": "session_userId_user_id_fk",
           "tableFrom": "session",
-          "tableTo": "user",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "user": {
+    "public.user": {
       "name": "user",
       "schema": "",
       "columns": {
@@ -485,21 +483,21 @@
         "user_location_id_location_id_fk": {
           "name": "user_location_id_location_id_fk",
           "tableFrom": "user",
-          "tableTo": "location",
           "columnsFrom": [
             "location_id"
           ],
+          "tableTo": "location",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "verificationToken": {
+    "public.verificationToken": {
       "name": "verificationToken",
       "schema": "",
       "columns": {
@@ -537,20 +535,23 @@
     }
   },
   "enums": {
-    "type": {
+    "public.type": {
       "name": "type",
-      "values": {
-        "colissimo": "colissimo",
-        "laposte": "laposte",
-        "mondialrelay": "mondialrelay",
-        "chronopost": "chronopost"
-      }
+      "schema": "public",
+      "values": [
+        "colissimo",
+        "laposte",
+        "mondialrelay",
+        "chronopost"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "5f792031-d4d1-43f5-bc51-e8f1afae10a7",
+  "prevId": "a5d90bd7-d398-4993-8ff9-feef49b0dead"
 }

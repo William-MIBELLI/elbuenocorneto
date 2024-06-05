@@ -11,13 +11,29 @@ import {
   createProductACTION,
 } from "@/lib/actions/product.action";
 import SubmitButton from "../submit-button/SubmitButton";
-import { DeliveryType } from "@/interfaces/IDelivery";
 
 const Validation = () => {
-  const { product, location, pictures, selected, setPart, part, deliveries, setIsComplete } =
-    useNewProductContext();
+  const {
+    product,
+    location,
+    pictures,
+    selected,
+    setPart,
+    deliveries,
+    setIsComplete,
+    productAttributes,
+    attributes,
+  } = useNewProductContext();
   const [displayPics, setDisplayPics] = useState(true);
   const [files, setFiles] = useState<FormData>(new FormData());
+
+  // useEffect(() => {
+  //   console.log("PRODATTR : ", productAttributes);
+  // }, [productAttributes]);
+
+  // useEffect(() => {
+  //   console.log('ATTRIBUTES DANS VALIDAIOTN : ', attributes);
+  // },[attributes])
 
   //ON PASSE LES IMAGES DU CONTEXT DANS UN FORMDATA POUR LE SERVERACTION
   useEffect(() => {
@@ -34,6 +50,8 @@ const Validation = () => {
       location: location as LocationInsert,
       files,
       selected,
+      productAttributes,
+      attributes,
     }),
     {
       success: false,
@@ -42,20 +60,21 @@ const Validation = () => {
       images: undefined,
       location: undefined,
       product: undefined,
+      attrs: undefined,
     } as ICreationState
   );
 
   //SI LE SUBMIT EST OK, ON AFFICHE SUCCESS-PART
   useEffect(() => {
     if (state?.success) {
-      setPart(part + 1);
+      setPart("success");
     }
   }, [state]);
 
   //ON MET ISCOMPLETE A TRUE POUR DISPLAY LE BON BUTTON SI LUSER REVIENT EN ARRIERE
   useEffect(() => {
     setIsComplete(true);
-  },[])
+  }, []);
 
   return (
     <div className="text-left">
@@ -73,11 +92,11 @@ const Validation = () => {
             <p className="font-semibold underline">Le titre de l'annonce :</p>
             <p className="">{product.title}</p>
             <div className="bg-blue-300 text-blue-900  w-fit px-2 rounded-xl text-xs flex items-center">
-              {product.category}
+              {product.categoryType}
             </div>
           </div>
           <Button
-            onClick={() => setPart(0)}
+            onClick={() => setPart("title")}
             isIconOnly
             className="bg-transparent hover:bg-gray-200"
           >
@@ -88,17 +107,40 @@ const Validation = () => {
           {state?.product?.title}
         </p>
         <p className="text-red-400 font-semibold text-center text-xs">
-          {state?.product?.category}
+          {state?.product?.categoryType}
         </p>
 
         {/* PRICE */}
         <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
           <div className="flex gap-2">
-          <p className="font-semibold underline">Le prix :</p>
-          <p className="text-green-600">{product.price}€</p>
+            <p className="font-semibold underline">Le prix :</p>
+            <p className="text-green-600">{product.price}€</p>
           </div>
           <Button
-            onClick={() => setPart(2)}
+            onClick={() => setPart("price")}
+            isIconOnly
+            className="bg-transparent hover:bg-gray-200"
+          >
+            <Pen size={20} />
+          </Button>
+        </div>
+        <p className="text-red-400 font-semibold text-center text-xs">
+          {state?.product?.price}
+        </p>
+
+        {/* ATTRIBUTES */}
+        <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
+          <div className="">
+            {productAttributes &&
+              productAttributes.map((attr, index) => (
+                <div key={index} className="flex gap-2">
+                  <p className="font-semibold">{attr.label}</p>
+                  <p className="text-gray-500">{attr.value}</p>
+                </div>
+              ))}
+          </div>
+          <Button
+            onClick={() => setPart("price")}
             isIconOnly
             className="bg-transparent hover:bg-gray-200"
           >
@@ -127,16 +169,14 @@ const Validation = () => {
                 </div>
               ))}
             <Button
-              onClick={() => setPart(5)}
+              onClick={() => setPart("deliveries")}
               isIconOnly
               className="bg-transparent hover:bg-gray-200"
             >
               <Pen size={20} />
             </Button>
           </div>
-        ) : (
-            null
-        )}
+        ) : null}
         <p className="text-red-400 font-semibold text-center text-xs">
           {state?.selected}
         </p>
@@ -149,7 +189,7 @@ const Validation = () => {
           </div>
           <Button
             isIconOnly
-            onClick={() => setPart(1)}
+            onClick={() => setPart("description")}
             className="bg-transparent hover:bg-gray-200"
           >
             <Pen size={20} />
@@ -167,21 +207,18 @@ const Validation = () => {
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center p-2">
               <div className="flex gap-4 items-center">
-                <p className="font-semibold underline">
-                  Photos de l'annonce :
-                </p>
+                <p className="font-semibold underline">Photos de l'annonce :</p>
                 <p>
                   <span
                     className={`${
                       pictures.length === 0 ? "text-red-500" : "text-green-500"
                     }`}
                   >
-                    {pictures.length + ' ' }
+                    {pictures.length + " "}
                   </span>
                   / 10
-
                 </p>
-               
+
                 <ChevronDown
                   size={20}
                   className={`${
@@ -191,7 +228,7 @@ const Validation = () => {
               </div>
               <Button
                 isIconOnly
-                onClick={() => setPart(3)}
+                onClick={() => setPart("images")}
                 className="bg-transparent hover:bg-gray-200"
               >
                 <Pen size={20} />
@@ -201,10 +238,11 @@ const Validation = () => {
           {displayPics && (
             <div className="grid grid-cols-5 gap-3 p-2 transition-all bg-gray-50">
               {pictures.map((item) => (
-                <div className="h-36 w-full relative ">
+                <div key={item.url} className="h-36 w-full relative ">
                   <Image
                     src={item.url}
                     alt={item.file.name}
+                    key={item.url}
                     fill
                     className="rounded-lg"
                   />
@@ -221,12 +259,15 @@ const Validation = () => {
         {/* <Location API_KEY="" location={location as LocationSelect} /> */}
         <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
           <div className="flex items-center gap-4">
-            <MapPin size={20} className="text-blue-900"/>
-            <p>{`${location?.postcode} - `}<span className="font-semibold">{location?.city}</span></p>
+            <MapPin size={20} className="text-blue-900" />
+            <p>
+              {`${location?.postcode} - `}
+              <span className="font-semibold">{location?.city}</span>
+            </p>
           </div>
           <Button
             isIconOnly
-            onClick={() => setPart(4)}
+            onClick={() => setPart("location")}
             className="bg-transparent hover:bg-gray-200"
           >
             <Pen size={20} />

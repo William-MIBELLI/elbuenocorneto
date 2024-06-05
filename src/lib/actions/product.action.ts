@@ -1,19 +1,19 @@
 
 "use server";
 
-import { LocationInsert, ProductInsert, ProductSelect, deliveries } from "@/drizzle/schema";
+import { AttributeSelect, LocationInsert, ProdAttrInsert, ProductInsert, ProductSelect, deliveries } from "@/drizzle/schema";
 import { DeliveryType } from "@/interfaces/IDelivery";
 import { IProductImage } from "@/interfaces/IProducts";
 import { parseWithZod } from "@conform-to/zod";
 import { z } from "zod";
-import { ProductSchemaType, locationSchema, productSchema } from "../zod";
-import { createProductOnDB } from "../requests/product.request";
+import { ProductSchemaType, createDynamicSchemaForAttrs, locationSchema, productSchema } from "../zod";
+import { createProdAttrsOnDB, createProductOnDB } from "../requests/product.request";
 import { createLocationOnDB } from "../requests/location.request";
 import { insertImagesOnDB, uploadImageOnCloud, uploadMultipleImagesOnCloud } from "../requests/picture.request";
 import { insertPDLOnDB } from "../requests/delivery.request";
+import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 
 export const newProductACTION = async (initialState: unknown, fd: FormData) => {
-  console.log("PRODUCT ACTION ");
   const parsedTitle = parseWithZod(fd, {
     schema: z.object({ title: z.string().min(4, "MINIMUM DEPUIS ACTION") }),
   });
@@ -29,6 +29,7 @@ export interface ICreationState {
   selected?: string | undefined;
   success: boolean;
   _form?: string | undefined;
+  attrs?: string | undefined;
 }
 
 export const createProductACTION = async (
@@ -37,6 +38,8 @@ export const createProductACTION = async (
     location: LocationInsert;
     files: FormData;
     selected: string[];
+    productAttributes: ProdAttrTypeWithName[],
+    attributes: AttributeSelect[]
   },
   initialState: ICreationState,
   fd: FormData
@@ -48,8 +51,22 @@ export const createProductACTION = async (
 
     if (!parsedProduct.success) {
       const errors = parsedProduct.error.flatten().fieldErrors;
-      const mappedErrors = Object.values(errors).map(fields => fields.flat().join(', '))
       return { ...initialState, product: errors };
+    }
+
+    //ON MAP LES PRODUCTS ATTRIBUTES
+    const mappedAttributes: ProdAttrInsert[] = data.productAttributes.map(attr => {
+      return {...attr, test: 'jambon'}
+    })
+    
+    //ON CREE UN SCHEMA ZOD DYNAMIC POUR FIT LES ATTRS
+    const dynamicSchema = createDynamicSchemaForAttrs(data.attributes)
+
+    //ON LES CHECK
+    const parsedAttributes = z.object({}).extend(dynamicSchema).safeParse(mappedAttributes);
+
+    if (!parsedAttributes) {
+      return {...initialState, attrs: 'Les caractéristiques renseignées présentent une erreur.'}
     }
 
     //ON CHECK LA LOCATION
@@ -57,7 +74,6 @@ export const createProductACTION = async (
 
     if (!parsedLocation.success) {
       const errors = parsedLocation.error.flatten().fieldErrors;
-      const mappedErrors = Object.values(errors).map(fields => fields.flat().join(', '));
       return {...initialState, location: "La localisation de l'adresse présente une erreur, merci de la renseigner à nouveau."}
     }
 
@@ -70,6 +86,11 @@ export const createProductACTION = async (
     const newP = await createProductOnDB(data.product);
 
     if (!newP) throw new Error("Impossible de sauvegarder votre annonce.");
+
+    //ON CREE LES PRODUCTSATTRIBUTS DANS LA DB
+    const newA = await createProdAttrsOnDB(mappedAttributes);
+
+    if (!newA) throw new Error('Impossible de sauvegarder les caractéristiques de l\'annonce.');
 
 
     //ON UPLOAD LES PHOTO SUR LE CLOUD ET ON RECUP LES URLS
@@ -104,11 +125,4 @@ export const createProductACTION = async (
   }
 };
 
-export const testCreateProductACTION = async (data: {product: ProductInsert, location: LocationInsert, pictures: IProductImage[]}, is: any, fd: FormData) => {
-  try {
-    console.log('ON EST DANS TEST , ', data);
-    return {...is}
-  } catch (error) {
-    return {...is}
-  }
-}
+

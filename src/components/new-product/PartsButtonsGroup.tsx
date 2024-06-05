@@ -1,6 +1,6 @@
 "use client";
 
-import { useNewProductContext } from "@/context/newproduct.context";
+import { partList, useNewProductContext } from "@/context/newproduct.context";
 import { Button } from "@nextui-org/react";
 import React, { Dispatch, FC } from "react";
 
@@ -10,15 +10,24 @@ interface IProps {
 const PartsButtonsGroup: FC<IProps> = ({ disable }) => {
   const { part, setPart, setBack, isComplete, totalPart } =
     useNewProductContext();
+  
+  const getNextPart = (forward: boolean) => {
+    const index = partList.findIndex(item => item === part);
+    if (index === -1) {
+      return 'title'
+    }
+    const next = forward ? partList[index + 1] : partList[index - 1];
+    return next
+  }
 
-  const onPreviousHandler = () => {
-    setPart(part - 1);
+  const onClickHandler = (forward: boolean) => {
+    setPart(getNextPart(forward));
     setBack(true);
   };
   return (
     <div className="flex justify-between">
-      {part > 0 && (
-        <Button className="button_secondary" onClick={onPreviousHandler}>
+      {part !== 'title' && (
+        <Button className="button_secondary" onClick={() => onClickHandler(false)}>
           Précédent
         </Button>
       )}
@@ -28,7 +37,7 @@ const PartsButtonsGroup: FC<IProps> = ({ disable }) => {
             isDisabled={!disable}
             className="bg-blue-900 text-white font-semibold"
             type="button"
-            onClick={() => setPart(totalPart - 1)}
+            onClick={() => setPart('validation')}
           >
             Retourner au récapitulatif
           </Button>

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   Button,
   Checkbox,
@@ -8,6 +8,7 @@ import {
   ModalBody,
   ModalContent,
   ModalFooter,
+  Spinner,
   useDisclosure,
 } from "@nextui-org/react";
 import { Package, Pen } from "lucide-react";
@@ -16,43 +17,43 @@ import React, { useEffect, useState } from "react";
 import PartsButtonsGroup from "./PartsButtonsGroup";
 import { DeliveryType } from "@/interfaces/IDelivery";
 import { useNewProductContext } from "@/context/newproduct.context";
-import { DeliverySelect } from "@/drizzle/schema";
 
 const Deliveries = () => {
-
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const { part, setPart, selected, setSelected, deliveries, setDeliveries } = useNewProductContext()
+  const {  setPart, selected, setSelected, deliveries, setDeliveries } =
+    useNewProductContext();
+  const [loading, setLoading] = useState<boolean>(true);
 
   //GESTION DES CHECKBOW DANS LA MODAL
   const onCheckboxHandler = (item: DeliveryType[]) => {
     return setSelected([...item]);
   };
 
-  useEffect(() => {
-    console.log('SELECTED : ', selected);
-  },[selected])
-
   //SUBMIT DU FORM
-  const onSubmitHandler = (event : React.FormEvent<HTMLFormElement>) => {
+  const onSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPart(part + 1)
-  }
+    setPart('location');
+  };
 
   //FETCH DES DELIVERIES DEPUIS LA DB
   useEffect(() => {
     const getDels = async () => {
-      const res = await fetch('/api/fetch/deliveries');
+      const res = await fetch("/api/fetch/deliveries");
       if (!res.ok) {
         return;
       }
       const data = await res.json();
-      setDeliveries(data)
-    }
+      setDeliveries(data);
+      setLoading(false);
+    };
     getDels();
-  }, [])
+  }, []);
 
   return (
-    <form onSubmit={onSubmitHandler} className="flex flex-col w-full gap-3 text-left">
+    <form
+      onSubmit={onSubmitHandler}
+      className="flex flex-col w-full gap-3 text-left"
+    >
       <h2 className="text-xl font-semibold mb-3">Remise du Bien</h2>
 
       <div className="flex flex-col items-start gap-2 border-1 border-gray-400 p-4 rounded-lg">
@@ -66,7 +67,6 @@ const Deliveries = () => {
           Vous acceptez de remettre l’article à votre acheteur en main propre.
         </p>
       </div>
-
 
       <div className="flex flex-col items-start gap-2 border-1 border-gray-400 p-4 rounded-lg text-left">
         <div className="flex items-center gap-5">
@@ -88,25 +88,47 @@ const Deliveries = () => {
           </p>
 
           <div className="flex gap-5 text-sm">
-            {deliveries && deliveries.slice(0, 3).map((item, index) => (
-              <div className="flex items-center gap-2" key={index}>
-                <Image
-                  src={item.iconUrl}
-                  alt={item.type}
-                  width={25}
-                  height={25}
-                  key={index}
-                />
-                <p>{item.label}</p>
+            {loading ? (
+              <div className="flex justify-center items-center gap-3 w-full my-5">
+                <Spinner size="md" classNames={{
+                  circle2: [
+                    'border-b-main'
+                  ],
+                  circle1: [
+                    'border-b-main'
+                  ]
+                }} />
+                <p>Chargement des modes de livraison disponible...</p>
               </div>
-            ))}
+            ) : deliveries ? (
+              deliveries.slice(0, 3).map((item, index) => (
+                <div className="flex items-center gap-2" key={index}>
+                  <Image
+                    src={item.iconUrl}
+                    alt={item.type}
+                    width={25}
+                    height={25}
+                    key={index}
+                  />
+                  <p>{item.label}</p>
+                </div>
+              ))
+            ) : (
+              <div>
+                <p>
+                  Une erreur s'est porduite lors de la récupération des modes de
+                  livraison disponible.
+                </p>
+              </div>
+            )}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-full justify-center">
             <Button
               startContent={<Pen size={15} />}
               className="button_delivery_mod"
               onClick={onOpen}
+              isDisabled={deliveries.length === 0}
             >
               Modifier les modes de livraisons
             </Button>
@@ -135,39 +157,42 @@ const Deliveries = () => {
                 onCheckboxHandler(value as DeliveryType[])
               }
             >
-              {deliveries && deliveries.map((item, index) => (
-                <Checkbox
-                  key={index}
-                  className="my-2"
-                  value={item.id}
-                  classNames={{
-                    base: ["flex items-start justify-start"],
-                    label: ["p-0 -mt-1"],
-                  }}
-                >
-                  <div className="flex flex-col gap-2">
-                    <div>
-                      <div className="flex gap-3 items-center">
-                        <h4>{item.label}</h4>
-                        <Image
-                          src={item.iconUrl}
-                          alt={item.type}
-                          width={20}
-                          height={20}
-                        />
+              {deliveries &&
+                deliveries.map((item, index) => (
+                  <Checkbox
+                    key={index}
+                    className="my-2"
+                    value={item.id}
+                    classNames={{
+                      base: ["flex items-start justify-start"],
+                      label: ["p-0 -mt-1"],
+                    }}
+                  >
+                    <div className="flex flex-col gap-2">
+                      <div>
+                        <div className="flex gap-3 items-center">
+                          <h4>{item.label}</h4>
+                          <Image
+                            src={item.iconUrl}
+                            alt={item.type}
+                            width={20}
+                            height={20}
+                          />
+                        </div>
+                        <div className="rounded-xl text-xs bg-orange-200 text-yellow-900 w-fit px-1 py-0.5 font-semibold">
+                          Jusqu'à {item.maxWeight} kg
+                        </div>
                       </div>
-                      <div className="rounded-xl text-xs bg-orange-200 text-yellow-900 w-fit px-1 py-0.5 font-semibold">
-                        Jusqu'à {item.maxWeight} kg
-                      </div>
+                      <p className="text-sm">{item.requirement}</p>
                     </div>
-                    <p className="text-sm">{item.requirement}</p>
-                  </div>
-                </Checkbox>
-              ))}
+                  </Checkbox>
+                ))}
             </CheckboxGroup>
           </ModalBody>
           <ModalFooter>
-            <Button className="button_main" onClick={onClose}>Valider</Button>
+            <Button className="button_main" onClick={onClose}>
+              Valider
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

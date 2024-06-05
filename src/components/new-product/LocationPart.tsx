@@ -6,7 +6,7 @@ import PartsButtonsGroup from './PartsButtonsGroup'
 
 const LocationPart = () => {
 
-  const { part, setPart, setLocation, setProduct, product, location } = useNewProductContext()
+  const { setPart, setLocation, setProduct, product, location } = useNewProductContext()
   const [previous, setPrevious] = useState(location);
   const [error, setError] = useState<string>();
 
@@ -14,7 +14,7 @@ const LocationPart = () => {
   const onClickhandler = (item: LocationInsert) => {
     setLocation(item);
     setProduct({...product, locationId: item.id})
-    setPart(part + 1);
+    setPart('validation');
   }
 
   //SI ILL Y A DEJA UNE LOCAIOTN DANS LE CONTEXT, ON L'AFFICHE POUR L'USER
@@ -24,12 +24,12 @@ const LocationPart = () => {
     }
   }, [location])
   
-  //SUBMIT HANDLER SI L'USER EST REVENU SUR LA PAGE ET QU'UN LOCATION EST DEJA STOCKEE
+  //SUBMIT HANDLER SI L'USER EST REVENU SUR LA PAGE ET QU'UNE LOCATION EST DEJA STOCKEE, DU COUP LE BOUTON SUIVANT EST CLICKABLE
   const onSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (location) {
       setError(undefined);
-      return setPart(part + 1)
+      return setPart('validation')
     }
     setError('Vous devez renseigner un emplacement pour votre annonce')
   }
@@ -58,7 +58,9 @@ const LocationPart = () => {
             <p className='font-semibold underline'>
               Adresse deja renseignée :
             </p>
-            <div onClick={() => setPart(part + 1)} className='bg-gray-100 py-1 rounded-lg text-center hover:bg-gray-200 cursor-pointer'>
+            <div onClick={() => setPart(
+              'validation'
+            )} className='bg-gray-100 py-1 rounded-lg text-center hover:bg-gray-200 cursor-pointer'>
               {`${previous.postcode} - ${previous.city}`}
             </div>
           </div>

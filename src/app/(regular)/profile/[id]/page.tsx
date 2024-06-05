@@ -20,7 +20,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
 
   if (!data) return notFound();
 
-  const { name, rateNumber, rating, image, products, createdAt, location } = data;
+  const { name, rateNumber, rating, image, products, createdAt } = data;
 
   const mappedData = products.map(p => {
     return { product: {...p}, images: p.images, location: p.location}

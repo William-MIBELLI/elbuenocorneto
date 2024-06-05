@@ -32,7 +32,7 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
     >
       {isRegular ? (
         imagesToDisplay?.map((image) => (
-          <div className="w-full">
+          <div className="w-full" key={Math.random()}>
             <Image
               className="h-full w-full rounded-lg "
               key={Math.random()}

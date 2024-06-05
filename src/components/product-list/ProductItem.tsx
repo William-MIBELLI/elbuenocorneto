@@ -9,7 +9,7 @@ interface IProps {
 }
 const ProductItem: FC<IProps> = ({ data }) => {
   const { product, images, location } = data;
-  const { title, id, category, createdAt, price } = product;
+  const { title, id, categoryType, createdAt, price } = product;
   return (
     <Link
       href={`/product/${id}`}
@@ -31,7 +31,7 @@ const ProductItem: FC<IProps> = ({ data }) => {
         </div>
         <div className="flex  flex-row justify-between w-full items-end">
           <div className="text-xs flex flex-col items-start">
-            <p className="font-semibold">{category}</p>
+            <p className="font-semibold">{categoryType}</p>
             <p>{location.city + " " + location.postcode}</p>
             <p>{createdAt?.toLocaleDateString()}</p>
           </div>

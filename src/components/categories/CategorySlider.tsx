@@ -1,5 +1,5 @@
 "use client";
-import { categoriesList } from "@/interfaces/IProducts";
+import { CategoriesType, ICategory, categoriesList } from "@/interfaces/IProducts";
 import React, { useRef } from "react";
 import CategoryCard from "./CategoryCard";
 import { Button } from "@nextui-org/react";
@@ -21,7 +21,7 @@ const CategorySlider = () => {
         className="w-full flex gap-4 overflow-x-hidden scroll-smooth"
       >
         {Object.values(categoriesList).map((category) => (
-          <CategoryCard key={category.id} category={category} />
+          <CategoryCard key={category.id} category={category as ICategory} />
         ))}
         <Button
           radius="full"

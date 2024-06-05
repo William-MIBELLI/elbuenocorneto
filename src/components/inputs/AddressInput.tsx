@@ -22,13 +22,13 @@ const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
   };
 
   const onKeyUp = async () => {
-    const timer = 500;
+    const timer = 400;
     lastTimeTyping.current = Date.now();
     setTimeout(async () => {
       const now = Date.now();
       const diff = now - lastTimeTyping.current!;
       if (diff >= timer) {
-        if (keyword.length > 4) {
+        if (keyword.length >= 4) {
           const res = await fetchAddressFromAPI(keyword);
           setList(res);
         }

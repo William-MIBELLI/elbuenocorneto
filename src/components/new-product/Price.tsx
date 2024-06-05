@@ -26,7 +26,7 @@ const Price = () => {
       } else {
         setProduct({...product, price: fields.price.value ? +fields.price.value :  0})
       }
-      setPart(part + 1);
+      setPart('images');
     }
   })
   return (

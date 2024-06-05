@@ -1,5 +1,3 @@
-import { ILocation } from "@/interfaces/ILocation";
-
 import {
   timestamp,
   pgTable,
@@ -11,13 +9,70 @@ import {
   text,
   real,
   varchar,
-  boolean
+  boolean,
+  AnyPgColumn,
 } from "drizzle-orm/pg-core";
-import type { AdapterAccount } from "next-auth/adapters";
-import { CategoriesType } from "@/interfaces/IProducts";
 import { relations } from "drizzle-orm";
 
-export const genderEnum = pgEnum('gender', ['0', '1', '2']);
+export const genderEnum = pgEnum("gender", ["0", "1", "2"]);
+export const attributeTypeEnum = pgEnum("attribute_type_enum", [
+  "text",
+  "number",
+  "select",
+  "boolean",
+]);
+export const StateEnum = pgEnum("state_enum", [
+  "Etat neuf",
+  "Très bon état",
+  "Bon état",
+  "Etat satisfaisant",
+]);
+export const deliveriesEnum = pgEnum("type", [
+  "colissimo",
+  "laposte",
+  "mondialrelay",
+  "chronopost",
+]);
+export const AttributeType = pgEnum("attribute_type", [
+  "text",
+  "select",
+  "number",
+]);
+export const CategoryEnum = pgEnum("category_enum", [
+  "immobilier",
+  "vehicule",
+  "vacance",
+  "job",
+  "mode",
+  "jardin",
+  "famille",
+  "electronique",
+  "loisir",
+  "autre",
+]);
+
+export const AttributeNameEnum = pgEnum("attribute_name_enum", [
+  "carBrand",
+  "year",
+  "milling",
+  "fuel",
+  "power",
+  'doors',
+  'livingSpace',
+  'habitationType',
+  'garden',
+  'color',
+  'clothMaterial',
+  'objectMaterial',
+  'model',
+  'brand',
+  'stockage',
+  'memory',
+  'age',
+  'size',
+  'contractType',
+  'wage'
+]);
 
 export const users = pgTable("user", {
   id: text("id").primaryKey(),
@@ -36,8 +91,8 @@ export const users = pgTable("user", {
   phoneVerified: timestamp("phone_verified"),
   lastname: text("lastname"),
   firstname: text("firstname"),
-  gender: genderEnum('gender'),
-  birthday: timestamp('birthday'),
+  gender: genderEnum("gender"),
+  birthday: timestamp("birthday"),
 });
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -50,38 +105,6 @@ export const usersRelations = relations(users, ({ many, one }) => ({
 
 export type SelectUser = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
-
-export const accounts = pgTable(
-  "account",
-  {
-    userId: text("userId")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    type: text("type").$type<AdapterAccount["type"]>().notNull(),
-    provider: text("provider").notNull(),
-    providerAccountId: text("providerAccountId").notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: text("token_type"),
-    scope: text("scope"),
-    id_token: text("id_token"),
-    session_state: text("session_state"),
-  },
-  (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-  })
-);
-
-export const sessions = pgTable("session", {
-  sessionToken: text("sessionToken").notNull().primaryKey(),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
-});
 
 export const verificationTokens = pgTable(
   "verificationToken",
@@ -106,8 +129,11 @@ export const products = pgTable("product", {
     .notNull()
     .references(() => locations.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
-  category: text("category").$type<CategoriesType>().notNull(),
+  categoryType: CategoryEnum('category_type')
+    .notNull()
+    .references(() => categoryTable.type),
   description: text("description").notNull(),
+  state: StateEnum("state").notNull(),
 });
 
 export const productsRelations = relations(products, ({ one, many }) => ({
@@ -121,6 +147,10 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   images: many(images),
   pdl: many(productDeliveryLink),
+  category: one(categoryTable, {
+    fields: [products.categoryType],
+    references: [categoryTable.type]
+  })
 }));
 
 export type ProductInsert = typeof products.$inferInsert;
@@ -144,13 +174,6 @@ export const imagesRelations = relations(images, ({ one }) => ({
 export type ImageSelect = typeof images.$inferSelect;
 export type InsertImage = typeof images.$inferInsert;
 
-export const deliveriesEnum = pgEnum("type", [
-  "colissimo",
-  "laposte",
-  "mondialrelay",
-  "chronopost",
-]);
-
 export const deliveries = pgTable("deliveries", {
   id: text("id").primaryKey(),
   type: deliveriesEnum("type").notNull(),
@@ -159,7 +182,7 @@ export const deliveries = pgTable("deliveries", {
   price: numeric("price").notNull(),
   iconUrl: text("icon_url").notNull(),
   requirement: text("requirement"),
-  maxWeight: numeric("max_weight")
+  maxWeight: numeric("max_weight"),
 });
 
 export const deliveriesRelations = relations(deliveries, ({ many }) => ({
@@ -172,10 +195,10 @@ export type DeliveryInsert = typeof deliveries.$inferInsert;
 export const productDeliveryLink = pgTable("product_delivery_link", {
   productId: text("product_id")
     .notNull()
-    .references(() => products.id, { onDelete: 'cascade'}),
+    .references(() => products.id, { onDelete: "cascade" }),
   deliveryId: text("delivery_id")
     .notNull()
-    .references(() => deliveries.id, { onDelete: 'cascade'}),
+    .references(() => deliveries.id, { onDelete: "cascade" }),
 });
 
 export const pdlRelations = relations(productDeliveryLink, ({ one }) => ({
@@ -206,12 +229,56 @@ export const locations = pgTable("location", {
 export type LocationInsert = typeof locations.$inferInsert;
 export type LocationSelect = typeof locations.$inferSelect;
 
-export const AttributeType = pgEnum('attribute_type', [ 'text', 'select', 'number'])
+export const categoryTable = pgTable("category", {
+  id: text("id").primaryKey().notNull(),
+  parentId: text("parent_id").references((): AnyPgColumn => categoryTable.id, {
+    onDelete: "cascade",
+  }),
+  label: text("label").notNull(),
+  description: text("description"),
+  target: text("target").notNull(),
+  imageUrl: text("image_url").notNull(),
+  type: CategoryEnum("category_enum").notNull().unique(),
+});
 
-export const attributes = pgTable('attribute', {
-  id: text('id').primaryKey().notNull(),
-  type: AttributeType('attribute_type').notNull(),
-  label: text('label').notNull(),
-  required: boolean('required').notNull(),
-  
-})
+export type CategorySelect = typeof categoryTable.$inferSelect;
+export type CategoryInsert = typeof categoryTable.$inferInsert;
+
+export const attributesTable = pgTable("attribute", {
+  id: text("id").primaryKey().notNull(),
+  name: AttributeNameEnum('name').notNull().unique(),
+  type: attributeTypeEnum("type").notNull(),
+  label: text("label").notNull(),
+  required: boolean("required").default(true),
+  possibleValue: json("possible_value").$type<string[]>(),
+});
+
+export type AttributeSelect = typeof attributesTable.$inferSelect;
+export type AttributeInsert = typeof attributesTable.$inferInsert;
+
+export const attributeCategoryJONC = pgTable("attribute_category_jonc", {
+  id: text("id").primaryKey().notNull(),
+  categoryType: CategoryEnum("category_type")
+    .notNull()
+    .references(() => categoryTable.type),
+  attributeName: AttributeNameEnum("attribute_name")
+    .notNull()
+    .references(() => attributesTable.name),
+});
+
+export type AttrCatSelect = typeof attributeCategoryJONC.$inferSelect;
+export type AttrCatInsert = typeof attributeCategoryJONC.$inferInsert;
+
+export const productAttributeJONC = pgTable("product_attribute_jonc", {
+  id: text("id").primaryKey().notNull(),
+  productId: text("product_id")
+    .notNull()
+    .references(() => products.id),
+  attributeId: text("attribute_id")
+    .notNull()
+    .references(() => attributesTable.id),
+  value: text("value").notNull(),
+});
+
+export type ProdAttrSelect = typeof productAttributeJONC.$inferSelect;
+export type ProdAttrInsert = typeof productAttributeJONC.$inferInsert;
