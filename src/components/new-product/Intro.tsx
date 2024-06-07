@@ -32,6 +32,11 @@ const Intro: FC<IProps> = () => {
   const [error, setError] = useState<string>();
   const shuffeldList = useRef<CategoryInsert[]>([]);
 
+  useEffect(() => {
+    console.log('PRODUCT DANS INTRO : ', product);
+
+  },[])
+
   //VALIDATION FRONT ET GESTION DU SUBMIT
   const [form, fields] = useForm({
     onValidate({ formData }) {
@@ -130,7 +135,7 @@ const Intro: FC<IProps> = () => {
 
       {/* LE TITRE DE L'ANNONCE */}
       <UncontrolledInput
-        label="Quel est le titre de l'annonce ? *"
+        label="Quel est le titre de l'annonce ?"
         name={fields.title.name}
         defaultValue={product.title}
       />
@@ -156,6 +161,7 @@ const Intro: FC<IProps> = () => {
               </Radio>
             ))}
           </RadioGroup>
+          
 
           {/* SINON UN SELECT AVEC TOUTES LES CATEGORIES DISPPONIBLE */}
           <Select

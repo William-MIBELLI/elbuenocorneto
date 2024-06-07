@@ -1,9 +1,12 @@
 import {
   AttributeInsert,
+  AttributeSelect,
   CategoryInsert,
+  CategorySelect,
   DeliveryLinkSelect,
   ImageSelect,
   LocationSelect,
+  ProdAttrSelect,
   ProductSelect,
   SelectUser,
 } from "@/drizzle/schema";
@@ -166,6 +169,15 @@ export interface IProductDetails {
   images: string[];
   del: string[];
   location: ILocation | null;
+}
+
+export type AttrType = ProdAttrSelect & { attribute : AttributeSelect}
+
+export type ProductUpdateType = ProductSelect & {
+  images: ImageSelect[],
+  location: LocationSelect,
+  category: CategorySelect,
+  attributes: AttrType[]
 }
 
 export type ICard = ProductSelect & {

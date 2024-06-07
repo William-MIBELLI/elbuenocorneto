@@ -15,12 +15,11 @@ const ProductItem: FC<IProps> = ({ data }) => {
       href={`/product/${id}`}
       className="flex  w-full rounded-lg overflow-hidden border-1"
     >
-      <div className="w-1/3">
+      <div className="w-1/3 relative h-40">
         <Image
           src={images[0]?.url ?? "/image_placeholder.svg"}
           alt={title}
-          width={300}
-          height={300}
+          fill
           className="w-full"
         />
       </div>

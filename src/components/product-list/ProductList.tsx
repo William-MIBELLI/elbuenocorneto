@@ -35,7 +35,7 @@ const ProductList: FC<IProps> = ({ products }) => {
             ))
           }
         </Select>
-        <Button className="bg-orange-500 text-white">
+        <Button isDisabled className="bg-orange-500 text-white">
           Créer un lot
         </Button> 
       </div>

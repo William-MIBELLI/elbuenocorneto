@@ -152,7 +152,8 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categoryTable, {
     fields: [products.categoryType],
     references: [categoryTable.type]
-  })
+  }),
+  attributes: many(productAttributeJONC)
 }));
 
 export type ProductInsert = typeof products.$inferInsert;
@@ -243,6 +244,10 @@ export const categoryTable = pgTable("category", {
   type: CategoryEnum("category_enum").notNull().unique(),
 });
 
+export const categoryRelations = relations(categoryTable, ({ many }) => ({
+  attrRel: many(attributesTable)
+}))
+
 export type CategorySelect = typeof categoryTable.$inferSelect;
 export type CategoryInsert = typeof categoryTable.$inferInsert;
 
@@ -254,6 +259,11 @@ export const attributesTable = pgTable("attribute", {
   required: boolean("required").default(true),
   possibleValue: json("possible_value").$type<string[]>(),
 });
+
+export const attributeRelations = relations(attributesTable, ({ many }) => ({
+  attrToCat: many(categoryTable),
+  attrProd: many(products)
+}))
 
 export type AttributeSelect = typeof attributesTable.$inferSelect;
 export type AttributeInsert = typeof attributesTable.$inferInsert;
@@ -268,6 +278,17 @@ export const attributeCategoryJONC = pgTable("attribute_category_jonc", {
     .references(() => attributesTable.name),
 });
 
+export const attrCatRelations = relations(attributeCategoryJONC, ({ one }) => ({
+  attribute: one(attributesTable, {
+    fields: [attributeCategoryJONC.attributeName],
+    references: [attributesTable.id]
+  }),
+  category: one(categoryTable, {
+    fields: [attributeCategoryJONC.categoryType],
+    references: [categoryTable.type]
+  })
+}))
+
 export type AttrCatSelect = typeof attributeCategoryJONC.$inferSelect;
 export type AttrCatInsert = typeof attributeCategoryJONC.$inferInsert;
 
@@ -275,12 +296,23 @@ export const productAttributeJONC = pgTable("product_attribute_jonc", {
   id: text("id").primaryKey().notNull(),
   productId: text("product_id")
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, { onDelete: 'cascade'}),
   attributeId: text("attribute_id")
     .notNull()
     .references(() => attributesTable.id),
   value: text("value").notNull(),
 });
+
+export const prodAttrRelations = relations(productAttributeJONC, ({ one }) => ({
+  product: one(products, {
+    fields: [productAttributeJONC.productId],
+    references: [products.id]
+  }),
+  attribute: one(attributesTable, {
+    fields: [productAttributeJONC.attributeId],
+    references: [attributesTable.id]
+  })
+}))
 
 export type ProdAttrSelect = typeof productAttributeJONC.$inferSelect;
 export type ProdAttrInsert = typeof productAttributeJONC.$inferInsert;

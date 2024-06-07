@@ -52,6 +52,10 @@ input[type='number'] {
     @apply bg-transparent font-semibold text-gray-400 border-gray-300 border-1
   }
 
+  .button_update {
+    @apply bg-transparent font-semibold text-blue-950 border-blue-900 border-1
+  }
+
   .error_message {
     @apply text-red-500 text-sm font-semibold
   }
@@ -67,6 +71,7 @@ input[type='number'] {
   .button_delivery_mod {
     @apply bg-transparent text-blue-800 font-semibold hover:bg-gray-200
   }
+
 
 }
 

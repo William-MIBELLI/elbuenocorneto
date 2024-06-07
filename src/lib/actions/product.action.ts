@@ -6,8 +6,8 @@ import { DeliveryType } from "@/interfaces/IDelivery";
 import { IProductImage } from "@/interfaces/IProducts";
 import { parseWithZod } from "@conform-to/zod";
 import { z } from "zod";
-import { ProductSchemaType, createDynamicSchemaForAttrs, locationSchema, productSchema } from "../zod";
-import { createProdAttrsOnDB, createProductOnDB } from "../requests/product.request";
+import { ProductSchemaType, createDynamicSchemaForAttrs, locationSchema, productSchema, updateProductSchema } from "../zod";
+import { createProdAttrsOnDB, createProductOnDB, deleteProductOnDB, udpateProductOnDB } from "../requests/product.request";
 import { createLocationOnDB } from "../requests/location.request";
 import { insertImagesOnDB, uploadImageOnCloud, uploadMultipleImagesOnCloud } from "../requests/picture.request";
 import { insertPDLOnDB } from "../requests/delivery.request";
@@ -120,9 +120,38 @@ export const createProductACTION = async (
     return { ...initialState, success: true };
     
   } catch (error: any) {
+    //SI ERREUR AVEC LA CREATION, ON SUPPRIME TOUT CE QUI A PU ETRE CREE POUR EVITER LES CONFLITS LORS DU RESUBMIT
     console.log("ERROR CREATE PRODUCT ACTION", error);
+    await deleteProductOnDB(data.product.id);
     return {...initialState, success: false, _form: error?.message ?? 'Une erreur est survenue.'};
   }
 };
+
+export const updateProductACTION = async (data: {productId: string },initialState: unknown, fd: FormData) => {
+  try {
+    const parsedProduct = parseWithZod(fd, { schema: updateProductSchema})
+    
+    //SI ERREUR DANS LE FORMULAIRE, ON RETURN LES ERREURS VIA CONFORM
+    if (parsedProduct.status !== 'success') {
+      return parsedProduct.reply();
+    }
+
+    //ON MET A JOUR LE PRODUCT DANS LA DB
+    const update = await udpateProductOnDB(data.productId, parsedProduct.payload)
+    
+    //SI AUCUNE RESULTAT, ON THROW UNE ERREUR
+    if (!update) {
+      throw new Error('No product updated');
+    }
+    console.log('UPDATE : ', update);
+
+    //SINON ON RETURN SUCCESS
+    return parsedProduct.reply()
+
+  } catch (error) {
+    console.log('ERROR UPDATE PRODUCT ACTION : ', error);
+    return null;
+  }
+}
 
 

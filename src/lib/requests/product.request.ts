@@ -1,4 +1,8 @@
-import { CategoriesType, ICard } from "@/interfaces/IProducts";
+import {
+  CategoriesType,
+  ICard,
+  ProductUpdateType,
+} from "@/interfaces/IProducts";
 import { getDb } from "@/drizzle/db";
 import {
   ImageSelect,
@@ -17,7 +21,7 @@ import {
   products,
   users,
 } from "@/drizzle/schema";
-import { eq, count, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { ProductDataForList } from "@/components/product-list/ProductList";
 
 export const getProductDetailsById = async (id: string) => {
@@ -28,15 +32,33 @@ export const getProductDetailsById = async (id: string) => {
         .select()
         .from(products)
         .where(eq(products.id, id));
-      
-      const c = await tx.select().from(categoryTable).where(eq(categoryTable.type, p[0].categoryType)).then(r => r[0])
 
-      // REQUEST TOUS LES ATTRIBUTS DISPO POUR LA CREATION 
-      const sq = db.select().from(attributeCategoryJONC).where(eq(attributeCategoryJONC.categoryType, c.type)).as('sq')
-      const a = await tx.select().from(attributesTable).rightJoin(sq, eq(sq.attributeName, attributesTable.name));
-      
+      const c = await tx
+        .select()
+        .from(categoryTable)
+        .where(eq(categoryTable.type, p[0].categoryType))
+        .then((r) => r[0]);
+
+      // REQUEST TOUS LES ATTRIBUTS DISPO POUR LA CREATION
+      const sq = db
+        .select()
+        .from(attributeCategoryJONC)
+        .where(eq(attributeCategoryJONC.categoryType, c.type))
+        .as("sq");
+      const a = await tx
+        .select()
+        .from(attributesTable)
+        .rightJoin(sq, eq(sq.attributeName, attributesTable.name));
+
       //const subq = db.select().from(attributesTable).where(eq())
-      const attrs = await tx.select().from(productAttributeJONC).leftJoin(attributesTable, eq(productAttributeJONC.attributeId, attributesTable.id)).where(eq(productAttributeJONC.productId, p[0].id));
+      const attrs = await tx
+        .select()
+        .from(productAttributeJONC)
+        .leftJoin(
+          attributesTable,
+          eq(productAttributeJONC.attributeId, attributesTable.id)
+        )
+        .where(eq(productAttributeJONC.productId, p[0].id));
 
       const u: SelectUser[] = await tx
         .select()
@@ -68,8 +90,8 @@ export const getProductDetailsById = async (id: string) => {
         images: i.map((item) => item.url),
         del: d.map((item) => item.deliveries),
         location: l[0],
-        category: c, 
-        attributes: attrs
+        category: c,
+        attributes: attrs,
       };
     });
 
@@ -85,7 +107,11 @@ export const fetchProductsForSlider = async (
 ): Promise<ICard[]> => {
   try {
     const db = getDb();
-    const cat = await db.select().from(categoryTable).where(eq(categoryTable.type, category)).then(r => r[0])
+    const cat = await db
+      .select()
+      .from(categoryTable)
+      .where(eq(categoryTable.type, category))
+      .then((r) => r[0]);
     const prods = await db.query.products.findMany({
       where: eq(products.categoryType, cat.type),
       with: {
@@ -132,7 +158,11 @@ export const getProductsByCategory = async (
 ): Promise<ProductDataForList[]> => {
   try {
     const db = getDb();
-    const cat = await db.select().from(categoryTable).where(eq(categoryTable.type, category)).then(r => r[0])
+    const cat = await db
+      .select()
+      .from(categoryTable)
+      .where(eq(categoryTable.type, category))
+      .then((r) => r[0]);
     const prods = await db.query.products.findMany({
       where: eq(products.categoryType, cat.type),
       with: {
@@ -155,25 +185,123 @@ export const getProductsByCategory = async (
 export const createProductOnDB = async (product: ProductInsert) => {
   try {
     const db = getDb();
-    const newProduct = await db.insert(products).values(product).returning().then(r => r[0]);
-    if (!newProduct) throw new Error('Failed to create product on DB');
+    const newProduct = await db
+      .insert(products)
+      .values(product)
+      .returning()
+      .then((r) => r[0]);
+    if (!newProduct) throw new Error("Failed to create product on DB");
     return true;
   } catch (error) {
-    console.log('ERROR CREATE PRODUCT REQUEST ', error);
+    console.log("ERROR CREATE PRODUCT REQUEST ", error);
     return false;
   }
-}
+};
 
 export const createProdAttrsOnDB = async (prodAttrs: ProdAttrInsert[]) => {
   try {
     const db = getDb();
-    const pa = await db.insert(productAttributeJONC).values(prodAttrs).returning();
+    const pa = await db
+      .insert(productAttributeJONC)
+      .values(prodAttrs)
+      .returning();
     if (!pa.length) {
-      console.log('0 ROW INSERTED PRODATTR : ', prodAttrs);
+      console.log("0 ROW INSERTED PRODATTR : ", prodAttrs);
     }
     return true;
   } catch (error) {
-    console.log('ERROR CREATING PRODATTR REQUEST : ', error);
+    console.log("ERROR CREATING PRODATTR REQUEST : ", error);
     return null;
   }
-}
+};
+
+export const deleteProductOnDB = async (productId: string) => {
+  try {
+    const db = getDb();
+    const deleted = await db
+      .delete(products)
+      .where(eq(products.id, productId))
+      .returning();
+    console.log("DELETED : ", deleted);
+    return true;
+  } catch (error) {
+    console.log("ERROR DELETING PRODUCT : ", error);
+    return null;
+  }
+};
+
+export const getProductsForUpdateList = async (
+  userId: string
+): Promise<ProductUpdateType[]> => {
+  try {
+    const db = getDb();
+
+    const prods = await db.query.products.findMany({
+      where: eq(products.userId, userId),
+      with: {
+        attributes: {
+          with: {
+            attribute: true,
+          },
+        },
+        images: true,
+        location: true,
+        category: true,
+      },
+    });
+
+    return prods;
+  } catch (error) {
+    console.log("ERROR FETCHING PRODUCT BY USERID : ", error);
+    return [];
+  }
+};
+
+export const getProductForUpdate = async (
+  productId: string
+): Promise<ProductUpdateType | undefined> => {
+  try {
+    const db = getDb();
+    const prod = await db.query.products.findFirst({
+      where: eq(products.id, productId),
+      with: {
+        attributes: {
+          with: {
+            attribute: true,
+          },
+        },
+        images: true,
+        location: true,
+        category: true,
+      },
+    });
+
+    if (!prod) {
+      throw new Error("No product with this id");
+    }
+
+    return prod;
+  } catch (error) {
+    console.log("ERROR FETCHING PRODUCT FOR UPDATE : ", error);
+    return undefined;
+  }
+};
+
+export const udpateProductOnDB = async (
+  productId: string,
+  values: Partial<ProductInsert>
+) => {
+  try {
+    const db = getDb();
+    const updatedProd = await db
+      .update(products)
+      .set(values)
+      .where(eq(products.id, productId))
+      .returning()
+      .then((r) => r[0]);
+    return updatedProd;
+  } catch (error) {
+    console.log("ERROR UPDATE PRODUCT ON DB ", error);
+    return null;
+  }
+};

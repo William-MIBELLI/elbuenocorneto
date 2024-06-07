@@ -34,12 +34,9 @@ const page: FC<IProps> = async ({ params: { id } }) => {
             <Image src={image ?? ProfileDefault}  alt={name} fill className='rounded-full' />
           </div>
           <div className='flex  flex-grow justify-between pl-3'>
-            <p>
               <h2 className='text-2xl font-bold'>
                 {name}
               </h2>
-
-            </p>
             <div className='flex justify-center items-center gap-3'>
               <Button className='bg-orange-500 text-white'>
                 Suivre

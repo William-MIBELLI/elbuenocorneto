@@ -8,10 +8,10 @@ interface IProps {
   card: ICardDashboard
 }
 
-const Card: FC<IProps> = ({ card: { title, content, iconUrl, target } }) => {
+const Card: FC<IProps> = ({ card: { title, content, iconUrl, target, available = false } }) => {
   return (
     <Link href={target}>
-      <div className={`flex  ${content ? 'flex-col' : 'gap-1'} items-start p-6 py-7 rounded-lg shadow-dashboard_card h-full`}>
+      <div className={`flex  ${content ? 'flex-col' : 'gap-1'} ${available ? '' : 'bg-gray-50 text-gray-200 cursor-default'} items-start p-6 py-7 rounded-lg shadow-dashboard_card h-full`}>
         <Image
           src={`/images/dashboard/${iconUrl}`}
           alt={title}

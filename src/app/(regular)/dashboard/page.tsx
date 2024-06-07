@@ -14,6 +14,7 @@ export interface ICardDashboard {
   content?: string;
   iconUrl: string;
   target: string;
+  available?: boolean;
 }
 
 const cardsToDisplay: ICardDashboard[] = [
@@ -21,7 +22,8 @@ const cardsToDisplay: ICardDashboard[] = [
     title: 'Annonces',
     content: 'Gérer mes annonces déposées',
     iconUrl: 'annonces.png',
-    target: '/mes-annonces'
+    target: '/mes-annonces',
+    available: true
   },
   {
     title: ' Transaction',
@@ -39,13 +41,15 @@ const cardsToDisplay: ICardDashboard[] = [
     title: 'Profil et Espaces',
     content: 'Modifier mon profil public, accéder à mes avis, aux espaces candidat, locataire et bailleur',
     iconUrl: 'private-profile.png',
-    target: `/mon-profil/`
+    target: `/mon-profil/`,
+    available: true
   },
   {
     title: 'Paramètres',
     content: 'Compléter et modifier mes informations privées et préférences',
     iconUrl: 'parametres.png',
-    target: `/mes-parametres/`
+    target: `/mes-parametres/`,
+    available: true,
   },
   {
     title: 'Connexion et sécurité',

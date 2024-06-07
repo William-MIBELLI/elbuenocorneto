@@ -2,7 +2,6 @@
 // import React, { Dispatch, FC } from "react";
 // import UncontrolledInput from "../inputs/UncontrolledInput";
 // import AttributeSelectInput from "./AttributeSelectInput";
-// import { useNewProductContext } from "@/context/newproduct.context";
 // import { z } from "zod";
 
 // interface IProps {

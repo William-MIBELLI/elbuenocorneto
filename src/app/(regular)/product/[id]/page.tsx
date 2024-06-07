@@ -52,7 +52,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
   return (
     // CONTAINER
     <div className="w-full flex flex-col-reverse items-center px-2 gap-2  lg:flex-row lg:items-start ">
-      <main className="w-full lg:w-2/3">
+      <div className="w-full lg:w-2/3">
         <div>
           <div className="flex justify-between">
             {
@@ -78,7 +78,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
 
             {/* PAIEMENT EN PLUSIEURS FOIS */}
             <div className="flex items-center justify-center text-sm mt-3">
-              <p>
+              <div>
                 Payez en{" "}
                 <Button
                   isIconOnly
@@ -99,7 +99,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
                   {" "}
                   à partir de {Math.floor(price / 4)}€/mois
                 </span>
-              </p>
+              </div>
               <BadgeInfo size={13} className="ml-1" />
 
               {/* DATE DE CREATION */}
@@ -134,7 +134,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
         </div>
         <Divider className="my-4" />
         <CardSlider category={data.category.type} title="Ces annonces peuvent vous intéresser"/>
-      </main>
+      </div>
       <aside className=" w-full lg:w-1/3 ">
         <Seller userId={data.user.id} />
       </aside>

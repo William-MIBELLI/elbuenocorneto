@@ -1,10 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useNewProductContext } from "@/context/newproduct.context";
 import PartsButtonsGroup from "./PartsButtonsGroup";
 import { IProductImage } from "@/interfaces/IProducts";
 import ImagesDisplayer from "./ImagesDisplayer";
 
-const Images = () => {
+interface IProps {
+  update?: boolean
+}
+
+const Images: FC<IProps> = ({ update = false}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { pictures, setPictures, setPart } = useNewProductContext();
@@ -38,9 +42,14 @@ const Images = () => {
   }
 
   return (
-    <form onSubmit={onSubmithandler} className="flex flex-col gap-3 text-left">
-      <h3 className="font-semibold text-xl">Ajoutez des photos</h3>
-      <p>Faites glisser vos photos pour changer leur ordre</p>
+    <form onSubmit={onSubmithandler} className="flex flex-col gap-3 text-left w-full box-border">
+      {
+        !update && (
+
+          <h3 className="font-semibold text-xl">Ajoutez des photos</h3>
+        )
+      }
+      <p>Vous pouvez en ajouter jusqu'à 10 gratuitement.</p>
       <ImagesDisplayer inputRef={inputRef}/>
       <input
         ref={inputRef}

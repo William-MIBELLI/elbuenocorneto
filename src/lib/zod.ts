@@ -71,31 +71,32 @@ export const informationsSchema = z
   })
   .partial();
 
-export const productSchema = z.object({
-  userId: z.string().uuid("This user_id is not valid."),
-  title: z
-    .string()
-    .min(4, "Le titre doit avoir au moins 4 caractères.")
-    .max(100, "Le titre doit avoir au maximum 100 caractères."),
-  price: z.number(),
-  description: z
-    .string()
-    .min(10, "La description doit avoir au moins 10 caractères.")
-    .max(2500, "Maximum 2500 caractères."),
-  // category: z.enum([categoriesTypeList[0], ...categoriesTypeList], {
-  //   message: "Cette catégorie n'est pas disponible.",
-  // }),
-  categoryType: z
-    .string()
-    .refine(
-      (value) => categoriesTypeList.includes(value as CategoriesType),
-      "Cette catégorie n'est aps disponible"
-    ),
-  locationId: z.string().uuid(),
-  state: z
-    .string({ message: "L'état est requis" })
-    .refine((val) => StateEnum.enumValues.find((item) => item === val)),
-});
+
+
+export const productSchema = z
+  .object({
+    userId: z.string().uuid("This user_id is not valid."),
+    title: z
+      .string()
+      .min(4, "Le titre doit avoir au moins 4 caractères.")
+      .max(100, "Le titre doit avoir au maximum 100 caractères."),
+    price: z.number().optional(),
+    description: z
+      .string()
+      .min(10, "La description doit avoir au moins 10 caractères.")
+      .max(2500, "Maximum 2500 caractères."),
+    categoryType: z
+      .string()
+      .refine(
+        (value) => categoriesTypeList.includes(value as CategoriesType),
+        "Cette catégorie n'est aps disponible"
+      ),
+    locationId: z.string().uuid(),
+    state: z
+      .string({ message: "L'état est requis" })
+      .refine((val) => StateEnum.enumValues.find((item) => item === val)),
+  });
+  
 export type ProductSchemaType = z.infer<typeof productSchema>;
 
 export const locationSchema = z.object({
@@ -167,3 +168,6 @@ export const createDynamicSchemaForAttrs = (attributes: AttributeSelect[]) => {
   //ON LE STOCKE DANS LE STATE
   return mappedVers;
 };
+
+
+export const updateProductSchema = productSchema.pick({ title: true, price: true, description: true})

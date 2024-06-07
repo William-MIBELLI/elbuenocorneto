@@ -27,13 +27,6 @@ const Validation = () => {
   const [displayPics, setDisplayPics] = useState(true);
   const [files, setFiles] = useState<FormData>(new FormData());
 
-  // useEffect(() => {
-  //   console.log("PRODATTR : ", productAttributes);
-  // }, [productAttributes]);
-
-  // useEffect(() => {
-  //   console.log('ATTRIBUTES DANS VALIDAIOTN : ', attributes);
-  // },[attributes])
 
   //ON PASSE LES IMAGES DU CONTEXT DANS UN FORMDATA POUR LE SERVERACTION
   useEffect(() => {

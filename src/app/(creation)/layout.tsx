@@ -1,7 +1,6 @@
 
 import Footer from "@/components/footer/Footer";
 import CreationNavbar from "@/components/navbar/CreationNavbar";
-import { useNewProductContext } from "@/context/newproduct.context";
 import { Progress } from "@nextui-org/react";
 import { useState } from "react";
 
