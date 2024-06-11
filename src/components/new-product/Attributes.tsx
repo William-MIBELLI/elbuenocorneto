@@ -8,28 +8,51 @@ import { CategoriesType } from "@/interfaces/IProducts";
 import { AttributeSelect, ProdAttrInsert } from "@/drizzle/schema";
 import { Spinner } from "@nextui-org/react";
 // import AttributeDisplayer from "./AttributeDisplayer";
-import { z } from "zod";
+import { ZodType, z } from "zod";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import UncontrolledInput from "../inputs/UncontrolledInput";
 import AttributeSelectInput from "./AttributeSelectInput";
 import { v4 as uuidV4 } from "uuid";
 import { createDynamicSchemaForAttrs } from "@/lib/zod";
+import SubmitButton from "../submit-button/SubmitButton";
+import { useFormState } from "react-dom";
+import { updateProductAttributesACTION } from "@/lib/actions/product.action";
 
-const Attributes = () => {
+interface IProps {
+  update?: boolean;
+}
 
-  const { setPart, product, setProductAttributes, attributes, setAttributes, productAttributes } =
-    useNewProductContext();
-  
+const Attributes = ({ update = false }) => {
+  const {
+    setPart,
+    product,
+    setProductAttributes,
+    attributes,
+    setAttributes,
+    productAttributes,
+  } = useNewProductContext();
+
+  const attrForUpdate = useRef<ProdAttrTypeWithName[]>([]);
+  const schemaForUpdate = useRef<Record<string, ZodType<any, any, any>>>();
   const [loading, setLoading] = useState<boolean>(true);
   const filledAttrs = useRef<{ [key: string]: any }>({});
   const [verifDynamicAttributes, setVerifDynamicAttributes] = useState<
     Record<string, z.ZodType<any, any>>
-    >({});
+  >({});
 
+  const [lastResult, action] = useFormState(
+    updateProductAttributesACTION.bind(null, {
+      prodAttrs: productAttributes,
+      productId: product.id!,
+      attributes: JSON.stringify(productAttributes)
+    }),
+    undefined
+  );
 
-  //VERIFICATION  DES INPUT FRONTSIDE ET SUBMIT HANDLER 
+  //VERIFICATION  DES INPUT FRONTSIDE ET SUBMIT HANDLER
   const [form, fields] = useForm({
+    lastResult,
     onValidate({ formData }) {
       //ON CHECK LES INPUTS AVEC ZOD
       const submission = parseWithZod(formData, {
@@ -46,7 +69,6 @@ const Attributes = () => {
     shouldRevalidate: "onInput",
 
     onSubmit({ nativeEvent }) {
-      nativeEvent.preventDefault();
 
       //AU SUBMIT, ON CREE DES PRODUCTATTRIBUTE AVEC LES VALUES STOCKEES DANS LE STATE TEMPORAIRE
       const temp: ProdAttrTypeWithName[] = Object.entries(
@@ -61,6 +83,11 @@ const Attributes = () => {
         const val = value ? value.toString() : "";
         return { id, attributeId, value: val, productId, label };
       });
+
+      if (update) {
+        attrForUpdate.current = temp;
+        console.log("UPDATE ATTRIBUTES : ", temp, schemaForUpdate, product?.id);
+      }
 
       //ON LES ENVOIE DANS LE CONTEXT
       setProductAttributes(temp);
@@ -93,6 +120,7 @@ const Attributes = () => {
   useEffect(() => {
     if (attributes.length) {
       const vers = createDynamicSchemaForAttrs(attributes);
+      schemaForUpdate.current = vers;
       setVerifDynamicAttributes(vers);
     }
   }, [attributes]);
@@ -101,6 +129,7 @@ const Attributes = () => {
     <form
       id={form.id}
       onSubmit={form.onSubmit}
+      action={action}
       className="flex flex-col gap-4"
       noValidate
     >
@@ -125,7 +154,11 @@ const Attributes = () => {
                     type={attr.type}
                     key={attr.id}
                     errors={fields?.[attr.name].errors}
-                    defaultValue={productAttributes.find(item => item.label === attr.label)?.value ?? ''}
+                    defaultValue={
+                      productAttributes.find(
+                        (item) => item.label === attr.label
+                      )?.value ?? ""
+                    }
                   />
                 );
               case "select":
@@ -146,7 +179,7 @@ const Attributes = () => {
           })}
         </div>
       )}
-      <PartsButtonsGroup disable={true} />
+      {update ? <SubmitButton success={lastResult?.status === 'success'} successMessage="Les modifications ont bien été enregistrées." /> : <PartsButtonsGroup disable={true} />}
     </form>
   );
 };

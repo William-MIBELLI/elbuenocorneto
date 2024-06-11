@@ -1,4 +1,4 @@
-
+import { inArray } from 'drizzle-orm';
 "use server";
 
 import {
@@ -8,12 +8,13 @@ import {
   ProdAttrInsert,
   ProductInsert,
   ProductSelect,
+  attrNameType,
   deliveries,
 } from "@/drizzle/schema";
 import { DeliveryType } from "@/interfaces/IDelivery";
 import { IProductImage } from "@/interfaces/IProducts";
 import { parseWithZod } from "@conform-to/zod";
-import { z } from "zod";
+import { ZodAny, ZodType, z } from "zod";
 import {
   ProductSchemaType,
   createDynamicSchemaForAttrs,
@@ -26,6 +27,7 @@ import {
   createProductOnDB,
   deleteProductOnDB,
   udpateProductOnDB,
+  updateProdAttrOnDb,
 } from "../requests/product.request";
 import { createLocationOnDB } from "../requests/location.request";
 import {
@@ -222,17 +224,21 @@ interface DataType {
 }
 export const udpateProductImagesACTION = async (
   data: DataType,
-  initialState: { _error?: string | undefined, success?: boolean, newPictures: ImageSelect[] },
+  initialState: {
+    _error?: string | undefined;
+    success?: boolean;
+    newPictures: ImageSelect[];
+  },
   fd: FormData
 ) => {
   try {
-    const { previous , current, productId } = data;
+    const { previous, current, productId } = data;
     const filesToSave: File[] = [];
     const filesToDelete: File[] = [];
 
     //ON MAP LES FILES DES FORMDATA DANS DES ARRAYS
     const currentList = current.getAll("file") as File[];
-    const previousList = previous.getAll("file") as File[];;
+    const previousList = previous.getAll("file") as File[];
 
     //ON LOOP SUR CURRENTLIST
     currentList.forEach((item) => {
@@ -244,22 +250,20 @@ export const udpateProductImagesACTION = async (
         filesToSave.push(item);
       }
     });
-    
+
     //SI IL Y A DES IMAGES A AJOUTER
     if (filesToSave.length) {
-
       //ON LUPLOAD filesToSave DANS LE CLOUD
       const newImg = await uploadMultipleImagesOnCloud(filesToSave, productId);
-  
+
       if (!newImg) throw new Error("newImg is null");
-  
+
       //ON LE STOCKE DANS LA DB
       const newImgsInserted = await insertImagesOnDB(newImg);
-  
+
       if (!newImgsInserted) throw new Error("image insertion return false");
-  
     }
-    
+
     //ON LOOP SUR PREVIOUSLIST
     previousList.forEach((item) => {
       //ON CHECK SI LE FILE EST DANS LA CURRENT LIST
@@ -267,7 +271,7 @@ export const udpateProductImagesACTION = async (
 
       //S'IL N'Y EST PAS, C'EST QU'IL FAUT LE DELETE ET ON LE STOCKE DANS filesToDelete
       if (!existingFile) {
-        console.log('FILE TO DELETE : ', item);
+        console.log("FILE TO DELETE : ", item);
         filesToDelete.push(item);
       }
     });
@@ -275,20 +279,24 @@ export const udpateProductImagesACTION = async (
     //ON MAP LE TABLEAU POUR RECUP QUE LES URLS
     const urlsToDelete = filesToDelete.map((f) => {
       //ON PREPEND L'URL A DELETE AVEC L'HOST
-      return 'https://firebasestorage.googleapis.com/v0/b/ebccloud-f8c7c.appspot.com/o/' + f.name;
+      return (
+        "https://firebasestorage.googleapis.com/v0/b/ebccloud-f8c7c.appspot.com/o/" +
+        f.name
+      );
     });
 
     //SI AUCUNES IMAGES A SUPPRIMER, ON FAST RETURN
     if (!urlsToDelete.length) {
-      return {...initialState, success: true}
+      return { ...initialState, success: true };
     }
 
     //ON LE DELETE DE LA DB
     const deletedOnDb = await deleteImagesOnDB(productId, urlsToDelete);
 
-    if (!deletedOnDb) throw new Error('LES IMAGES NE SONT PAS DELETE DE LA DB.');
+    if (!deletedOnDb)
+      throw new Error("LES IMAGES NE SONT PAS DELETE DE LA DB.");
 
-    console.log('URL TO DELETE : ', urlsToDelete);
+    console.log("URL TO DELETE : ", urlsToDelete);
     //ON LES DELETE DU CLOUD
     const deletedImgsCloud = await deleteMultipleImagesOnCloud(urlsToDelete);
 
@@ -296,12 +304,56 @@ export const udpateProductImagesACTION = async (
       console.log("LES IMAGES NONT PAS ETE SUPPRIME DU CLOUD");
     }
 
-
-    revalidatePath('/update-product/' + productId)
-    return { ...initialState, success: true }
-    
+    revalidatePath("/update-product/" + productId);
+    return { ...initialState, success: true };
   } catch (error) {
     console.log("ERROR UPDATING PRODUCT IMAGES ACTION : ", error);
-    return {...initialState, success: false};
+    return { ...initialState, success: false };
+  }
+};
+
+export const updateProductAttributesACTION = async (
+  data: {
+    prodAttrs: ProdAttrTypeWithName[],
+    productId: string
+    attributes: string
+  },
+  is: unknown,
+  fd: FormData
+) => {
+  try {
+    console.log('ON RENTRE DANS ACTION : ', data.prodAttrs);
+    const parsedAttributes = JSON.parse(data.attributes);
+    const schema = createDynamicSchemaForAttrs(parsedAttributes);
+    //ON VERIFIE LES INPUTS
+    const submission = parseWithZod(fd, {
+      schema: z.object({}).extend(schema),
+    });
+
+    //SI ERROR, ON FATS RETURN
+    if (submission.status !== "success") {
+      return submission.reply();
+
+    }
+
+    //ON MAP LE PAYLOAD DANS UN ARRAY
+    const mappedPayload = Object.entries(submission.payload).map(([key, value]) => {
+      return {name: key as attrNameType, value: value as string}
+    })
+
+    //SI C'EST OK, ON ENVOIE LE PAYLOAD MAPPE VERS PRODUCT.REQUEST
+    const updated = await updateProdAttrOnDb(data.productId ,mappedPayload);
+
+    if (!updated || !updated.length) {
+      console.log('NOTHING UPDATED ON DB : ', updated, mappedPayload);
+    }
+
+    //ON RETURN SUCCESS
+    console.log('UPDATED OK : ', updated);
+    return submission.reply();
+
+  } catch (error) {
+    console.log("ERROR UPDATE ATTR ACTION : ", error);
+    return null;
   }
 };

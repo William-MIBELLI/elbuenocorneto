@@ -194,13 +194,16 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
           </div>
           <Divider />
 
+            {/* ATTRIBUTES */}
           <Accordion>
-            <AccordionItem key={1} title="Modifier les attributs">
-              <Attributes />
+            <AccordionItem key={1} title="Modifier les caractérisques de votre annonce.">
+              <Attributes update={true} />
             </AccordionItem>
           </Accordion>
           <Divider />
 
+            
+            {/* LOCATION */}
           <Accordion>
             <AccordionItem key={1} title="Modifier la localisation">
               <LocationPart />

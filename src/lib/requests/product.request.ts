@@ -10,6 +10,7 @@ import {
   ProductInsert,
   ProductSelect,
   SelectUser,
+  attrNameType,
   attributeCategoryJONC,
   attributesTable,
   categoryTable,
@@ -21,8 +22,9 @@ import {
   products,
   users,
 } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { ProductDataForList } from "@/components/product-list/ProductList";
+import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 
 export const getProductDetailsById = async (id: string) => {
   try {
@@ -302,6 +304,48 @@ export const udpateProductOnDB = async (
     return updatedProd;
   } catch (error) {
     console.log("ERROR UPDATE PRODUCT ON DB ", error);
+    return null;
+  }
+};
+
+export const updateProdAttrOnDb = async (
+  productId: string,
+  attrs: {name: attrNameType, value: string}[]
+) => {
+  try {
+    const db = getDb();
+    const updated = [];
+
+    //ON LOOP SUR LE PAYLOAD MAPPE
+    for (let i = 0; i < attrs.length; i++) {
+
+      //ON STOCKE L'ATTRIBUT CURRENT DU PAYLOAD
+      const { name, value } = attrs[i];
+
+      //ON RECUPERE L'ID DE L'ATTRIBUT DANS LA DB VIA SON NAME RECU DEPUIS LE PAYLOAD
+      const attr = await db.select().from(attributesTable).where(eq(attributesTable.name, name)).then(r => r[0]);
+      
+      //ON UPDATE LE PRODATTR GRACE A L'ID DE L'ATTRIBUT RECUPERE ET DU PRODUCT ID
+      const up = await db
+        .update(productAttributeJONC)
+        .set({
+          value
+        })
+        .where(
+          and(
+            eq(productAttributeJONC.productId, productId),
+            eq(productAttributeJONC.attributeId, attr.id)
+          )
+        )
+        .returning()
+        .then((r) => r[0]);
+      if (up) {
+        updated.push(up);
+      }
+    }
+    return updated;
+  } catch (error) {
+    console.log("ERROR UPDATING PRODATTR ON DB : ", error);
     return null;
   }
 };
