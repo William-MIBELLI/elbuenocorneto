@@ -34,9 +34,8 @@ const _Price: FC<IProps> = ({ previousPrice, name }) => {
         name={name ?? 'price'}
         defaultValue={previousPrice?.toString()}
         min={1}
-        isDisabled={check}
         value={check ? '0' : price.toString()}
-        onChange={(e) => setPrice(+e.target.value)}
+        onChange={(e) => check ? {} : setPrice(+e.target.value)}
         classNames={{
           inputWrapper: [check ? "bg-gray-300" : null],
         }}

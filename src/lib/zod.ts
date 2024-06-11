@@ -80,7 +80,7 @@ export const productSchema = z
       .string()
       .min(4, "Le titre doit avoir au moins 4 caractères.")
       .max(100, "Le titre doit avoir au maximum 100 caractères."),
-    price: z.number().optional(),
+    price: z.number(),
     description: z
       .string()
       .min(10, "La description doit avoir au moins 10 caractères.")

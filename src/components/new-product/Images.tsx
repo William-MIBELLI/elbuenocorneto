@@ -3,63 +3,41 @@ import { useNewProductContext } from "@/context/newproduct.context";
 import PartsButtonsGroup from "./PartsButtonsGroup";
 import { IProductImage } from "@/interfaces/IProducts";
 import ImagesDisplayer from "./ImagesDisplayer";
+import SubmitButton from "../submit-button/SubmitButton";
+import { useFormState } from "react-dom";
+import { udpateProductImagesACTION } from "@/lib/actions/product.action";
+import { useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
+import { z } from "zod";
+import _Images from "../product-crud-part/_Images";
 
 interface IProps {
-  update?: boolean
+  update?: boolean;
 }
 
-const Images: FC<IProps> = ({ update = false}) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+const Images: FC<IProps> = ({ update = false }) => {
 
-  const { pictures, setPictures, setPart } = useNewProductContext();
+  const { setPart } = useNewProductContext();
 
-  const onClickHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = event.target;
-
-    //SI AUCUNS FILES? ON FAST RETURN
-    if (!files) {
-      return;
-    }
-
-    //ON MAP LE FILELIST EN INJECTANT L'URL POUR LA PREVIEW
-    const mappedFiles: IProductImage[] = Array.from(files)
-      .slice(0, 10 - pictures.length)
-      .filter((item) => item.size < 1024 * 1024 * 5 && item.type.includes('image/')) // ON CHECK LA VALIDITE DU FICHIER SIZE/TYPE
-      .map((item) => {
-        return {
-          file: item,
-          url: URL.createObjectURL(item),
-        };
-      });
-
-    //ON AJOUTE LES NOUVELLES IMAGES A CELLE DEJA STOCKEES
-    setPictures(pictures.concat(mappedFiles));
-  };
-
-  const onSubmithandler = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setPart('deliveries');
-  }
+  const [form, fields] = useForm({
+    onSubmit() {
+      if (!update) {
+        return setPart("deliveries");
+      }
+    },
+  });
 
   return (
-    <form onSubmit={onSubmithandler} className="flex flex-col gap-3 text-left w-full box-border">
-      {
-        !update && (
-
-          <h3 className="font-semibold text-xl">Ajoutez des photos</h3>
-        )
-      }
+    <form
+      id={form.id}
+      onSubmit={form.onSubmit}
+      className="flex flex-col gap-3 text-left w-full box-border"
+      noValidate
+    >
+      {!update && <h3 className="font-semibold text-xl">Ajoutez des photos</h3>}
       <p>Vous pouvez en ajouter jusqu'à 10 gratuitement.</p>
-      <ImagesDisplayer inputRef={inputRef}/>
-      <input
-        ref={inputRef}
-        hidden
-        type="file"
-        accept="image/*"
-        onChange={onClickHandler}
-        multiple
-      />
-      <PartsButtonsGroup disable={true} />
+      <_Images/>
+      {update ? <SubmitButton /> : <PartsButtonsGroup disable={true} />}
     </form>
   );
 };

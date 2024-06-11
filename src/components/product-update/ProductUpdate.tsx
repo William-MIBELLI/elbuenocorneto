@@ -25,6 +25,7 @@ import { updateProductSchema } from "@/lib/zod";
 import { useFormState } from "react-dom";
 import { updateProductACTION } from "@/lib/actions/product.action";
 import { ProductSelect } from "@/drizzle/schema";
+import ImagesUpdate from "./ImagesUpdate";
 
 interface IProps {
   data: ProductUpdateType;
@@ -39,23 +40,23 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
     setProductAttributes,
   } = useNewProductContext();
 
-  const [loading, setLoading] = useState(true);
-  const [display, setDisplay] = useState(false);
-  const [displayImages, setDisplayImages] = useState(false);
-  const [isSimilar, setIsSimilar] = useState(true);
-  const [previousProd, setPreviousProd] = useState<
-    Pick<ProductSelect, "description" | "price" | "title">
-  >({ title: data.title, description: data.description, price: data.price });
-
-  //ON MAP LES IMAGES POUR FIT AVEC LE COMPOSANT
-  const images = data.images.map((item) => {
-    return { ...item, file: new File([""], item.url) };
+  //ON MAP LES IMAGESELECTS DE LA DB VERS IPRODUCTIMAGE pour les passer au context dans pictures
+  const images: IProductImage[] = data.images.map((item) => {
+    return { ...item , file: new File([""], item.url) };
   });
 
   //PAREIL POUR LES PRODUCTATTRIBUTES
   const attributes = data.attributes.map((item) => {
     return { ...item, label: item.attribute.label };
   });
+
+  const [loading, setLoading] = useState(true);
+  const [display, setDisplay] = useState(false);
+  const [displayImages, setDisplayImages] = useState(false);
+  const [previousProd, setPreviousProd] = useState<
+    Pick<ProductSelect, "description" | "price" | "title">
+  >({ title: data.title, description: data.description, price: data.price });
+
 
   //ON HYDRATE LE CONTEXT AVEC LES DATA DU PRODUCT QU'ON A FETCH
   useEffect(() => {
@@ -152,7 +153,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
             <Divider />
 
             {/* PRICE */}
-            <_Price previousPrice={data.price} name={fields.price.name} />
+            <_Price previousPrice={previousProd.price} name={fields.price.name} />
             <p className="error_message">{fields.price.errors?.join(", ")}</p>
             <Divider />
             <SubmitButton
@@ -189,7 +190,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
             </div>
           </div>
           <div className={`${!displayImages ? "hidden" : ""}`}>
-            <Images update={true} />
+              <ImagesUpdate productId={data.id} images={data.images} />
           </div>
           <Divider />
 
