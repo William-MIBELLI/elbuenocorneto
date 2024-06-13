@@ -44,6 +44,10 @@ const tips: Partial<Record<PartType, string[]>> = {
     "Bravo !",
     "Votre annonce est maintenant en ligne. vous pouvez la modifier depuis votre profil.",
   ],
+  attributes: [
+    "Les caractéristiques de votre annonce sont importantes pour les acheteurs.",
+    "N'hésitez pas à en renseigner un maximum."
+  ]
 };
 interface IProps {
   userId: string;

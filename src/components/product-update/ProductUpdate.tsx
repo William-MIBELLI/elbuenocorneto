@@ -27,6 +27,7 @@ import { updateProductACTION } from "@/lib/actions/product.action";
 import { ProductSelect } from "@/drizzle/schema";
 import ImagesUpdate from "./ImagesUpdate";
 import LocationUpdate from "./LocationUpdate";
+import Deliveries from "../new-product/Deliveries";
 
 interface IProps {
   data: ProductUpdateType;
@@ -39,6 +40,8 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
     setPictures,
     setLocation,
     setProductAttributes,
+    selected,
+    setSelected
   } = useNewProductContext();
 
   //ON MAP LES IMAGESELECTS DE LA DB VERS IPRODUCTIMAGE pour les passer au context dans pictures
@@ -51,6 +54,9 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
     return { ...item, label: item.attribute.label };
   });
 
+  //PAREIL POUR DELIVERIES
+  const dels = data.pdl.map(item => item.deliveryId)
+
   const [loading, setLoading] = useState(true);
   const [display, setDisplay] = useState(false);
   const [displayImages, setDisplayImages] = useState(false);
@@ -61,10 +67,12 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
 
   //ON HYDRATE LE CONTEXT AVEC LES DATA DU PRODUCT QU'ON A FETCH
   useEffect(() => {
+    console.log('DATA : ', data);
     setProduct(data);
     setProductAttributes(attributes);
     setPictures(images);
     setLocation(data.location);
+    setSelected(dels)
   }, []);
 
   //QUAND L'HYDRATATION EST FINIE, ON DISPLAY LES FORMS
@@ -215,7 +223,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
                 {/* DELIVERIES */}
           <Accordion>
             <AccordionItem key={1} title="Livraison">
-              <LocationUpdate/>
+                <Deliveries update={true} />
             </AccordionItem>
           </Accordion>
           <Divider />

@@ -54,6 +54,10 @@ const Description = () => {
     },
   });
 
+  const onSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setState(e.target.value)
+  }
+
   return (
     <form
       id={form.id}
@@ -69,7 +73,7 @@ const Description = () => {
           name={fields.state.name}
           selectedKeys={[state!]}
           value={state}
-          onChange={e => setState(e.target.value)}
+          onChange={onSelectChange}
         >
           {StateEnum.enumValues.map((val) => (
             <SelectItem key={val} value={val}>
@@ -117,7 +121,7 @@ const Description = () => {
         disable={
           !!fields.description.value &&
           fields.description.value.length >= MIN &&
-          !fields.state.errors
+          !!state
         }
       />
     </form>

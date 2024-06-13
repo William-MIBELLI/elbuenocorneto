@@ -1,3 +1,4 @@
+import { deliveries } from './../drizzle/schema';
 import {
   AttributeInsert,
   AttributeSelect,
@@ -177,7 +178,8 @@ export type ProductUpdateType = ProductSelect & {
   images: ImageSelect[],
   location: LocationSelect,
   category: CategorySelect,
-  attributes: AttrType[]
+  attributes: AttrType[],
+  pdl: DeliveryLinkSelect[]
 }
 
 export type ICard = ProductSelect & {

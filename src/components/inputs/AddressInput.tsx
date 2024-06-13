@@ -49,10 +49,10 @@ const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
   return (
     <div>
         <div className="w-full flex flex-col items-start">
-          <label htmlFor="email">Votre adresse *</label>
+          <label htmlFor="address">Votre adresse *</label>
           <Input
             isRequired={required}
-            name="email"
+            name="address"
             value={keyword}
             onChange={onChangeHandler}
             onKeyUp={onKeyUp}

@@ -1,4 +1,4 @@
-import { inArray } from 'drizzle-orm';
+
 "use server";
 
 import {
@@ -37,7 +37,7 @@ import {
   uploadImageOnCloud,
   uploadMultipleImagesOnCloud,
 } from "../requests/picture.request";
-import { insertPDLOnDB } from "../requests/delivery.request";
+import { insertPDLOnDB, updatePDLonDB } from "../requests/delivery.request";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { revalidatePath } from "next/cache";
 
@@ -314,15 +314,14 @@ export const udpateProductImagesACTION = async (
 
 export const updateProductAttributesACTION = async (
   data: {
-    prodAttrs: ProdAttrTypeWithName[],
-    productId: string
-    attributes: AttributeSelect[]
+    prodAttrs: ProdAttrTypeWithName[];
+    productId: string;
+    attributes: AttributeSelect[];
   },
   is: unknown,
   fd: FormData
 ) => {
   try {
-    
     //ON CREE LE SCHEMA ZOD GRACE AUX ATTRIBUTS POUR CHECK LES INPUTS
     const schema = createDynamicSchemaForAttrs(data.attributes);
 
@@ -334,28 +333,69 @@ export const updateProductAttributesACTION = async (
     //SI ERROR, ON FATS RETURN
     if (submission.status !== "success") {
       return submission.reply();
-
     }
 
     //ON MAP LE PAYLOAD DANS UN ARRAY
-    const mappedPayload = Object.entries(submission.payload).map(([key, value]) => {
-      return {name: key as attrNameType, value: value as string}
-    })
+    const mappedPayload = Object.entries(submission.payload).map(
+      ([key, value]) => {
+        return { name: key as attrNameType, value: value as string };
+      }
+    );
 
     //SI C'EST OK, ON ENVOIE LE PAYLOAD MAPPE VERS PRODUCT.REQUEST
-    const updated = await updateProdAttrOnDb(data.productId ,mappedPayload);
+    const updated = await updateProdAttrOnDb(data.productId, mappedPayload);
 
     if (!updated || !updated.length) {
-      console.log('NOTHING UPDATED ON DB : ', updated, mappedPayload);
+      console.log("NOTHING UPDATED ON DB : ", updated, mappedPayload);
     }
 
     //ON RETURN SUCCESS
-    console.log('UPDATED OK : ', updated);
+    console.log("UPDATED OK : ", updated);
     return submission.reply();
-
   } catch (error) {
     console.log("ERROR UPDATE ATTR ACTION : ", error);
     return null;
   }
 };
 
+export const updatePDLACTION = async (
+  data: {previous: string[], selected: string[], productId: string},
+  iniotialState: { success?: boolean },
+  fd: FormData
+) => {
+  try {
+    console.log('UPDATE PDL ACTION');
+    const pdlToAdd: string[] = [];
+    
+    const { previous, selected, productId } = data;
+
+    //ON LOOP SUR SELECTED
+    selected.forEach(item => {
+      const inPrevious = previous.find(pre => pre === item);
+
+      //SI L'ITEM EST ABSENT DE PREVIOUS, IL FAUT l'AJOUTER
+      if (!inPrevious) {
+        pdlToAdd.push(item);
+      }
+    })
+
+    //ON LOOP SUR PREVIOUS
+    const pdlToDelete: string[] = previous.filter(item => {
+
+      //SI L'ITEM EST ABSENT DE SELECTED, IL FAUT LE SUPPRIMER
+      return !selected.find(sel => sel === item)
+    })
+    
+    console.log('TOADD ET TODELETE : ', pdlToAdd, pdlToDelete);
+
+    //ON REQUEST LA DB AVEC LES PDL A ADD ET DELETE
+    const updated = await updatePDLonDB(productId, pdlToAdd, pdlToDelete);
+
+    console.log('UPDATED : ', updated);
+    return { ...iniotialState, success: true }
+    
+  } catch (error) {
+    console.log("ERROR UPDATE PDL ACTION : ", error);
+    return { ...iniotialState, success: false };
+  }
+};

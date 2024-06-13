@@ -108,7 +108,8 @@ const _Deliveries: FC<IProps> = ({ value, loading, deliveries, onCheckboxHandler
         </div>
       </div>
 
-      <PartsButtonsGroup disable={true} />
+      
+      {/* MODAL */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
         <ModalContent>
           <ModalBody>

@@ -249,6 +249,11 @@ export const getProductsForUpdateList = async (
         images: true,
         location: true,
         category: true,
+        pdl: {
+          with: {
+            product: true
+          }
+        }
       },
     });
 
@@ -275,6 +280,7 @@ export const getProductForUpdate = async (
         images: true,
         location: true,
         category: true,
+        pdl: true
       },
     });
 

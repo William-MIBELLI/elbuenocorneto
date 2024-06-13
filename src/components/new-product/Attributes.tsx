@@ -119,10 +119,8 @@ const Attributes = ({ update = false }) => {
 
   //ON DEFINIT UN SCHEMA DYNAMIQUE ZOD QUI S'ADAPTE AUX INPUTS RECUS
   useEffect(() => {
-    if (attributes.length) {
-      const vers = createDynamicSchemaForAttrs(attributes);
-      setVerifDynamicAttributes(vers);
-    }
+    const vers = createDynamicSchemaForAttrs(attributes);
+    setVerifDynamicAttributes(vers);
   }, [attributes]);
 
   //LE ONCHANGE SUR LES SELECT
@@ -161,7 +159,7 @@ const Attributes = ({ update = false }) => {
         <Spinner color="warning" />
       ) : (
         <div className="flex flex-col gap-3">
-          {attributes.map((attr) => {
+          {attributes.length ? attributes.map((attr) => {
             switch (attr.type) {
               case "boolean":
                 return <div key={attr.id}>Boolean</div>;
@@ -198,7 +196,9 @@ const Attributes = ({ update = false }) => {
                   <p className="error_message">Probléme de récupération</p>
                 );
             }
-          })}
+          }) : (
+                <div>Aucunes caractérisques n'est disponible pour cette catégorie. 🙀</div>
+          )}
         </div>
       )}
       {update ? (
