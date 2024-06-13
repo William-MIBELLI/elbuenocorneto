@@ -43,6 +43,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
     selected,
     setSelected,
     setCategorySelected,
+    categorySelected
   } = useNewProductContext();
 
   //ON MAP LES IMAGESELECTS DE LA DB VERS IPRODUCTIMAGE pour les passer au context dans pictures
@@ -162,12 +163,16 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
             <Divider />
 
             {/* PRICE */}
-            <_Price
-              previousPrice={previousProd.price}
-              name={fields.price.name}
-            />
-            <p className="error_message">{fields.price.errors?.join(", ")}</p>
-            <Divider />
+            <div className={categorySelected?.gotPrice ? 'null' : 'hidden'}>
+              <_Price
+                previousPrice={previousProd.price}
+                name={fields.price.name}
+              />
+              <p className="error_message">{fields.price.errors?.join(", ")}</p>
+              <Divider />
+            </div>
+              
+
             <SubmitButton
               text="Enregistrer les modifications"
               success={

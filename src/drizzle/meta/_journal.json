@@ -281,6 +281,13 @@
       "when": 1718295941735,
       "tag": "0044_pretty_punisher",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "6",
+      "when": 1718301224716,
+      "tag": "0045_rare_exodus",
+      "breakpoints": true
     }
   ]
 }

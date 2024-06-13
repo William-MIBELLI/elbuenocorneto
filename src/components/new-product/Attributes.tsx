@@ -30,6 +30,8 @@ const Attributes = ({ update = false }) => {
     attributes,
     setAttributes,
     productAttributes,
+    categorySelected,
+    setProduct
   } = useNewProductContext();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -93,8 +95,15 @@ const Attributes = ({ update = false }) => {
       //ON LES ENVOIE DANS LE CONTEXT
       setProductAttributes(temp);
 
-      //ON PASSE AU PART SUIVANT
-      setPart("price");
+      //SI LA CATEGORIE PEUT ACCEPTER UN PRICE, ON SETPART A PRICE
+      if (categorySelected?.gotPrice) {
+        return setPart("price");
+        }
+        
+      //SINON SET LE PRODUCT.PRICE A ZERO ET ON PASSE DIRECT A IMAGE
+      setProduct({ ...product, price: 0 })
+      setPart('images');
+
     },
   });
 

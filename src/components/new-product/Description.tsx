@@ -9,7 +9,7 @@ import PartsButtonsGroup from "./PartsButtonsGroup";
 import { StateEnum } from "@/drizzle/schema";
 
 const Description = () => {
-  const { product, setProduct, setPart } = useNewProductContext();
+  const { product, setProduct, setPart, categorySelected } = useNewProductContext();
   const [state, setState] = useState<string>();
   const MIN = 10;
   const MAX = 2500;
@@ -19,8 +19,16 @@ const Description = () => {
     if (product.state) {
       setState(product.state)
     }
-  },[product])
+  }, [product])
+  
+  //SI LA CATEGORIE NE PERMET PAS DE DEFINIR UN STATE, ON LE MET PAR DEFAUT
+  useEffect(() => {
+    if (!categorySelected?.gotPrice) {
+      setState("Etat neuf")
+    }
+  },[])
 
+  //VALIDATION FRONTSIDE
   const [form, fields] = useForm({
     onValidate({ formData }) {
       const res = parseWithZod(formData, {
@@ -66,7 +74,9 @@ const Description = () => {
       noValidate
     >
       <h3 className="text-xl font-semibold text-left">Décrivez votre bien</h3>
-      <div>
+
+        {/* STATE */}
+      <div className={!categorySelected?.gotState ? 'hidden' : ''}>
         <label className="text-left" htmlFor="state">Etat *</label>
         <Select
           aria-label="Etat"
@@ -87,6 +97,8 @@ const Description = () => {
           </p>
         </div>
       </div>
+
+      {/* DESCRIPTION */}
       <div>
         <Textarea
           label="Description de l'annonce *"

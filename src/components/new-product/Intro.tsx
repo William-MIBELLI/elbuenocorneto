@@ -79,8 +79,9 @@ const Intro: FC<IProps> = () => {
   //ET ON MET ISCOMPLETE A FALSE POOUR LEMPECHER DE RETOURNER DIRECTEMENT A LA VALIDATION
   useEffect(() => {
     if (product.categoryType && cat && cat !== product.categoryType) {
-      console.log("CHANGEMENT DE CAT, ON RESTE LE CONTEXT");
+      console.log("CHANGEMENT DE CAT, ON RESET LE CONTEXT");
       setIsComplete(false);
+      setProduct({...product, state: undefined})
       setProductAttributes([]);
     }
   }, [cat]);

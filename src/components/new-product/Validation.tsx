@@ -23,11 +23,10 @@ const Validation = () => {
     setIsComplete,
     productAttributes,
     attributes,
-    categorySelected
+    categorySelected,
   } = useNewProductContext();
   const [displayPics, setDisplayPics] = useState(true);
   const [files, setFiles] = useState<FormData>(new FormData());
-
 
   //ON PASSE LES IMAGES DU CONTEXT DANS UN FORMDATA POUR LE SERVERACTION
   useEffect(() => {
@@ -103,24 +102,29 @@ const Validation = () => {
         <p className="text-red-400 font-semibold text-center text-xs">
           {state?.product?.categoryType}
         </p>
+        
 
         {/* PRICE */}
-        <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
-          <div className="flex gap-2">
-            <p className="font-semibold underline">Le prix :</p>
-            <p className="text-green-600">{product.price}€</p>
-          </div>
-          <Button
-            onClick={() => setPart("price")}
-            isIconOnly
-            className="bg-transparent hover:bg-gray-200"
-          >
-            <Pen size={20} />
-          </Button>
-        </div>
-        <p className="text-red-400 font-semibold text-center text-xs">
-          {state?.product?.price}
-        </p>
+        {categorySelected?.gotPrice && (
+          <>
+            <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
+              <div className="flex gap-2">
+                <p className="font-semibold underline">Le prix :</p>
+                <p className="text-green-600">{product.price}€</p>
+              </div>
+              <Button
+                onClick={() => setPart("price")}
+                isIconOnly
+                className="bg-transparent hover:bg-gray-200"
+              >
+                <Pen size={20} />
+              </Button>
+            </div>
+            <p className="text-red-400 font-semibold text-center text-xs">
+              {state?.product?.price}
+            </p>
+          </>
+        )}
 
         {/* ATTRIBUTES */}
         <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
@@ -171,9 +175,9 @@ const Validation = () => {
             </Button>
           </div>
         ) : (
-            <div className="text-center bg-gray-200 flex w-fit mx-auto px-2 py-1 rounded-xl text-sm text-gray-600">
-              La catégorie de votre annonce ne possède aucune option de livraison.
-            </div>
+          <div className="text-center bg-gray-200 flex w-fit mx-auto px-2 py-1 rounded-xl text-sm text-gray-600">
+            La catégorie de votre annonce ne possède aucune option de livraison.
+          </div>
         )}
         <p className="text-red-400 font-semibold text-center text-xs">
           {state?.selected}

@@ -242,7 +242,9 @@ export const categoryTable = pgTable("category", {
   target: text("target").notNull(),
   imageUrl: text("image_url").notNull(),
   type: CategoryEnum("category_enum").notNull().unique(),
-  availableToDelivery: boolean("available_to_delivery").default(true)
+  availableToDelivery: boolean("available_to_delivery").default(true),
+  gotPrice: boolean('got_price').default(true),
+  gotState: boolean('got_state').default(true)
 });
 
 export const categoryRelations = relations(categoryTable, ({ many }) => ({
