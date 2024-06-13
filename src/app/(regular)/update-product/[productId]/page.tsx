@@ -34,7 +34,6 @@ const page: FC<IProps> = async ({ params }) => {
   return (
     <NewProductProvider>
       <div className='w-full'>
-        PRODUCT ID : {params.productId}
         <ProductUpdate data={prod}/>
       </div>
     </NewProductProvider>

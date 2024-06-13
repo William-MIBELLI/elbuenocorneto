@@ -1,3 +1,4 @@
+import { usePathname } from 'next/navigation';
 
 "use server";
 
@@ -12,7 +13,7 @@ import {
   deliveries,
 } from "@/drizzle/schema";
 import { DeliveryType } from "@/interfaces/IDelivery";
-import { IProductImage } from "@/interfaces/IProducts";
+import { IProductImage, ProductUpdateType } from "@/interfaces/IProducts";
 import { parseWithZod } from "@conform-to/zod";
 import { ZodAny, ZodType, z } from "zod";
 import {
@@ -40,6 +41,7 @@ import {
 import { insertPDLOnDB, updatePDLonDB } from "../requests/delivery.request";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export const newProductACTION = async (initialState: unknown, fd: FormData) => {
   const parsedTitle = parseWithZod(fd, {
@@ -399,3 +401,30 @@ export const updatePDLACTION = async (
     return { ...iniotialState, success: false };
   }
 };
+
+export const deleteProductAction = async (data: { product: ProductUpdateType },initialState: { success?: boolean, _error?: string }, fd: FormData) => {
+  try {
+    const session = await auth();
+    const { product } = data;
+
+    //ON VERIFIE QUE LE PRODUCT A DELETE APPARTIENT BIEN A L'USER DE LA SESSION
+    if (!session || session.user?.id !== product.userId) {
+      return { ...initialState, success: false, _error: "Vous n'avez pas les autorisations pour supprimer cette annonce." };
+    }
+
+    //ON DELETE DANS LA DB AVEC LE PRODUCT.ID
+    const deleted = await deleteProductOnDB(product.id);
+    
+    if (!deleted) throw new Error('deleted null');
+
+    //ON REVALIDE LE PATH
+    revalidatePath('/mes-annonces');
+
+    //ON RETURN SUCCESS
+    return { ...initialState, success: true }
+    
+  } catch (error) {
+    console.log('ERROR DELETE PRODUCT ACTION : ', error);
+    return {...initialState, success: false}
+  }
+}
