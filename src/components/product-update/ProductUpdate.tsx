@@ -41,12 +41,13 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
     setLocation,
     setProductAttributes,
     selected,
-    setSelected
+    setSelected,
+    setCategorySelected,
   } = useNewProductContext();
 
   //ON MAP LES IMAGESELECTS DE LA DB VERS IPRODUCTIMAGE pour les passer au context dans pictures
   const images: IProductImage[] = data.images.map((item) => {
-    return { ...item , file: new File([""], item.url) };
+    return { ...item, file: new File([""], item.url) };
   });
 
   //PAREIL POUR LES PRODUCTATTRIBUTES
@@ -55,7 +56,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
   });
 
   //PAREIL POUR DELIVERIES
-  const dels = data.pdl.map(item => item.deliveryId)
+  const dels = data.pdl.map((item) => item.deliveryId);
 
   const [loading, setLoading] = useState(true);
   const [display, setDisplay] = useState(false);
@@ -64,15 +65,15 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
     Pick<ProductSelect, "description" | "price" | "title">
   >({ title: data.title, description: data.description, price: data.price });
 
-
   //ON HYDRATE LE CONTEXT AVEC LES DATA DU PRODUCT QU'ON A FETCH
   useEffect(() => {
-    console.log('DATA : ', data);
+    console.log("DATA : ", data);
     setProduct(data);
     setProductAttributes(attributes);
     setPictures(images);
     setLocation(data.location);
-    setSelected(dels)
+    setSelected(dels);
+    setCategorySelected(data.category);
   }, []);
 
   //QUAND L'HYDRATATION EST FINIE, ON DISPLAY LES FORMS
@@ -110,7 +111,6 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
       });
     }
   }, [lastResult]);
-
 
   return (
     <div className="flex flex-col gap-3 w-full">
@@ -162,7 +162,10 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
             <Divider />
 
             {/* PRICE */}
-            <_Price previousPrice={previousProd.price} name={fields.price.name} />
+            <_Price
+              previousPrice={previousProd.price}
+              name={fields.price.name}
+            />
             <p className="error_message">{fields.price.errors?.join(", ")}</p>
             <Divider />
             <SubmitButton
@@ -199,11 +202,11 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
             </div>
           </div>
           <div className={`${!displayImages ? "hidden" : ""}`}>
-              <ImagesUpdate productId={data.id} images={data.images} />
+            <ImagesUpdate productId={data.id} images={data.images} />
           </div>
           <Divider />
 
-            {/* ATTRIBUTES */}
+          {/* ATTRIBUTES */}
           <Accordion>
             <AccordionItem key={1} title="Caractéristiques">
               <Attributes update={true} />
@@ -211,22 +214,25 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
           </Accordion>
           <Divider />
 
-            
-            {/* LOCATION */}
+          {/* LOCATION */}
           <Accordion>
             <AccordionItem key={1} title="Localisation">
-            <LocationUpdate/>
-            </AccordionItem>
-          </Accordion>
-            <Divider />
-            
-                {/* DELIVERIES */}
-          <Accordion>
-            <AccordionItem key={1} title="Livraison">
-                <Deliveries update={true} />
+              <LocationUpdate />
             </AccordionItem>
           </Accordion>
           <Divider />
+
+          {/* DELIVERIES */}
+          {data.category.availableToDelivery && (
+            <>
+              <Accordion>
+                <AccordionItem key={1} title="Livraison">
+                  <Deliveries update={true} />
+                </AccordionItem>
+              </Accordion>
+              <Divider />
+            </>
+          )}
         </div>
       )}
     </div>

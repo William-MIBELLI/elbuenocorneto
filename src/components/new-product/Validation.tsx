@@ -23,6 +23,7 @@ const Validation = () => {
     setIsComplete,
     productAttributes,
     attributes,
+    categorySelected
   } = useNewProductContext();
   const [displayPics, setDisplayPics] = useState(true);
   const [files, setFiles] = useState<FormData>(new FormData());
@@ -145,7 +146,7 @@ const Validation = () => {
         </p>
 
         {/* DELIVERIES */}
-        {selected.length ? (
+        {categorySelected?.availableToDelivery ? (
           <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
             {deliveries
               .filter((item) => selected.includes(item.id))
@@ -169,7 +170,11 @@ const Validation = () => {
               <Pen size={20} />
             </Button>
           </div>
-        ) : null}
+        ) : (
+            <div className="text-center bg-gray-200 flex w-fit mx-auto px-2 py-1 rounded-xl text-sm text-gray-600">
+              La catégorie de votre annonce ne possède aucune option de livraison.
+            </div>
+        )}
         <p className="text-red-400 font-semibold text-center text-xs">
           {state?.selected}
         </p>

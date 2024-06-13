@@ -43,6 +43,8 @@ type NewProductContextType = {
   setCategories: Dispatch<CategorySelect[]>;
   attributes: AttributeSelect[];
   setAttributes: Dispatch<AttributeSelect[]>;
+  categorySelected: CategorySelect | undefined,
+  setCategorySelected: Dispatch<CategorySelect>;
 };
 
 const NewProductContext = createContext<NewProductContextType>(
@@ -79,6 +81,7 @@ export const NewProductProvider = ({ children }: Props) => {
   const [productAttributes, setProductAttributes] = useState<ProdAttrTypeWithName[]>([])
   const [categories, setCategories] = useState<CategorySelect[]>([]);
   const [attributes, setAttributes] = useState<AttributeSelect[]>([]);
+  const [categorySelected, setCategorySelected] = useState<CategorySelect>();
 
   useEffect(() => {
     //console.log("PROGRESS : ", progress);
@@ -114,7 +117,9 @@ export const NewProductProvider = ({ children }: Props) => {
     categories,
     setCategories,
     attributes,
-    setAttributes
+    setAttributes,
+    categorySelected,
+    setCategorySelected
   };
 
   return (

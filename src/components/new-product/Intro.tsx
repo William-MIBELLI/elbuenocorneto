@@ -25,17 +25,24 @@ interface IProps {
 
 const Intro: FC<IProps> = () => {
   const [step, setStep] = useState(0);
-  const { setPart, setProduct, product, categories, setCategories, setIsComplete, setProductAttributes} =
-    useNewProductContext();
+  const {
+    setPart,
+    setProduct,
+    product,
+    categories,
+    setCategories,
+    setIsComplete,
+    setProductAttributes,
+    setCategorySelected,
+  } = useNewProductContext();
   const [cat, setCat] = useState<CategoriesType>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
   const shuffeldList = useRef<CategoryInsert[]>([]);
 
   useEffect(() => {
-    console.log('PRODUCT DANS INTRO : ', product);
-
-  },[])
+    console.log("PRODUCT DANS INTRO : ", product);
+  }, []);
 
   //VALIDATION FRONT ET GESTION DU SUBMIT
   const [form, fields] = useForm({
@@ -62,25 +69,25 @@ const Intro: FC<IProps> = () => {
         title: fields.title.value,
         categoryType: cat,
       });
+      const c = categories.find((item) => item.type === cat);
+      setCategorySelected(c!);
       setPart("description");
     },
   });
 
   //SI 'L'USER REVIENT ET QU'IL CHANGE DE CATEGORIE, ON DELETE LES PRODATTR STOCKéS DANS LE CONTEXT
-  //ET ON MET ISCOMPLETE A FALSE POOUR LEMPECHER DE RETOURNER DIRECTEMENT A LA VALIDATION 
+  //ET ON MET ISCOMPLETE A FALSE POOUR LEMPECHER DE RETOURNER DIRECTEMENT A LA VALIDATION
   useEffect(() => {
     if (product.categoryType && cat && cat !== product.categoryType) {
-      console.log('CHANGEMENT DE CAT, ON RESTE LE CONTEXT');
+      console.log("CHANGEMENT DE CAT, ON RESTE LE CONTEXT");
       setIsComplete(false);
       setProductAttributes([]);
     }
-  },[cat])
-
+  }, [cat]);
 
   //FETCH CATEGORIES
   useEffect(() => {
     const getCat = async () => {
-
       const res = await fetch("/api/fetch/categories");
       setLoading(false);
 
@@ -90,16 +97,15 @@ const Intro: FC<IProps> = () => {
         return;
       }
 
-      //SINON ON STOCKE LES CATEGORIES DANS LE STATE ET ON SHUFFLE UN ECHANTILLON 
+      //SINON ON STOCKE LES CATEGORIES DANS LE STATE ET ON SHUFFLE UN ECHANTILLON
       const data = (await res.json()) as CategorySelect[];
       setCategories(data);
       shuffeldList.current = shuffle(Object.values(data)).slice(0, 3);
       return;
     };
 
-    getCat(); 
+    getCat();
   }, []);
-
 
   // ON CHECK LA LONGUEUR DU TITLE
   useEffect(() => {
@@ -161,7 +167,6 @@ const Intro: FC<IProps> = () => {
               </Radio>
             ))}
           </RadioGroup>
-          
 
           {/* SINON UN SELECT AVEC TOUTES LES CATEGORIES DISPPONIBLE */}
           <Select

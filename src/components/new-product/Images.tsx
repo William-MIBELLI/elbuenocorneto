@@ -17,12 +17,17 @@ interface IProps {
 
 const Images: FC<IProps> = ({ update = false }) => {
 
-  const { setPart } = useNewProductContext();
+  const { setPart, categories, product, categorySelected } = useNewProductContext();
 
   const [form, fields] = useForm({
     onSubmit() {
       if (!update) {
-        return setPart("deliveries");
+        // const cat = categories.find(item => item.type === product.categoryType)
+        if (categorySelected?.availableToDelivery) {
+          console.log('CATEGORY SELECTED : ', categorySelected)
+          return setPart( "deliveries");
+        }
+        return setPart('location');
       }
     },
   });
