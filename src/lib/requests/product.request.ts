@@ -339,11 +339,16 @@ export const updateProdAttrOnDb = async (
         )
         .returning()
         .then((r) => r[0]);
+      
+      //SI L'UPDATE A AFFECTE UNE LIGNE, ON LA STOCKE DANS updated
       if (up) {
         updated.push(up);
       }
     }
+
+    //ET ON LE RETURN
     return updated;
+    
   } catch (error) {
     console.log("ERROR UPDATING PRODATTR ON DB : ", error);
     return null;

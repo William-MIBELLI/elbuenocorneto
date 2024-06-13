@@ -1,29 +1,33 @@
-'use server';
+"use server";
 import { LocationInsert, LocationSelect } from "@/drizzle/schema";
-import { IGeometry, IMappedResponse, IProperties } from "@/interfaces/ILocation";
+import {
+  IGeometry,
+  IMappedResponse,
+  IProperties,
+} from "@/interfaces/ILocation";
 import { v4 as uuidv4 } from "uuid";
-import { updateLocationOnDB } from '../requests/location.request';
+import { updateLocationOnDB } from "../requests/location.request";
 
-export const mapLocationForStorage = (address: IMappedResponse[]): LocationInsert[] => {
-
+export const mapLocationForStorage = (
+  address: IMappedResponse[]
+): LocationInsert[] => {
   const locations: LocationInsert[] = [];
-  address.forEach(item => {
+  address.forEach((item) => {
     const { label, street, postcode, city } = item.properties;
-  
+
     const location: LocationInsert = {
       id: uuidv4(),
       label,
       streetName: street,
       postcode: +postcode,
       city,
-      coordonates: item.geometry
-    }
-  
-    locations.push(location);
+      coordonates: item.geometry,
+    };
 
-  })
+    locations.push(location);
+  });
   return locations;
-}
+};
 
 export interface IResponse {
   features: {
@@ -60,16 +64,23 @@ export const fetchAddressFromAPI = async (keyword: string) => {
   }
 };
 
-export const updateLocation = async (data: {address: LocationInsert, id: string}, initialState: { success?: boolean, address?: LocationSelect | null}, fd: FormData) => {
-  console.log('DATA : ', data);
+export const updateLocation = async (
+  data: { address: LocationInsert; id: string },
+  initialState: { success?: boolean; address?: LocationSelect | null },
+  fd: FormData
+) => {
+  console.log("DATA : ", data);
   try {
-    //const loc =  await mapLocationForStorage(data.address);
-    console.log('LOC DANS ACTION : ', data.address);
-    const updatedLoc = await updateLocationOnDB(data.address, data.id)
-    if (!updatedLoc) throw new Error('GET NULL FOR UPDATEDLOC IN ACTION');
-    return {success: true, address: updatedLoc}
+    console.log("LOC DANS ACTION : ", data.address);
+
+    const updatedLoc = await updateLocationOnDB(data.address, data.id);
+
+    if (!updatedLoc) throw new Error("GET NULL FOR UPDATEDLOC IN ACTION");
+
+    return { success: true, address: updatedLoc };
+    
   } catch (error) {
-    console.log('ERROR UPDATE LOCATION ACTION ', error);
-    return {...initialState, success: false};
+    console.log("ERROR UPDATE LOCATION ACTION ", error);
+    return { ...initialState, success: false };
   }
-}
+};

@@ -20,7 +20,7 @@ const _Deliveries: FC<IProps> = ({ value, loading, deliveries, onCheckboxHandler
 
 
   return (
-    <div>
+    <div className='flex flex-col gap-3'>
       <div className="flex flex-col items-start gap-2 border-1 border-gray-400 p-4 rounded-lg">
         <div className="flex items-center gap-5">
           <h3 className="font-semibold text-sm">Remise en main propre</h3>

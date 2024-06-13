@@ -8,6 +8,7 @@ interface IProps {
   name: string;
   errors?: string[];
   state: ProdAttrTypeWithName[];
+  // onChangeHandler: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
 const AttributeSelectInput: FC<IProps> = ({
@@ -15,6 +16,7 @@ const AttributeSelectInput: FC<IProps> = ({
   name,
   errors,
   state,
+  // onChangeHandler,
 }) => {
   const { possibleValue, label } = attribute;
   const mappedValue = possibleValue?.map((item, index) => {
@@ -31,18 +33,19 @@ const AttributeSelectInput: FC<IProps> = ({
     if (existingState) {
       setValue(existingState.value);
     }
-  }, []);
+  }, [state]);
 
   //SI PAS DE VALUES POSSIBLE, ON DISPLAY UNE ERREUR
   if (!mappedValue) {
     return (
       <div className="text-center w-full">
         <p className="error_message">
-          Une erreur est survenur pendant la récupération des données.
+          Une erreur est survenue pendant la récupération des données.
         </p>
       </div>
     );
   }
+
 
   return (
     <div className="text-left">
@@ -56,6 +59,7 @@ const AttributeSelectInput: FC<IProps> = ({
         value={value}
         selectedKeys={[value ?? ""]}
         onChange={e => setValue(e.target.value)}
+        // onChange={onChangeHandler}
       >
         {mappedValue &&
           mappedValue.map((item) => (

@@ -316,15 +316,16 @@ export const updateProductAttributesACTION = async (
   data: {
     prodAttrs: ProdAttrTypeWithName[],
     productId: string
-    attributes: string
+    attributes: AttributeSelect[]
   },
   is: unknown,
   fd: FormData
 ) => {
   try {
-    console.log('ON RENTRE DANS ACTION : ', data.prodAttrs);
-    const parsedAttributes = JSON.parse(data.attributes);
-    const schema = createDynamicSchemaForAttrs(parsedAttributes);
+    
+    //ON CREE LE SCHEMA ZOD GRACE AUX ATTRIBUTS POUR CHECK LES INPUTS
+    const schema = createDynamicSchemaForAttrs(data.attributes);
+
     //ON VERIFIE LES INPUTS
     const submission = parseWithZod(fd, {
       schema: z.object({}).extend(schema),
@@ -357,3 +358,4 @@ export const updateProductAttributesACTION = async (
     return null;
   }
 };
+

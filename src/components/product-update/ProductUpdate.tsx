@@ -26,6 +26,7 @@ import { useFormState } from "react-dom";
 import { updateProductACTION } from "@/lib/actions/product.action";
 import { ProductSelect } from "@/drizzle/schema";
 import ImagesUpdate from "./ImagesUpdate";
+import LocationUpdate from "./LocationUpdate";
 
 interface IProps {
   data: ProductUpdateType;
@@ -180,7 +181,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
             className="0 cursor-pointer"
           >
             <div className="flex justify-between items-center p-1">
-              <h3 className="text-[18px] ml-1">Modifier les images</h3>
+              <h3 className="text-[18px] ml-1">Images</h3>
               <ChevronLeft
                 size={16}
                 className={`${
@@ -196,7 +197,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
 
             {/* ATTRIBUTES */}
           <Accordion>
-            <AccordionItem key={1} title="Modifier les caractérisques de votre annonce.">
+            <AccordionItem key={1} title="Caractéristiques">
               <Attributes update={true} />
             </AccordionItem>
           </Accordion>
@@ -205,8 +206,16 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
             
             {/* LOCATION */}
           <Accordion>
-            <AccordionItem key={1} title="Modifier la localisation">
-              <LocationPart />
+            <AccordionItem key={1} title="Localisation">
+            <LocationUpdate/>
+            </AccordionItem>
+          </Accordion>
+            <Divider />
+            
+                {/* DELIVERIES */}
+          <Accordion>
+            <AccordionItem key={1} title="Livraison">
+              <LocationUpdate/>
             </AccordionItem>
           </Accordion>
           <Divider />

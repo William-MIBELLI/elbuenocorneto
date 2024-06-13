@@ -7,8 +7,7 @@ import {
 import { CategoriesType } from "@/interfaces/IProducts";
 import { AttributeSelect, ProdAttrInsert } from "@/drizzle/schema";
 import { Spinner } from "@nextui-org/react";
-// import AttributeDisplayer from "./AttributeDisplayer";
-import { ZodType, z } from "zod";
+import { z } from "zod";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import UncontrolledInput from "../inputs/UncontrolledInput";
@@ -33,19 +32,18 @@ const Attributes = ({ update = false }) => {
     productAttributes,
   } = useNewProductContext();
 
-  const attrForUpdate = useRef<ProdAttrTypeWithName[]>([]);
-  const schemaForUpdate = useRef<Record<string, ZodType<any, any, any>>>();
   const [loading, setLoading] = useState<boolean>(true);
   const filledAttrs = useRef<{ [key: string]: any }>({});
   const [verifDynamicAttributes, setVerifDynamicAttributes] = useState<
     Record<string, z.ZodType<any, any>>
   >({});
 
+  //SERVER ACTION
   const [lastResult, action] = useFormState(
     updateProductAttributesACTION.bind(null, {
       prodAttrs: productAttributes,
       productId: product.id!,
-      attributes: JSON.stringify(productAttributes)
+      attributes,
     }),
     undefined
   );
@@ -55,6 +53,7 @@ const Attributes = ({ update = false }) => {
     lastResult,
     onValidate({ formData }) {
       //ON CHECK LES INPUTS AVEC ZOD
+      console.log('VALIDATE')
       const submission = parseWithZod(formData, {
         schema: z.object({}).extend(verifDynamicAttributes),
       });
@@ -63,12 +62,19 @@ const Attributes = ({ update = false }) => {
       if (submission.status === "success") {
         filledAttrs.current = submission.value;
       }
+
+      console.log('SUBMISSION FRONTSIDE : ', submission, productAttributes)
       return submission;
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
 
     onSubmit({ nativeEvent }) {
+
+      //SI C'EST UNE CREATION, ON PREVENT DEFAULT POUR NE PAS CALL LE SERVER ACTION
+      if (!update) {
+        nativeEvent.preventDefault();
+      }
 
       //AU SUBMIT, ON CREE DES PRODUCTATTRIBUTE AVEC LES VALUES STOCKEES DANS LE STATE TEMPORAIRE
       const temp: ProdAttrTypeWithName[] = Object.entries(
@@ -83,11 +89,6 @@ const Attributes = ({ update = false }) => {
         const val = value ? value.toString() : "";
         return { id, attributeId, value: val, productId, label };
       });
-
-      if (update) {
-        attrForUpdate.current = temp;
-        console.log("UPDATE ATTRIBUTES : ", temp, schemaForUpdate, product?.id);
-      }
 
       //ON LES ENVOIE DANS LE CONTEXT
       setProductAttributes(temp);
@@ -116,14 +117,34 @@ const Attributes = ({ update = false }) => {
     getAttrs(product.categoryType!);
   }, [product]);
 
-  // ON DEFINIT UN SCHEMA DYNAMIQUE ZOD QUI S'ADAPTE AUX INPUTS RECUS
+  //ON DEFINIT UN SCHEMA DYNAMIQUE ZOD QUI S'ADAPTE AUX INPUTS RECUS
   useEffect(() => {
     if (attributes.length) {
       const vers = createDynamicSchemaForAttrs(attributes);
-      schemaForUpdate.current = vers;
       setVerifDynamicAttributes(vers);
     }
   }, [attributes]);
+
+  //LE ONCHANGE SUR LES SELECT
+  // const onChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+
+  //   //ON RECUPERE LE NAME ET LA VALUE RENVOYE PAR L'INPUT
+  //   const { value, name } = e.target;
+
+  //   //ON RECUPERE L'ID DE LATTRIBUT GRACE AU NAME
+  //   const attr = attributes.find(item => item.name === name);
+
+  //   if (!attr) return
+    
+  //   //ON MAP PRODATTR EN METTANT A JOUR L'ATTRIBUT AVEC LA NOUVELLE VALUE
+  //   const mappedProdAttr = productAttributes.map(item => {
+  //     return item.attributeId === attr.id ? {...item, value} : item
+  //   })
+  //   console.log('MAPPED ATTR ! ', mappedProdAttr)
+
+  //   //ON MET A JOUR LE CONTEXT
+  //   setProductAttributes(mappedProdAttr);
+  // }
 
   return (
     <form
@@ -169,6 +190,7 @@ const Attributes = ({ update = false }) => {
                     attribute={attr}
                     name={fields?.[attr.name].name}
                     errors={fields?.[attr.name].errors}
+                    // onChangeHandler={onChangeHandler}
                   />
                 );
               default:
@@ -179,7 +201,14 @@ const Attributes = ({ update = false }) => {
           })}
         </div>
       )}
-      {update ? <SubmitButton success={lastResult?.status === 'success'} successMessage="Les modifications ont bien été enregistrées." /> : <PartsButtonsGroup disable={true} />}
+      {update ? (
+        <SubmitButton
+          success={lastResult?.status === "success"}
+          successMessage="Les modifications ont bien été enregistrées."
+        />
+      ) : (
+        <PartsButtonsGroup disable={true} />
+      )}
     </form>
   );
 };

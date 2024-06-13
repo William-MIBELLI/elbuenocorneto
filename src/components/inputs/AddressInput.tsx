@@ -15,12 +15,14 @@ const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
   const lastTimeTyping = useRef<number>();
 
 
+  //ONCHANGE DU INPUT TEXT
   const onChangeHandler = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setKeyword(event.target.value);
   };
 
+  //ON TRIGGER LA RECHERCHE DANS L'API QUAND L'USER NE TAPE PLUS DEPUIS 400MS
   const onKeyUp = async () => {
     const timer = 400;
     lastTimeTyping.current = Date.now();
@@ -30,11 +32,19 @@ const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
       if (diff >= timer) {
         if (keyword.length >= 4) {
           const res = await fetchAddressFromAPI(keyword);
+
+          //ON STOCKE LE RESULTAT DANS LIST
           setList(res);
         }
       }
     }, timer);
   };
+
+  //ONCLICK SUR IN ITEM DE LA LIST
+  const testClickHandler = (item: LocationInsert) => {
+    setList([]);
+    onClickHandler(item);
+  }
 
   return (
     <div>

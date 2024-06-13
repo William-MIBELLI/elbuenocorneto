@@ -16,7 +16,7 @@ const ProductItemUpdate: FC<IProps> = ({ p }) => {
     <div className="p-3 flex items-center gap-4 w-full  relative">
       <div className="w-1/5 relative h-40">
         <Image
-          src={p.images[0].url}
+          src={p.images[0]?.url ?? '/image_placeholder.svg'}
           alt={p.title}
           fill
           className="rounded-lg"

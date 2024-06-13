@@ -9,7 +9,6 @@ interface IProps {
 
 const AddressList: FC<IProps> = ({ list, onClickHandler }) => {
 
-  console.log('LIST DANS LISTADDRESS : ', list);
   return (
     <div>
       {list.length ? (
