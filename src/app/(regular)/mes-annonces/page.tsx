@@ -2,9 +2,7 @@ import { auth } from "@/auth";
 import AuthRequired from "@/components/auth-required/AuthRequired";
 import ProductItemUpdate from "@/components/product-list/ProductItemUpdate";
 import { getProductsForUpdateList } from "@/lib/requests/product.request";
-import { Button, Divider } from "@nextui-org/react";
-import Image from "next/image";
-import Link from "next/link";
+import { Divider } from "@nextui-org/react";
 import React from "react";
 
 const page = async () => {
@@ -14,7 +12,6 @@ const page = async () => {
     return <AuthRequired />;
   }
   const prods = await getProductsForUpdateList(session.user.id!);
-
 
   return (
     <div className="w-full">

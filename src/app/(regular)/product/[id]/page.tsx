@@ -16,6 +16,10 @@ import Image from "next/image";
 import ImagePlaceHolder from 'public/image_placeholder.svg'
 import CardSlider from "@/components/card-slider/CardSlider";
 import SellerContent from "@/components/product-details/SellerContent";
+import { auth } from "@/auth";
+import Link from "next/link";
+import ModalDeleteProduct from "@/components/modal/ModalDeleteProduct";
+import Managament from "@/components/product-details/Managament";
 
 export const revalidate = 0;
 
@@ -29,6 +33,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
 
 
   const data = await getProductDetailsById(id);
+  const session = await auth();
 
   if (!data?.product || !data?.user) return notFound();
 
@@ -37,10 +42,12 @@ const page: FC<IProps> = async ({ params: { id } }) => {
     price = 0,
     createdAt,
     description,
-    state
+    state,
+    userId,
+    id: productId
   } = data.product;
 
-  const { del, location, attributes, category } = data;
+  const { del, location, attributes, category, product } = data;
 
   console.log('CATEGORIE : ', category.type)
   attributes.forEach(item => console.log('ATRR : ', item.attribute?.label))
@@ -135,10 +142,14 @@ const page: FC<IProps> = async ({ params: { id } }) => {
         <Divider className="my-4" />
         <CardSlider category={data.category.type} title="Ces annonces peuvent vous intéresser"/>
       </div>
-      <aside className=" w-full lg:w-1/3 ">
+      <aside className=" w-full lg:w-1/3 sticky top-10">
         <Seller userId={data.user.id} />
-      </aside>
-      {/* HEADER */}
+        {
+          session && session?.user?.id === userId && (
+            <Managament product={product} />
+          )
+        }
+      </aside>      
     </div>
   );
 };

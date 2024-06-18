@@ -1,6 +1,6 @@
 "use client";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,6 +16,7 @@ import SubmitButton from "../submit-button/SubmitButton";
 import { useFormState } from "react-dom";
 import { deleteProductAction } from "@/lib/actions/product.action";
 import { RedirectType, redirect } from "next/navigation";
+import ModalDeleteProduct from "../modal/ModalDeleteProduct";
 
 interface IProps {
   p: ProductUpdateType;
@@ -23,18 +24,13 @@ interface IProps {
 
 const ProductItemUpdate: FC<IProps> = ({ p }) => {
 
-  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const [open, setOpen] = useState(false);
 
-  const [state, action] = useFormState(deleteProductAction.bind(null, { product: p }), { success: false })
+  const onOpenModal = () => {
+    setOpen(true);
+  }
+
   
-  //SI DELETED OK, ON REDIRECT POUR REFRESH LA LIST DES PRODUCTS
-  //PEUT ETRE VOIR SI IL N'Y A PAS UNE METHODE PLUS CLEAN
-  useEffect(() => {
-    if (state?.success) {
-      redirect(`/mes-annonces`, RedirectType.replace)
-    }
-  },[state])
-
   return (
     <div className="p-3 flex items-center gap-4 w-full  relative">
       <div className="w-1/5 relative h-40">
@@ -69,7 +65,7 @@ const ProductItemUpdate: FC<IProps> = ({ p }) => {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button className="button_danger" onClick={onOpen}>
+          <Button className="button_danger" onClick={onOpenModal}>
             Supprimer
           </Button>
           <Button
@@ -83,34 +79,7 @@ const ProductItemUpdate: FC<IProps> = ({ p }) => {
       </div>
 
       {/* MODAL SUPPRESSION */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1 ">Attention</ModalHeader>
-              <ModalBody className="text-center">
-                <div>
-                  <p className="text-sm">
-                    Vous êtes sur le point de supprimer votre annonce
-                  </p>
-                  <p className="font-semibold">
-                    {p.title}
-                  </p>
-                </div>
-                <p className="text-red-600 font-semibold">
-                  Cette action est irréversible.
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <form className="w-full" action={action}>
-                  <input type="text" hidden value={JSON.stringify(p)} name="productId" />
-                  <SubmitButton fullWidth/>
-                </form>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <ModalDeleteProduct open={open} setOpen={setOpen} product={p} redirection={false} />
     </div>
   );
 };

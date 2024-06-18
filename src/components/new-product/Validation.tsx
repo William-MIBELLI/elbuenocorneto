@@ -152,7 +152,7 @@ const Validation = () => {
         {/* DELIVERIES */}
         {categorySelected?.availableToDelivery ? (
           <div className="flex justify-between items-center border-gray-200 border-1 p-2 rounded-lg">
-            {deliveries
+            { deliveries.length ? deliveries
               .filter((item) => selected.includes(item.id))
               .map((item, index) => (
                 <div className="flex items-center gap-1 text-sm" key={index}>
@@ -165,7 +165,9 @@ const Validation = () => {
                   />
                   <p>{item.label}</p>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center font-semibold">Vous n'avez choisi aucun mode de livraison pour cette annonce.</div>
+              )}
             <Button
               onClick={() => setPart("deliveries")}
               isIconOnly

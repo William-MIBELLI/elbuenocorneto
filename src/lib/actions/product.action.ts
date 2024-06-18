@@ -1,6 +1,6 @@
-import { usePathname } from 'next/navigation';
-
 "use server";
+import { RedirectType, redirect, usePathname } from "next/navigation";
+
 
 import {
   AttributeSelect,
@@ -361,70 +361,84 @@ export const updateProductAttributesACTION = async (
 };
 
 export const updatePDLACTION = async (
-  data: {previous: string[], selected: string[], productId: string},
+  data: { previous: string[]; selected: string[]; productId: string },
   iniotialState: { success?: boolean },
   fd: FormData
 ) => {
   try {
-    console.log('UPDATE PDL ACTION');
+    console.log("UPDATE PDL ACTION");
     const pdlToAdd: string[] = [];
-    
+
     const { previous, selected, productId } = data;
 
     //ON LOOP SUR SELECTED
-    selected.forEach(item => {
-      const inPrevious = previous.find(pre => pre === item);
+    selected.forEach((item) => {
+      const inPrevious = previous.find((pre) => pre === item);
 
       //SI L'ITEM EST ABSENT DE PREVIOUS, IL FAUT l'AJOUTER
       if (!inPrevious) {
         pdlToAdd.push(item);
       }
-    })
+    });
 
     //ON LOOP SUR PREVIOUS
-    const pdlToDelete: string[] = previous.filter(item => {
-
+    const pdlToDelete: string[] = previous.filter((item) => {
       //SI L'ITEM EST ABSENT DE SELECTED, IL FAUT LE SUPPRIMER
-      return !selected.find(sel => sel === item)
-    })
-    
-    console.log('TOADD ET TODELETE : ', pdlToAdd, pdlToDelete);
+      return !selected.find((sel) => sel === item);
+    });
+
+    console.log("TOADD ET TODELETE : ", pdlToAdd, pdlToDelete);
 
     //ON REQUEST LA DB AVEC LES PDL A ADD ET DELETE
     const updated = await updatePDLonDB(productId, pdlToAdd, pdlToDelete);
 
-    console.log('UPDATED : ', updated);
-    return { ...iniotialState, success: true }
-    
+    console.log("UPDATED : ", updated);
+    return { ...iniotialState, success: true };
   } catch (error) {
     console.log("ERROR UPDATE PDL ACTION : ", error);
     return { ...iniotialState, success: false };
   }
 };
 
-export const deleteProductAction = async (data: { product: ProductUpdateType },initialState: { success?: boolean, _error?: string }, fd: FormData) => {
+export const deleteProductAction = async (
+  data: { product: ProductSelect; redirection: boolean, redirectPath: string },
+  initialState: { success?: boolean; _error?: string },
+  fd: FormData
+) => {
   try {
     const session = await auth();
     const { product } = data;
 
+    console.log('REDIRECTION PATH  DANS LE DELETE : ', data.redirection);
+
     //ON VERIFIE QUE LE PRODUCT A DELETE APPARTIENT BIEN A L'USER DE LA SESSION
     if (!session || session.user?.id !== product.userId) {
-      return { ...initialState, success: false, _error: "Vous n'avez pas les autorisations pour supprimer cette annonce." };
+      return {
+        ...initialState,
+        success: false,
+        _error:
+          "Vous n'avez pas les autorisations pour supprimer cette annonce.",
+      };
     }
 
     //ON DELETE DANS LA DB AVEC LE PRODUCT.ID
-    const deleted = await deleteProductOnDB(product.id);
-    
-    if (!deleted) throw new Error('deleted null');
+    // const deleted = await deleteProductOnDB(product.id);
+
+    // if (!deleted) throw new Error("deleted null");
 
     //ON REVALIDE LE PATH
-    revalidatePath('/mes-annonces');
+    revalidatePath("/mes-annonces");
 
-    //ON RETURN SUCCESS
-    return { ...initialState, success: true }
-    
   } catch (error) {
-    console.log('ERROR DELETE PRODUCT ACTION : ', error);
-    return {...initialState, success: false}
+    console.log("ERROR DELETE PRODUCT ACTION : ", error);
+    return { ...initialState, success: false };
   }
-}
+
+  //SI REDIRECTION EST TRUE, ON REDIRIGE
+  if (data.redirection) {
+    redirect(data.redirectPath)
+  }
+
+  //SINON ON RETURN SUCCESS
+  return { ...initialState, success: true };
+};

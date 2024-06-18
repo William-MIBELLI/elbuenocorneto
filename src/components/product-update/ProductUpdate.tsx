@@ -11,6 +11,7 @@ import { useNewProductContext } from "@/context/newproduct.context";
 import {
   Accordion,
   AccordionItem,
+  Button,
   Divider,
   Spinner,
   Textarea,
@@ -28,6 +29,9 @@ import { ProductSelect } from "@/drizzle/schema";
 import ImagesUpdate from "./ImagesUpdate";
 import LocationUpdate from "./LocationUpdate";
 import Deliveries from "../new-product/Deliveries";
+import Managament from "../product-details/Managament";
+import Link from "next/link";
+import ModalDeleteProduct from "../modal/ModalDeleteProduct";
 
 interface IProps {
   data: ProductUpdateType;
@@ -43,7 +47,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
     selected,
     setSelected,
     setCategorySelected,
-    categorySelected
+    categorySelected,
   } = useNewProductContext();
 
   //ON MAP LES IMAGESELECTS DE LA DB VERS IPRODUCTIMAGE pour les passer au context dans pictures
@@ -61,6 +65,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
 
   const [loading, setLoading] = useState(true);
   const [display, setDisplay] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [displayImages, setDisplayImages] = useState(false);
   const [previousProd, setPreviousProd] = useState<
     Pick<ProductSelect, "description" | "price" | "title">
@@ -130,114 +135,137 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
           <Spinner color="warning" />
         </div>
       ) : (
-        <div className="flex flex-col gap-6 text-left w-2/3">
-          <form
-            id={form.id}
-            action={action}
-            onSubmit={form.onSubmit}
-            className="flex flex-col gap-6 text-left"
-            noValidate
-          >
-            {/* TITLE */}
-            <UncontrolledInput
-              label="Titre de l'annonce"
-              name={fields.title.name}
-              defaultValue={data.title}
-              errors={fields.title.errors}
-              isRequired
-            />
-            <Divider />
-
-            {/* DESCRIPTION */}
-            <fieldset>
-              <label htmlFor="description">Description *</label>
-              <Textarea
-                name={fields.description.name}
-                defaultValue={data.description}
+        <div className="flex w-full gap-6">
+          <div className="flex flex-col gap-6 text-left w-2/3">
+            <form
+              id={form.id}
+              action={action}
+              onSubmit={form.onSubmit}
+              className="flex flex-col gap-6 text-left"
+              noValidate
+            >
+              {/* TITLE */}
+              <UncontrolledInput
+                label="Titre de l'annonce"
+                name={fields.title.name}
+                defaultValue={data.title}
+                errors={fields.title.errors}
                 isRequired
               />
-              <p className="error_message">
-                {fields.description.errors?.join(", ")}
-              </p>
-            </fieldset>
+              <Divider />
+
+              {/* DESCRIPTION */}
+              <fieldset>
+                <label htmlFor="description">Description *</label>
+                <Textarea
+                  name={fields.description.name}
+                  defaultValue={data.description}
+                  isRequired
+                />
+                <p className="error_message">
+                  {fields.description.errors?.join(", ")}
+                </p>
+              </fieldset>
+              <Divider />
+
+              {/* PRICE */}
+              <div className={categorySelected?.gotPrice ? "null" : "hidden"}>
+                <_Price
+                  previousPrice={previousProd.price}
+                  name={fields.price.name}
+                />
+                <p className="error_message">
+                  {fields.price.errors?.join(", ")}
+                </p>
+                <Divider />
+              </div>
+
+              <SubmitButton
+                text="Enregistrer les modifications"
+                success={
+                  lastResult?.status === "success" &&
+                  fields.description.value === previousProd.description &&
+                  Number(fields.price.value) === previousProd.price &&
+                  fields.title.value === previousProd.title
+                }
+                successMessage="Les modifications ont bien été enregistrées."
+                disable={
+                  fields.description.value === previousProd.description &&
+                  Number(fields.price.value) === previousProd.price &&
+                  fields.title.value === previousProd.title
+                }
+              />
+            </form>
             <Divider />
 
-            {/* PRICE */}
-            <div className={categorySelected?.gotPrice ? 'null' : 'hidden'}>
-              <_Price
-                previousPrice={previousProd.price}
-                name={fields.price.name}
-              />
-              <p className="error_message">{fields.price.errors?.join(", ")}</p>
-              <Divider />
+            {/* IMAGES */}
+            <div
+              onClick={() => setDisplayImages(!displayImages)}
+              className="0 cursor-pointer"
+            >
+              <div className="flex justify-between items-center p-1">
+                <h3 className="text-[18px] ml-1">Images</h3>
+                <ChevronLeft
+                  size={16}
+                  className={`${
+                    displayImages ? "-rotate-90" : ""
+                  } transition-all`}
+                />
+              </div>
             </div>
-              
+            <div className={`${!displayImages ? "hidden" : ""}`}>
+              <ImagesUpdate productId={data.id} images={data.images} />
+            </div>
+            <Divider />
 
-            <SubmitButton
-              text="Enregistrer les modifications"
-              success={
-                lastResult?.status === "success" &&
-                fields.description.value === previousProd.description &&
-                Number(fields.price.value) === previousProd.price &&
-                fields.title.value === previousProd.title
-              }
-              successMessage="Les modifications ont bien été enregistrées."
-              disable={
-                fields.description.value === previousProd.description &&
-                Number(fields.price.value) === previousProd.price &&
-                fields.title.value === previousProd.title
-              }
-            />
-          </form>
-          <Divider />
+            {/* ATTRIBUTES */}
+            <Accordion>
+              <AccordionItem key={1} title="Caractéristiques">
+                <Attributes update={true} />
+              </AccordionItem>
+            </Accordion>
+            <Divider />
 
-          {/* IMAGES */}
-          <div
-            onClick={() => setDisplayImages(!displayImages)}
-            className="0 cursor-pointer"
-          >
-            <div className="flex justify-between items-center p-1">
-              <h3 className="text-[18px] ml-1">Images</h3>
-              <ChevronLeft
-                size={16}
-                className={`${
-                  displayImages ? "-rotate-90" : ""
-                } transition-all`}
+            {/* LOCATION */}
+            <Accordion>
+              <AccordionItem key={1} title="Localisation">
+                <LocationUpdate />
+              </AccordionItem>
+            </Accordion>
+            <Divider />
+
+            {/* DELIVERIES */}
+            {data.category.availableToDelivery && (
+              <>
+                <Accordion>
+                  <AccordionItem key={1} title="Livraison">
+                    <Deliveries update={true} />
+                  </AccordionItem>
+                </Accordion>
+                <Divider />
+              </>
+            )}
+          </div>
+          <aside className="border-1 sticky top-10 border-gray-100 p-4 w-1/3 h-fit rounded-lg flex flex-col gap-5 shadow-medium">
+            <h3 className="font-semibold">Vous voulez ?</h3>
+            <div className="flex flex-col gap-3">
+              <Button
+                as={Link}
+                href={`/product/${product.id}`}
+                className="button_secondary"
+              >
+                Aller à la page du produit
+              </Button>
+              <Button onClick={() => setOpen(true)} className="button_danger">Supprimer l'annonce</Button>
+              <ModalDeleteProduct
+                open={open}
+                setOpen={setOpen}
+                  product={product as ProductSelect}
+                  redirection={true}
+                  redirectPath={`/mes-annonces`}
               />
             </div>
-          </div>
-          <div className={`${!displayImages ? "hidden" : ""}`}>
-            <ImagesUpdate productId={data.id} images={data.images} />
-          </div>
-          <Divider />
-
-          {/* ATTRIBUTES */}
-          <Accordion>
-            <AccordionItem key={1} title="Caractéristiques">
-              <Attributes update={true} />
-            </AccordionItem>
-          </Accordion>
-          <Divider />
-
-          {/* LOCATION */}
-          <Accordion>
-            <AccordionItem key={1} title="Localisation">
-              <LocationUpdate />
-            </AccordionItem>
-          </Accordion>
-          <Divider />
-
-          {/* DELIVERIES */}
-          {data.category.availableToDelivery && (
-            <>
-              <Accordion>
-                <AccordionItem key={1} title="Livraison">
-                  <Deliveries update={true} />
-                </AccordionItem>
-              </Accordion>
-              <Divider />
-            </>
-          )}
+          </aside>
         </div>
       )}
     </div>
