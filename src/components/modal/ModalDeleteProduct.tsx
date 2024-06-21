@@ -29,7 +29,7 @@ const ModalDeleteProduct: FC<IProps> = ({
   redirection,
   redirectPath = "/mes-annonces",
 }) => {
-  const { isOpen, onOpenChange, onOpen } = useDisclosure();
+  const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
 
   const [state, action] = useFormState(
     deleteProductAction.bind(null, { product, redirectPath, redirection }),
@@ -54,11 +54,14 @@ const ModalDeleteProduct: FC<IProps> = ({
 
   //SI ON CLOSE LA MODAL, ON MET LE STAT OPEN DU PARENT A FALSE
   const onCloseHandler = () => {
+    console.log('ONCLOSE HANDLER');
     setOpen(false);
+    onClose();
   };
 
+ 
   return (
-    <Modal isOpen={isOpen} onClose={onCloseHandler} onOpenChange={onOpenChange}>
+    <Modal isOpen={isOpen} onClose={onCloseHandler} onOpenChange={onOpenChange} >
       <ModalContent>
         {(onClose) => (
           <>

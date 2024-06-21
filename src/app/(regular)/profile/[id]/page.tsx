@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import React, { FC } from 'react'
 import ProfileDefault from 'public/profile-default.svg'
+import { ProductForList } from '@/interfaces/IProducts';
 
 interface IProps {
   params: {
@@ -22,8 +23,8 @@ const page: FC<IProps> = async ({ params: { id } }) => {
 
   const { name, rateNumber, rating, image, products, createdAt } = data;
 
-  const mappedData = products.map(p => {
-    return { product: {...p}, images: p.images, location: p.location}
+  const mappedData: ProductForList[] = products.map(p => {
+    return { product: {...p}, image: p.images[0], location: p.location, favorites: p.favorites[0]}
   })
 
   return (

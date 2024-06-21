@@ -1,8 +1,9 @@
 'use client'
-import { ImageSelect, LocationSelect, ProductSelect } from "@/drizzle/schema";
+import { FavoriteSelect, ImageSelect, LocationSelect, ProductSelect } from "@/drizzle/schema";
 import React, { FC } from "react";
 import ProductItem from "./ProductItem";
 import { Button, Select, SelectItem } from "@nextui-org/react";
+import { ProductDataForList, ProductForList } from "@/interfaces/IProducts";
 
 const orderBy = [
   {value:'PRIX_DESC', description: 'prix decroissant', label:'Prix décroissant' },
@@ -11,15 +12,16 @@ const orderBy = [
 ]
 
 
-export interface ProductDataForList {
-  product: Pick<ProductSelect, "id" | "title" | "createdAt" | "price" | "categoryType" | "state">;
-  images: ImageSelect[],
-  location: LocationSelect
-}
+
 interface IProps {
-  products: ProductDataForList[];
+  products: ProductForList[];
 }
+
 const ProductList: FC<IProps> = ({ products }) => {
+
+  console.log('--------------------')
+  products.forEach(p => console.log(p?.product?.id))
+
   return <div className="flex flex-col gap-3">
     <div className="flex w-full justify-between items-center my-3">
       <p>
@@ -42,7 +44,7 @@ const ProductList: FC<IProps> = ({ products }) => {
     </div>
     {
       products.map(product => (
-          <ProductItem data={product} key={product.product.id} />
+          <ProductItem data={product} key={product.product?.id} />
       ))
     }
   </div>

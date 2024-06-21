@@ -1,6 +1,6 @@
 import ProductList from '@/components/product-list/ProductList'
 import { CategoriesType, categoriesList, categoriesTypeList } from '@/interfaces/IProducts'
-import { getProductsByCategory } from '@/lib/requests/product.request'
+import {  getProductsByCategory, getProductsListByCategory } from '@/lib/requests/product.request'
 import { notFound } from 'next/navigation'
 import React, { FC } from 'react'
 
@@ -19,7 +19,8 @@ const page: FC<IProps> = async ({ params: { category } }) => {
     return notFound();
   }
 
-  const productsList = await getProductsByCategory(category);
+  const productsList = await getProductsListByCategory(category);
+
 
   return (
     <div className='w-full'>
@@ -29,7 +30,7 @@ const page: FC<IProps> = async ({ params: { category } }) => {
         </h1>
         <p className='font-semibold text-gray-400'>{productsList.length} annonces</p>
       </div>
-      <ProductList products={productsList}/>
+      <ProductList products={productsList} />
     </div>
   )
 }

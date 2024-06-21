@@ -11,19 +11,23 @@ import { Heart, MoveLeft, MoveRight, Share2, X } from "lucide-react";
 import Image from "next/image";
 import React, { FC, useState } from "react";
 import ImageModal from "./ImageModal";
+import { Details } from "@/interfaces/IProducts";
+import Favorite from "../favorite/Favorite";
 
 interface IProps {
   imageUrl: string[];
+  data: Details;
 }
-const ImageContainer: FC<IProps> = ({ imageUrl }) => {
+const ImageContainer: FC<IProps> = ({ imageUrl, data }) => {
+  
   const regularDisplay = "relative w-auto mx-auto flex justify-center gap-2";
 
   const imagesToDisplay = imageUrl.slice(0, 3);
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const [open, setOpen] = useState<boolean>(false);
 
 
   const isRegular = imagesToDisplay.length < 3;
-  // console.log('IMAGE TO DISPLAY.LENGTH ', imagesToDisplay.length, isRegular);
   return (
     <div
       className={`relative w-full ${
@@ -80,7 +84,7 @@ const ImageContainer: FC<IProps> = ({ imageUrl }) => {
           <Share2 size={15} />
         </Button>
         <Button isIconOnly>
-          <Heart size={15} />
+          <Favorite open={open} setOpen={setOpen} fav={!!data.favorites.length} productId={data.id} />
         </Button>
       </div>
       <Button

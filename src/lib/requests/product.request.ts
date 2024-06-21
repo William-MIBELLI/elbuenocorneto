@@ -1,6 +1,9 @@
 import {
   CategoriesType,
+  Details,
   ICard,
+  ProductDataForList,
+  ProductForList,
   ProductUpdateType,
 } from "@/interfaces/IProducts";
 import { getDb } from "@/drizzle/db";
@@ -15,6 +18,7 @@ import {
   attributesTable,
   categoryTable,
   deliveries,
+  favoritesTable,
   images,
   locations,
   productAttributeJONC,
@@ -23,84 +27,117 @@ import {
   users,
 } from "@/drizzle/schema";
 import { and, eq } from "drizzle-orm";
-import { ProductDataForList } from "@/components/product-list/ProductList";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
+import { auth } from "@/auth";
 
-export const getProductDetailsById = async (id: string) => {
+// export const getProductDetailsById = async (id: string) => {
+//   try {
+//     const db = getDb();
+//     const data = await db.transaction(async (tx) => {
+//       const p: ProductSelect[] = await tx
+//         .select()
+//         .from(products)
+//         .where(eq(products.id, id));
+
+//       const c = await tx
+//         .select()
+//         .from(categoryTable)
+//         .where(eq(categoryTable.type, p[0].categoryType))
+//         .then((r) => r[0]);
+
+//       // REQUEST TOUS LES ATTRIBUTS DISPO POUR LA CREATION
+//       const sq = db
+//         .select()
+//         .from(attributeCategoryJONC)
+//         .where(eq(attributeCategoryJONC.categoryType, c.type))
+//         .as("sq");
+//       const a = await tx
+//         .select()
+//         .from(attributesTable)
+//         .rightJoin(sq, eq(sq.attributeName, attributesTable.name));
+
+//       //const subq = db.select().from(attributesTable).where(eq())
+//       const attrs = await tx
+//         .select()
+//         .from(productAttributeJONC)
+//         .leftJoin(
+//           attributesTable,
+//           eq(productAttributeJONC.attributeId, attributesTable.id)
+//         )
+//         .where(eq(productAttributeJONC.productId, p[0].id));
+
+//       const u: SelectUser[] = await tx
+//         .select()
+//         .from(users)
+//         .where(eq(users.id, p[0].userId));
+
+//       const i: ImageSelect[] = await tx
+//         .select()
+//         .from(images)
+//         .where(eq(images.productId, id));
+
+//       const d = await tx
+//         .select()
+//         .from(productDeliveryLink)
+//         .where(eq(productDeliveryLink.productId, id))
+//         .leftJoin(
+//           deliveries,
+//           eq(productDeliveryLink.deliveryId, deliveries.id)
+//         );
+
+//       const l = await tx
+//         .select()
+//         .from(locations)
+//         .where(eq(locations.id, p[0].locationId));
+
+//       return {
+//         product: p[0],
+//         user: u[0],
+//         images: i.map((item) => item.url),
+//         del: d.map((item) => item.deliveries),
+//         location: l[0],
+//         category: c,
+//         attributes: attrs,
+//       };
+//     });
+
+//     return data;
+//   } catch (error) {
+//     console.log("ERROR FETCHING PRODUCT : ", error);
+//     return null;
+//   }
+// };
+
+export const getProductDetails = async (productId: string): Promise<Details | undefined> => {
   try {
+
     const db = getDb();
-    const data = await db.transaction(async (tx) => {
-      const p: ProductSelect[] = await tx
-        .select()
-        .from(products)
-        .where(eq(products.id, id));
 
-      const c = await tx
-        .select()
-        .from(categoryTable)
-        .where(eq(categoryTable.type, p[0].categoryType))
-        .then((r) => r[0]);
+    const p = await db.query.products.findFirst({
+      where: eq(products.id, productId),
+      with: {
+        seller: true,
+        attributes: {
+          with: {
+            attribute: true
+          }
+        },
+        favorites: true,
+        images: true,
+        location: true,
+        pdl: {
+          with: {
+            delivery: true
+          }
+        }
+      }
+    })
 
-      // REQUEST TOUS LES ATTRIBUTS DISPO POUR LA CREATION
-      const sq = db
-        .select()
-        .from(attributeCategoryJONC)
-        .where(eq(attributeCategoryJONC.categoryType, c.type))
-        .as("sq");
-      const a = await tx
-        .select()
-        .from(attributesTable)
-        .rightJoin(sq, eq(sq.attributeName, attributesTable.name));
+    return p;
 
-      //const subq = db.select().from(attributesTable).where(eq())
-      const attrs = await tx
-        .select()
-        .from(productAttributeJONC)
-        .leftJoin(
-          attributesTable,
-          eq(productAttributeJONC.attributeId, attributesTable.id)
-        )
-        .where(eq(productAttributeJONC.productId, p[0].id));
-
-      const u: SelectUser[] = await tx
-        .select()
-        .from(users)
-        .where(eq(users.id, p[0].userId));
-
-      const i: ImageSelect[] = await tx
-        .select()
-        .from(images)
-        .where(eq(images.productId, id));
-
-      const d = await tx
-        .select()
-        .from(productDeliveryLink)
-        .where(eq(productDeliveryLink.productId, id))
-        .leftJoin(
-          deliveries,
-          eq(productDeliveryLink.deliveryId, deliveries.id)
-        );
-
-      const l = await tx
-        .select()
-        .from(locations)
-        .where(eq(locations.id, p[0].locationId));
-
-      return {
-        product: p[0],
-        user: u[0],
-        images: i.map((item) => item.url),
-        del: d.map((item) => item.deliveries),
-        location: l[0],
-        category: c,
-        attributes: attrs,
-      };
-    });
-
-    return data;
   } catch (error) {
-    console.log("ERROR FETCHING PRODUCT : ", error);
-    return null;
+    console.log("ERROR FETCHING PRODUCT DETAILS : ", error);
+    return undefined;
   }
 };
 
@@ -145,6 +182,7 @@ export const fetchProductsForSlider = async (
             city: true,
           },
         },
+        favorites: true,
       },
       limit: 10,
     });
@@ -160,23 +198,31 @@ export const getProductsByCategory = async (
 ): Promise<ProductDataForList[]> => {
   try {
     const db = getDb();
-    const cat = await db
-      .select()
-      .from(categoryTable)
-      .where(eq(categoryTable.type, category))
-      .then((r) => r[0]);
+    const session = await auth();
+
     const prods = await db.query.products.findMany({
-      where: eq(products.categoryType, cat.type),
+      where: eq(products.categoryType, category),
       with: {
         images: {
           limit: 1,
         },
         location: true,
+        favorites: {
+          where: eq(favoritesTable.userId, session?.user?.id ?? "null"),
+        },
       },
+      limit: 10,
     });
+
     const mappedProds = prods.map((p) => {
-      return { product: { ...p }, images: p.images, location: p.location };
+      return {
+        product: { ...p },
+        images: p.images,
+        location: p.location,
+        favorites: !!p.favorites.length,
+      };
     });
+
     return mappedProds;
   } catch (error) {
     console.log("ERROR FETCHING PORDS BY CATGEROY : ");
@@ -251,9 +297,9 @@ export const getProductsForUpdateList = async (
         category: true,
         pdl: {
           with: {
-            product: true
-          }
-        }
+            product: true,
+          },
+        },
       },
     });
 
@@ -280,7 +326,7 @@ export const getProductForUpdate = async (
         images: true,
         location: true,
         category: true,
-        pdl: true
+        pdl: true,
       },
     });
 
@@ -316,7 +362,7 @@ export const udpateProductOnDB = async (
 
 export const updateProdAttrOnDb = async (
   productId: string,
-  attrs: {name: attrNameType, value: string}[]
+  attrs: { name: attrNameType; value: string }[]
 ) => {
   try {
     const db = getDb();
@@ -324,18 +370,21 @@ export const updateProdAttrOnDb = async (
 
     //ON LOOP SUR LE PAYLOAD MAPPE
     for (let i = 0; i < attrs.length; i++) {
-
       //ON STOCKE L'ATTRIBUT CURRENT DU PAYLOAD
       const { name, value } = attrs[i];
 
       //ON RECUPERE L'ID DE L'ATTRIBUT DANS LA DB VIA SON NAME RECU DEPUIS LE PAYLOAD
-      const attr = await db.select().from(attributesTable).where(eq(attributesTable.name, name)).then(r => r[0]);
-      
+      const attr = await db
+        .select()
+        .from(attributesTable)
+        .where(eq(attributesTable.name, name))
+        .then((r) => r[0]);
+
       //ON UPDATE LE PRODATTR GRACE A L'ID DE L'ATTRIBUT RECUPERE ET DU PRODUCT ID
       const up = await db
         .update(productAttributeJONC)
         .set({
-          value
+          value,
         })
         .where(
           and(
@@ -345,7 +394,7 @@ export const updateProdAttrOnDb = async (
         )
         .returning()
         .then((r) => r[0]);
-      
+
       //SI L'UPDATE A AFFECTE UNE LIGNE, ON LA STOCKE DANS updated
       if (up) {
         updated.push(up);
@@ -354,9 +403,57 @@ export const updateProdAttrOnDb = async (
 
     //ET ON LE RETURN
     return updated;
-    
   } catch (error) {
     console.log("ERROR UPDATING PRODATTR ON DB : ", error);
     return null;
   }
+};
+
+export const getProductsListByCategory = async (
+  category: CategoriesType
+): Promise<ProductForList[]> => {
+  try {
+    const db = getDb();
+    const session = await auth();
+
+    const sb = db.select().from(images).limit(1).as("image");
+    const pr = await db
+      .selectDistinctOn([products.id])
+      .from(products)
+      .leftJoin(
+        favoritesTable,
+        and(
+          eq(products.id, favoritesTable.productId),
+          eq(favoritesTable.userId, session?.user?.id ?? "1")
+        )
+      )
+      .leftJoin(locations, eq(locations.id, products.locationId))
+      .leftJoin(images, eq(images.productId, products.id))
+      .where(eq(products.categoryType, category))
+      .limit(10);
+
+    return pr;
+  } catch (error) {
+    console.log("ERROR PR : ", error);
+    return [];
+  }
+};
+
+export const mapProductForList = (productsList: ProductForList[]) => {
+  const mapped = productsList.reduce<ProductForList[]>((acc, row) => {
+    let existing = false;
+    for (let i = 0; i < acc.length; i++) {
+      const curr = acc[i];
+      if (curr.product && row.product && curr.product.id === row.product.id) {
+        existing = true;
+      }
+    }
+    if (!existing) {
+      acc.push(row);
+    }
+    return acc;
+  }, []);
+
+  console.log("PRODUCLIST : ", productsList.length);
+  console.log("MAPPED : ", mapped.length);
 };

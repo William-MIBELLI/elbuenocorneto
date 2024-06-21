@@ -1,4 +1,4 @@
-import { getProductDetailsById } from "@/lib/requests/product.request";
+import { getProductDetails } from "@/lib/requests/product.request";
 import React, { FC } from "react";
 import { notFound } from "next/navigation";
 import Seller from "@/components/product-details/Seller";
@@ -8,7 +8,6 @@ import Protection from "@/components/product-details/Protection";
 import Description from "@/components/product-details/Description";
 import Location from "@/components/map/Location";
 import Specs from "@/components/product-details/Specs";
-import { ICoordonates, IProductDetails } from "@/interfaces/IProducts";
 import ImageContainer from "@/components/product-details/ImageContainer";
 import Delivery from "@/components/product-details/Delivery";
 import NoDelivery from "@/components/product-details/NoDelivery";
@@ -31,11 +30,10 @@ interface IProps {
 
 const page: FC<IProps> = async ({ params: { id } }) => {
 
-
-  const data = await getProductDetailsById(id);
+  const data = await getProductDetails(id)
   const session = await auth();
 
-  if (!data?.product || !data?.user) return notFound();
+  if (!data || !data?.seller) return notFound();
 
   const {
     title,
@@ -44,12 +42,12 @@ const page: FC<IProps> = async ({ params: { id } }) => {
     description,
     state,
     userId,
-    id: productId
-  } = data.product;
+    id: productId,
+    categoryType 
+  } = data;
 
-  const { del, location, attributes, category, product } = data;
+  const { pdl: del, location, attributes  } = data;
 
-  console.log('CATEGORIE : ', category.type)
   attributes.forEach(item => console.log('ATRR : ', item.attribute?.label))
 
 
@@ -64,7 +62,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
           <div className="flex justify-between">
             {
               data?.images?.length ? (
-                <ImageContainer imageUrl={data?.images} />
+                <ImageContainer imageUrl={data?.images.map(i => i.url)} data={data} />
               ) : (
                   <div className="h-96 w-full flex relative justify-center items-center  rounded-lg">
                     <Image src={ImagePlaceHolder} alt="default image" fill className="rounded-lg w-full"/>
@@ -76,7 +74,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
             <h1 className="text-2xl font-bold">{title}</h1>
             <div className="flex gap-2 items-center">
               <p className="font-semibold">{price} €</p>
-              {data?.del.length ? (
+              {data?.pdl.length ? (
                 <div className="bg-blue-200 px-2 rounded-xl text-xs items-center flex">
                   <p className="font-semibold">Livraison à partir de 4.99€</p>
                 </div>
@@ -116,14 +114,14 @@ const page: FC<IProps> = async ({ params: { id } }) => {
         </div>
         <Divider className="my-4" />
         <Divider className="my-4" />
-        <Protection />
+        <Protection/>
         <Divider className="my-4" />
         <Description description={description as string} />
         <Divider className="my-4" />
         <Specs attributes={attributes} />
         <Divider className="my-4" />
         {del.length ? (
-          <Delivery deliveryList={del} />
+          <Delivery deliveryList={del.map(d => d.delivery)} />
         ) : (
           <NoDelivery />
         )}
@@ -133,20 +131,20 @@ const page: FC<IProps> = async ({ params: { id } }) => {
           location={location}
         />
         <Divider className="my-4" />
-        <SellerContent user={data.user}/>
+        <SellerContent user={data.seller}/>
         <Divider className="my-4" />
         <div className="flex items-center gap-2 text-sm font-semibold underline my-8 ">
           <Flag size={17} />
           <p>Signaler l'annonce</p>
         </div>
         <Divider className="my-4" />
-        <CardSlider category={data.category.type} title="Ces annonces peuvent vous intéresser"/>
+        <CardSlider category={categoryType} title="Ces annonces peuvent vous intéresser"/>
       </div>
       <aside className=" w-full lg:w-1/3 sticky top-10">
-        <Seller userId={data.user.id} />
+        <Seller userId={data.seller.id} />
         {
           session && session?.user?.id === userId && (
-            <Managament product={product} />
+            <Managament product={data} />
           )
         }
       </aside>      

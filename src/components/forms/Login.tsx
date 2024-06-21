@@ -9,15 +9,15 @@ import PasswordInput from "../inputs/PasswordInput";
 import { usePathname } from "next/navigation";
 
 interface IProps {
-  callbackUrl?: string;
+  callbackUrl?: string[];
 }
 
-const LoginForm: FC<IProps> = ({ callbackUrl = '/' }) => {
+const LoginForm: FC<IProps> = ({ callbackUrl = ['/'] }) => {
 
-  const [state, formAction] = useFormState(login.bind(null, callbackUrl), { error: "" });
+  const [state, formAction] = useFormState(login.bind(null, callbackUrl.join('/')), { error: "" });
   const path = usePathname()
 
-  console.log('PATH : ', path, callbackUrl);
+  console.log('PATH : ',  callbackUrl);
 
 
   return (

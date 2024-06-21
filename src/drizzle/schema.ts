@@ -103,6 +103,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     fields: [users.locationId],
     references: [locations.id],
   }),
+  favorites: many(favoritesTable)
 }));
 
 export type SelectUser = typeof users.$inferSelect;
@@ -153,7 +154,8 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     fields: [products.categoryType],
     references: [categoryTable.type]
   }),
-  attributes: many(productAttributeJONC)
+  attributes: many(productAttributeJONC),
+  favorites: many(favoritesTable)
 }));
 
 export type ProductInsert = typeof products.$inferInsert;
@@ -319,3 +321,23 @@ export const prodAttrRelations = relations(productAttributeJONC, ({ one }) => ({
 
 export type ProdAttrSelect = typeof productAttributeJONC.$inferSelect;
 export type ProdAttrInsert = typeof productAttributeJONC.$inferInsert;
+
+export const favoritesTable = pgTable("favorites", {
+  id: text('id').primaryKey().notNull(),
+  productId: text("product_id").references(() => products.id,{ onDelete: 'cascade'}),
+  userId: text("user_id").references(() => users.id, { onDelete: 'cascade'})
+})
+
+export const favoritesRelations = relations(favoritesTable, ({ one }) => ({
+  productId: one(products, {
+    fields: [favoritesTable.productId],
+    references: [products.id]
+  }),
+  userId: one(users, {
+    fields: [favoritesTable.userId],
+    references: [users.id]
+  })
+}))
+
+export type FavoriteSelect = typeof favoritesTable.$inferSelect;
+export type Favoriteinsert = typeof favoritesTable.$inferInsert;

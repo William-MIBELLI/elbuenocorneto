@@ -48,7 +48,7 @@ const Navbar = () => {
   const [user, setUser] = useState(data?.user);
 
   useEffect(() => {
-    console.log('USEFFECT : ', data);
+    //console.log('USEFFECT : ', data);
     setUser(data?.user);
   }, [data]);
   return (

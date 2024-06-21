@@ -10,17 +10,10 @@ export const getUserForProfile = async (id: string) => {
       where: eq(users.id, id),
       with: {
         products: {
-          columns: {
-            title: true,
-            price: true,
-            categoryType: true,
-            id: true,
-            createdAt: true,
-            state: true
-          },
           with:{
             images: { limit: 1 },
-            location: true
+            location: true,
+            favorites: true
           }
         },
         location: {}
@@ -35,6 +28,8 @@ export const getUserForProfile = async (id: string) => {
     return undefined;
   }
 }
+
+
 
 export const getUserById = async (id: string) => {
   try {

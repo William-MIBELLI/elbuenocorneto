@@ -1,8 +1,12 @@
-import {  MessagesSquare, MoveRight, ShieldCheck, ShoppingCart } from 'lucide-react'
+'use client'
+import { MessagesSquare, MoveRight, ShieldCheck, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import React, { FC } from 'react'
+
 
 const Protection = () => {
+
+  
   return (
     <div className=''>
       <div className='flex gap-2 font-bold text-xl'>

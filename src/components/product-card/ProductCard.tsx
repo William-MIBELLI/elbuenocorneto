@@ -2,9 +2,10 @@
 import { Avatar } from "@nextui-org/react";
 import { Heart, Star } from "lucide-react";
 import Image from "next/image";
-import React, { FC, useRef } from "react";
+import React, { FC, useRef, useState } from "react";
 import { ICard, IProductCard } from "@/interfaces/IProducts";
 import Link from "next/link";
+import Favorite from "../favorite/Favorite";
 
 interface IProps {
   productData: ICard;
@@ -14,6 +15,7 @@ const ProductCard: FC<IProps> = ({ productData }) => {
   const { seller, images, createdAt, id, title, price, pdl, location } =
     productData;
   const { name, rating, rateNumber } = seller;
+  const [open, setOpen] = useState<boolean>(false);
   //console.log(`PRODUCTDATA ${seller.name}`, productData)
   const cardRef = useRef(null);
 
@@ -61,7 +63,7 @@ const ProductCard: FC<IProps> = ({ productData }) => {
           <p>{`${location?.city} ${location?.postcode}`}</p>
           <p>{createdAt?.toLocaleString().split(" ")[0]}</p>
         </div>
-        <Heart />
+        <Favorite productId={id} fav={!!productData?.favorites?.length} open={open} setOpen={setOpen} />
       </div>
     </Link>
   );

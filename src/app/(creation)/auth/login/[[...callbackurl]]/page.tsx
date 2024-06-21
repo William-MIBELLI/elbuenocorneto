@@ -16,6 +16,8 @@ const Login: FC<IProps> = async ({ params: { callbackurl = '/' } }) => {
   console.log('SLUG : ', callbackurl);
   const session = await auth();
   
+
+  //SI LUISER EST DEJA IDENTIFIE
   if (session && session.user) {
     return (
       <div className="flex flex-col gap-4 p-8">
@@ -36,7 +38,7 @@ const Login: FC<IProps> = async ({ params: { callbackurl = '/' } }) => {
       <p className="text-sm">
         Connectez-vous pour découvrir toutes nos fonctionnalités.
       </p>
-      <LoginForm callbackUrl={callbackurl} />
+      <LoginForm callbackUrl={[callbackurl]} />
       <div className="flex justify-center items-center mt-5">
         <p className="text-sm">
           Envie de nous rejoindre ?{" "}
