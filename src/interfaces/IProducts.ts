@@ -380,3 +380,9 @@ export type ProductForList = {
   image: ImageSelect | null;
   favorites: FavoriteSelect | null
 }
+
+export type SearchResultType = {
+  product: ProductSelect | null;
+  category: CategorySelect | null;
+  count: { total: number}
+}

@@ -5,12 +5,7 @@ import { categoriesList } from "@/interfaces/IProducts";
 
 const Categories = () => {
   return (
-    <Navbar
-      maxWidth="lg"
-      position="static"
-      height="1rem"
-      className="py-2 hidden md:flex"
-    >
+    <Navbar maxWidth="lg" height="1rem" className="py-2 hidden md:flex " position="static">
       {Object.entries(categoriesList).map(([key, { label, target }], index) => (
         <NavbarItem
           as={Link}

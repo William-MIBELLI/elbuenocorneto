@@ -5,9 +5,11 @@ import {
   ProductDataForList,
   ProductForList,
   ProductUpdateType,
+  SearchResultType,
 } from "@/interfaces/IProducts";
 import { getDb } from "@/drizzle/db";
 import {
+  CategorySelect,
   ImageSelect,
   ProdAttrInsert,
   ProductInsert,
@@ -26,7 +28,7 @@ import {
   products,
   users,
 } from "@/drizzle/schema";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, ilike, or } from "drizzle-orm";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { auth } from "@/auth";
 
@@ -108,9 +110,10 @@ import { auth } from "@/auth";
 //   }
 // };
 
-export const getProductDetails = async (productId: string): Promise<Details | undefined> => {
+export const getProductDetails = async (
+  productId: string
+): Promise<Details | undefined> => {
   try {
-
     const db = getDb();
 
     const p = await db.query.products.findFirst({
@@ -119,22 +122,21 @@ export const getProductDetails = async (productId: string): Promise<Details | un
         seller: true,
         attributes: {
           with: {
-            attribute: true
-          }
+            attribute: true,
+          },
         },
         favorites: true,
         images: true,
         location: true,
         pdl: {
           with: {
-            delivery: true
-          }
-        }
-      }
-    })
+            delivery: true,
+          },
+        },
+      },
+    });
 
     return p;
-
   } catch (error) {
     console.log("ERROR FETCHING PRODUCT DETAILS : ", error);
     return undefined;
@@ -456,4 +458,35 @@ export const mapProductForList = (productsList: ProductForList[]) => {
 
   console.log("PRODUCLIST : ", productsList.length);
   console.log("MAPPED : ", mapped.length);
+};
+
+export const searchOnDb = async (
+  keyword: string
+): Promise<SearchResultType[]> => {
+  try {
+    const db = getDb();
+
+    //LA SUBQUERY POUR RECUPERER LE COUNT TOTAL DE PRODUCT CORRESPONDANT A LA RECHERCHE
+    const sq = db.$with('count').as(db.select({total: count(products.id).as('compte')}).from(products).where(
+      or(
+        ilike(products.title, `%${keyword}%`),
+        ilike(products.description, `${keyword}`)
+      )
+    ))
+
+    const result = await db.with(sq)
+      .select()
+      .from(sq)
+      .leftJoin(products,or(
+        ilike(products.title, `%${keyword}%`),
+        ilike(products.description, `${keyword}`)
+      ))
+      .leftJoin(categoryTable, eq(products.categoryType, categoryTable.type))
+      .limit(3)
+    
+    return result;
+  } catch (error) {
+    console.log("ERROR SEARCHING ON DB : ", error);
+    return [];
+  }
 };

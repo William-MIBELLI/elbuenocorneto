@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Button,
   Input,
-  NavbarBrand,
   NavbarContent,
   NavbarMenuToggle,
   Navbar as Nv,
@@ -22,6 +21,8 @@ import Menu from "./Menu";
 import SellButton from "../sell-button/SellButton";
 import { useSession } from "next-auth/react";
 import Brand from "./Brand";
+import { ProductSelect } from "@/drizzle/schema";
+import SearchInput from "../search/SearchInput";
 
 export const navItems = [
   {
@@ -43,21 +44,21 @@ export const navItems = [
 
 const Navbar = () => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
-  const [isSearchFocus, setIsSearchFocus] = useState(false);
   const { data, status } = useSession();
   const [user, setUser] = useState(data?.user);
 
   useEffect(() => {
-    //console.log('USEFFECT : ', data);
     setUser(data?.user);
   }, [data]);
+
+
+
   return (
     <Nv
       maxWidth="lg"
       height="5rem"
       isMenuOpen={isOpenMenu}
       onMenuOpenChange={setIsOpenMenu}
-      position="static"
       classNames={{
         wrapper: ["md:px-0", "sm:px-6"],
       }}
@@ -74,24 +75,7 @@ const Navbar = () => {
 
       {/* SEARCH SECTION WITH NEW BUTTON */}
 
-      <div className="hidden md:flex w-[50%] gap-2 justify-between">
-        {!isSearchFocus && <SellButton />}
-        <Input
-          onFocus={() => setIsSearchFocus(true)}
-          onBlur={() => setIsSearchFocus(false)}
-          fullWidth={isSearchFocus}
-          placeholder="Rechercher sur El bueno Cornetto"
-          endContent={
-            <Search
-              size={28}
-              className="bg-orange-500 text-white p-1 rounded-lg"
-            />
-          }
-          classNames={{
-            inputWrapper: ["bg-gray-200", isSearchFocus ? "w-full" : "w-auto"],
-          }}
-        />
-      </div>
+      <SearchInput/>
 
       {/* ITEMS SECTION WITH SIGNIN */}
 
