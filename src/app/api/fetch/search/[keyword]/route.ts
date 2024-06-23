@@ -12,6 +12,7 @@ export const GET = async (
   context: { params: Params }
 ): Promise<NextResponse<SearchResultType[]>> => {
   try {
+    //console.log('REQUEST :', request);
     const p: SearchResultType[] = await searchOnDb(context.params.keyword);
 
     return NextResponse.json(p);
@@ -20,3 +21,13 @@ export const GET = async (
     return NextResponse.json([]);
   }
 };
+
+export const POST = async (request: Request): Promise<NextResponse<null>> => {
+  try {
+    console.log('POST RESQUEST :', request.body);
+    return NextResponse.json(null);
+  } catch (error) {
+    console.log('ERROR : ', error);
+    return NextResponse.json(null);
+  }
+}

@@ -37,6 +37,10 @@ const SearchInput: FC = () => {
     //TIMEOUT POUR DELAY LA RECHERCHE
     setTimeout(async () => {
       const now = Date.now();
+      const test = await fetch('/api/fetch/search/' + value, {
+        method: 'POST',
+        body: JSON.stringify({value})
+      })
       //SI VALUE EST VIDE, ON NE REQUEST PAS
       if (now - lastTyping.current! >= 200 && value.length !== 0) {
         console.log("ON LANCE LA RECHERCHE");
