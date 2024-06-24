@@ -24,13 +24,13 @@ const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
 
   //ON TRIGGER LA RECHERCHE DANS L'API QUAND L'USER NE TAPE PLUS DEPUIS 400MS
   const onKeyUp = async () => {
-    const timer = 400;
+    const timer = 100;
     lastTimeTyping.current = Date.now();
     setTimeout(async () => {
       const now = Date.now();
       const diff = now - lastTimeTyping.current!;
       if (diff >= timer) {
-        if (keyword.length >= 4) {
+        if (keyword.length >= 2) {
           const res = await fetchAddressFromAPI(keyword);
 
           //ON STOCKE LE RESULTAT DANS LIST

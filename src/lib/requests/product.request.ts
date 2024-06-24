@@ -28,7 +28,7 @@ import {
   products,
   users,
 } from "@/drizzle/schema";
-import { and, count, eq, ilike, or } from "drizzle-orm";
+import { SQL, and, count, eq, ilike, or, sql } from "drizzle-orm";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { auth } from "@/auth";
 
@@ -441,6 +441,33 @@ export const getProductsListByCategory = async (
   }
 };
 
+export const getProductsList = async (where: SQL<unknown>, limit: number = 10 ): Promise<ProductForList[]> => {
+  try {
+    const db = getDb();
+    const session = await auth();
+
+    const pr = await db
+      .selectDistinctOn([products.id])
+      .from(products)
+      .leftJoin(
+        favoritesTable,
+        and(
+          eq(products.id, favoritesTable.productId),
+          eq(favoritesTable.userId, session?.user?.id ?? "1")
+        )
+      )
+      .leftJoin(locations, eq(locations.id, products.locationId))
+      .leftJoin(images, eq(images.productId, products.id))
+      .where(where)
+      .limit(limit);
+
+    return pr;
+  } catch (error) {
+    console.log('ERROR GET PRODUCTS LIST : ', error);
+    return [];      
+  }
+}
+
 export const mapProductForList = (productsList: ProductForList[]) => {
   const mapped = productsList.reduce<ProductForList[]>((acc, row) => {
     let existing = false;
@@ -460,27 +487,31 @@ export const mapProductForList = (productsList: ProductForList[]) => {
   console.log("MAPPED : ", mapped.length);
 };
 
+export const createWhereConditionFromKeyword = (keyword: string, titleOnly: boolean) => {
+  const mappedKeyword = `%${keyword}%`;
+  const withDescription = sql`product.title ILIKE ${mappedKeyword} OR product.description ILIKE ${mappedKeyword}`;
+  const withoutDescription = sql`product.title ILIKE ${mappedKeyword}`;
+
+  const where = titleOnly ? withoutDescription : withDescription;
+  return where;
+}
+
 export const searchOnDb = async (
-  keyword: string
+  keyword: string,
+  titleOnly: boolean
 ): Promise<SearchResultType[]> => {
   try {
     const db = getDb();
+   
+    const where = createWhereConditionFromKeyword(keyword, titleOnly);
 
     //LA SUBQUERY POUR RECUPERER LE COUNT TOTAL DE PRODUCT CORRESPONDANT A LA RECHERCHE
-    const sq = db.$with('count').as(db.select({total: count(products.id).as('compte')}).from(products).where(
-      or(
-        ilike(products.title, `%${keyword}%`),
-        ilike(products.description, `${keyword}`)
-      )
-    ))
+    const sq = db.$with('count').as(db.select({total: count(products.id).as('compte')}).from(products).where(where))
 
     const result = await db.with(sq)
       .select()
       .from(sq)
-      .leftJoin(products,or(
-        ilike(products.title, `%${keyword}%`),
-        ilike(products.description, `${keyword}`)
-      ))
+      .leftJoin(products,where)
       .leftJoin(categoryTable, eq(products.categoryType, categoryTable.type))
       .limit(3)
     
@@ -490,3 +521,15 @@ export const searchOnDb = async (
     return [];
   }
 };
+
+export const getProductListForSearch = async (keyword: string, titleOnly: boolean): Promise<ProductForList[]> => {
+  try {
+    const db = getDb();
+    const data = await db.select().from(products)
+      .leftJoin(locations, eq(locations.id, products.id))
+    return [];
+  } catch (error) {
+    console.log('ERROR GET PRODUCT LIST FOR SEARCH : ', error);
+    return [];
+  }  
+}

@@ -23,7 +23,9 @@ const ProductList: FC<IProps> = ({ products }) => {
   products.forEach(p => console.log(p?.product?.id))
 
   return <div className="flex flex-col gap-3">
-    <div className="flex w-full justify-between items-center my-3">
+
+    {/* HEADER */}
+    {/* <div className="flex w-full justify-between items-center my-3">
       <p>
         Nb annonces
       </p>
@@ -41,7 +43,9 @@ const ProductList: FC<IProps> = ({ products }) => {
           Créer un lot
         </Button> 
       </div>
-    </div>
+    </div> */}
+
+    {/* DISPLAY DES PRODUCTS */}
     {
       products.map(product => (
           <ProductItem data={product} key={product.product?.id} />

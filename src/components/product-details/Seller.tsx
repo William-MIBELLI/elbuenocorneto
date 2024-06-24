@@ -28,7 +28,7 @@ const Seller: FC<IProps> = async ({ userId }) => {
   }
   const { id } = data.user;
   return (
-    <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium'>
+    <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium bg-white'>
       <Link href={`/profile/${id}`} className=' flex items-center gap-6 justify-between'>
         <UserHeader userData={data.user} count={data.count}/>
         <ChevronRight/>

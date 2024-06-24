@@ -74,6 +74,10 @@ input[type='number'] {
     @apply bg-transparent text-blue-800 font-semibold hover:bg-gray-200
   }
 
+  .section_sider {
+    @apply flex flex-col gap-2
+  }
+
 
 }
 

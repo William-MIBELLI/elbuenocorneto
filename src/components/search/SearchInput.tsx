@@ -11,6 +11,8 @@ const SearchInput: FC = () => {
   const [isSearchFocus, setIsSearchFocus] = useState(false);
   const [openResult, setOpenResult] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [titleOnly, setTitleOnly] = useState<boolean>(false);
+  const [value, setValue] = useState<string>('');
   const lastTyping = useRef<number>();
   const [searchResult, setSearchResult] = useState<SearchResultType[]>([]);
   const pathname = usePathname();
@@ -21,10 +23,14 @@ const SearchInput: FC = () => {
     setOpenResult(false);
   }, [pathname]);
 
+  //CALL LA RECHERCHE AU CHANGEMENT DE VALUE DE LINPUT OU DE LA CHECKBOX POUR LE TITRE
+  useEffect(() => {
+    search();
+  },[value, titleOnly])
 
-  //SEARCH HANDLER
-  const onSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
+  
+  //HANDLE LA RECHERCHE
+  const search = async () => {
     lastTyping.current = Date.now();
 
     //SI VALUE EST VIDE, ON RESET SEARCHRESULT
@@ -37,15 +43,16 @@ const SearchInput: FC = () => {
     //TIMEOUT POUR DELAY LA RECHERCHE
     setTimeout(async () => {
       const now = Date.now();
-      const test = await fetch('/api/fetch/search/' + value, {
-        method: 'POST',
-        body: JSON.stringify({value})
-      })
+
+
       //SI VALUE EST VIDE, ON NE REQUEST PAS
       if (now - lastTyping.current! >= 200 && value.length !== 0) {
         console.log("ON LANCE LA RECHERCHE");
         setLoading(true);
-        const response = await fetch(`/api/fetch/search/${value ?? ""}`);
+        const response = await fetch('/api/fetch/search/' + value, {
+          method: 'POST',
+          body: JSON.stringify({value, titleOnly})
+        })
         if (response.ok) {
           const p: SearchResultType[] = await response.json();
           console.log('RESULTAT : ', p);
@@ -55,7 +62,9 @@ const SearchInput: FC = () => {
         }
       }
     }, 200);
-  };
+  }
+
+
 
   //SI LINPUT PERD LE FOCUS, ON CHECK OU L'USER A CLICK
   const onBlurHandler = (
@@ -66,7 +75,7 @@ const SearchInput: FC = () => {
     console.log('ONBLUR EVENT ');
 
     //SI C'EST DANS RESULT, C'EST QUE L'USER A CLIQUE SUR UN LIEN, ON LAISSE LE RESULT AFFICHE
-    if (ref.current && !ref.current.contains(event.relatedTarget)) {
+    if ((ref.current && !ref.current.contains(event.relatedTarget)) || !value.length) {
       console.log('ON RENTRE DANS LE IF')
       setOpenResult(false);
       setIsSearchFocus(false)
@@ -87,7 +96,7 @@ const SearchInput: FC = () => {
           type="search"
           onFocus={onFocusHandler}
           onBlur={onBlurHandler}
-          onChange={onSearchChange}
+          onChange={e => setValue(e.target.value)}
           fullWidth={isSearchFocus}
           placeholder="Rechercher sur El bueno Cornetto"
           endContent={loading ? (
@@ -107,8 +116,11 @@ const SearchInput: FC = () => {
       {(searchResult.length > 0 && openResult) && (
         <div ref={ref}>
           <ResultContainer
+            value={value}
             result={searchResult}
             setOpenresult={setOpenResult}
+            titleOnly={titleOnly}
+            setTitleOnly={setTitleOnly}
           />
         </div>
       )}

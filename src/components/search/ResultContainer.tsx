@@ -3,13 +3,17 @@ import React, { Dispatch, FC, useEffect, useRef, useState } from "react";
 import ResultItem from "./ResultItem";
 import { Button, Checkbox, Divider } from "@nextui-org/react";
 import { SearchResultType } from "@/interfaces/IProducts";
+import Link from "next/link";
 
 interface IProps {
   result: SearchResultType[];
   setOpenresult: Dispatch<boolean>;
+  titleOnly: boolean;
+  setTitleOnly: Dispatch<boolean>
+  value: string;
 }
 
-const ResultContainer: FC<IProps> = ({ result, setOpenresult }) => {
+const ResultContainer: FC<IProps> = ({ result, setOpenresult, titleOnly, setTitleOnly, value }) => {
   const [open, setOpen] = useState(false);
   const [total, setTotal] = useState(result[0]?.count?.total ?? 0)
 
@@ -30,7 +34,7 @@ const ResultContainer: FC<IProps> = ({ result, setOpenresult }) => {
         className="flex flex-col w-full pt-3 gap-4 z-50 absolute top-10 p-3  bg-white rounded-xl overflow-hidden"
       >
         <div className="flex items-center justify-end px-2">
-          <Checkbox color="warning">
+          <Checkbox color="warning" isSelected={titleOnly} onValueChange={setTitleOnly}>
             Recherche uniquement dans le titre
           </Checkbox>
         </div>
@@ -51,7 +55,7 @@ const ResultContainer: FC<IProps> = ({ result, setOpenresult }) => {
             </p>
           )
         }
-        <Button className="button_main" fullWidth>
+        <Button as={Link} href={`/search-result/${value}?titleOnly=${titleOnly}`} className="button_main" fullWidth>
           Afficher tous les résultats ({total})
         </Button>
       </div>

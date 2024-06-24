@@ -140,7 +140,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
         <Divider className="my-4" />
         <CardSlider category={categoryType} title="Ces annonces peuvent vous intéresser"/>
       </div>
-      <aside className=" w-full lg:w-1/3 sticky top-10">
+      <aside className=" w-full lg:w-1/3 lg:sticky top-10">
         <Seller userId={data.seller.id} />
         {
           session && session?.user?.id === userId && (
