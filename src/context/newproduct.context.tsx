@@ -65,8 +65,11 @@ export const partList = [
   "validation",
   "success",
 ] as const;
+
 export type ProdAttrTypeWithName = ProdAttrInsert & { label: string };
 export type PartType = typeof partList[number];
+
+
 export const NewProductProvider = ({ children }: Props) => {
   const totalPart = 8;
   const [product, setProduct] = useState<Partial<ProductInsert>>({});

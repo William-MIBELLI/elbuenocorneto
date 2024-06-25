@@ -1,5 +1,6 @@
 import ProductList from "@/components/product-list/ProductList";
 import FilterHeader from "@/components/search-page/FilterHeader";
+import { SearchContextProvider } from "@/context/search.context";
 import {
   createWhereConditionFromKeyword,
   getProductsList,
@@ -27,16 +28,18 @@ const page: FC<IProps> = async ({ params, searchParams }) => {
   console.log("PARAMS : ", keyword);
   console.log("SEACRHJPARAMS : ", searchParams);
   return (
-    <div className="w-full">
-      <FilterHeader/>
-      <div className="text-left">
-        <h1 className="text-3xl font-bold mb-2">Annonce {keyword}</h1>
-        <p className="font-semibold text-gray-400">
-          {result.length} annonces
-        </p>
+    <SearchContextProvider>
+      <div className="w-full">
+        <FilterHeader keyword={keyword} titleOnly={titleOnly === 'true'} />
+        <div className="text-left">
+          <h1 className="text-3xl font-bold mb-2">Annonce {keyword}</h1>
+          <p className="font-semibold text-gray-400">
+            {result.length} annonces
+          </p>
+        </div>
+        <ProductList products={result} />
       </div>
-      <ProductList products={result} />
-    </div>
+    </SearchContextProvider>
   );
 };
 
