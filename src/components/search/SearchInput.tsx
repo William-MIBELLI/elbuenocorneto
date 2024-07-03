@@ -1,5 +1,5 @@
 import { Input, Spinner } from "@nextui-org/react";
-import { FC, useEffect, useRef, useState } from "react";
+import { Dispatch, FC, useEffect, useRef, useState } from "react";
 import SellButton from "../sell-button/SellButton";
 import { ProductSelect } from "@/drizzle/schema";
 import { Search } from "lucide-react";
@@ -7,8 +7,12 @@ import ResultContainer from "./ResultContainer";
 import { usePathname } from "next/navigation";
 import { SearchResultType } from "@/interfaces/IProducts";
 
-const SearchInput: FC = () => {
-  const [isSearchFocus, setIsSearchFocus] = useState(false);
+interface IProps {
+  isSearchFocus: boolean;
+  setIsSearchFocus: Dispatch<boolean>;
+}
+
+const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
   const [openResult, setOpenResult] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [titleOnly, setTitleOnly] = useState<boolean>(false);
@@ -21,6 +25,7 @@ const SearchInput: FC = () => {
   //SI L'USER CHANGE DE PAGE, ON CACHE LE RESULT
   useEffect(() => {
     setOpenResult(false);
+    setIsSearchFocus(false)
   }, [pathname]);
 
   //CALL LA RECHERCHE AU CHANGEMENT DE VALUE DE LINPUT OU DE LA CHECKBOX POUR LE TITRE

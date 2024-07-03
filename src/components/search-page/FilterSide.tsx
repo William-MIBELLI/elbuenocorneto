@@ -14,24 +14,34 @@ interface IProps {
 }
 
 const FilterSide: FC<IProps> = ({ open }) => {
-  const { displayCategories, setDisplayCategories, params, setParams, products, setProducts } =
-    useSearchContext();
-  
+  const {
+    displayCategories,
+    setDisplayCategories,
+    params,
+    setParams,
+    products,
+    setProducts,
+  } = useSearchContext();
+
   const container = useRef<HTMLDialogElement>(null);
   const dial = useRef<HTMLFormElement>(null);
   const submitRef = useRef<HTMLButtonElement>(null);
 
   const [isOpen, setIsOpen] = useState<boolean>(open);
   const [firstTime, setFirstTime] = useState<boolean>(true);
-  
-  const [state, action] = useFormState(searchWithFiltersACTION.bind(null, params), {success: false,products, error: null });
 
+  const [state, action] = useFormState(
+    searchWithFiltersACTION.bind(null, params),
+    { success: false, products, error: null }
+  );
+
+  //UPDATE DU RESULTAT DIRECTEMENT APRES QU'UN INPUT DU FILTER CHANGE DE VALUE
   useEffect(() => {
     if (state && state?.success && state?.products) {
-      console.log('ON RENTRE DANS LE USEEFFECT, products : ', state.products);
+      console.log("ON RENTRE DANS LE USEEFFECT, products : ", state);
       setProducts(state.products);
     }
-  },[state])
+  }, [state]);
 
   //GESTION DU DISPLAY
   useEffect(() => {
@@ -52,7 +62,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
 
   useEffect(() => {
     submitRef.current?.click();
-  },[params])
+  }, [params]);
 
   //CLOSE DIALOG SI CLICK OUTSIDE SIDER
   const onCloserHandler = (
@@ -74,7 +84,6 @@ const FilterSide: FC<IProps> = ({ open }) => {
       sort: undefined,
     });
   };
-
 
   return (
     <dialog
@@ -128,7 +137,9 @@ const FilterSide: FC<IProps> = ({ open }) => {
             <Button className="button_main">Rechercher</Button>
           </div>
         </div>
-        <button ref={submitRef} hidden type="submit">SUBMIT</button>
+        <button ref={submitRef} hidden type="submit">
+          SUBMIT
+        </button>
       </form>
     </dialog>
   );

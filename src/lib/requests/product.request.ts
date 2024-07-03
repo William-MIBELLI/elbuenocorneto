@@ -1,4 +1,4 @@
-import { SortType } from './../../context/search.context';
+import { SortType } from "./../../context/search.context";
 import {
   CategoriesType,
   Details,
@@ -443,13 +443,21 @@ export const getProductsListByCategory = async (
   }
 };
 
-export const getProductsList = async (where: SQL<unknown>, limit: number = 10 ): Promise<ProductForList[]> => {
+export const getProductsList = async (
+  where: SQL<unknown>,
+  order: SQL<unknown> = sql`${products.createdAt} desc`,
+  limit: number = 10
+): Promise<ProductForList[]> => {
   try {
     const db = getDb();
     const session = await auth();
 
-    const query =  db
-      .selectDistinctOn([products.id])
+    const sbImage =  db.selectDistinctOn([images.productId]).from(images).as('image');
+
+   
+
+    const pr: ProductForList[] = await db
+      .select()
       .from(products)
       .leftJoin(
         favoritesTable,
@@ -459,19 +467,21 @@ export const getProductsList = async (where: SQL<unknown>, limit: number = 10 ):
         )
       )
       .leftJoin(locations, eq(locations.id, products.locationId))
-      .leftJoin(images, eq(images.productId, products.id))
-      // .where(where)
-      .limit(limit);
+      .leftJoin(sbImage, eq(sbImage.productId, products.id))
+      .where(where)
+      .orderBy(order);
 
-    const dynamicQuery = query.$dynamic();
-    dynamicQuery.where(where);
-    const pr = await dynamicQuery
+    // const dynamicQuery = query.$dynamic().where(where).as("sb");
+    // // dynamicQuery.where(where);
+    // const pr = await db.select().from(dynamicQuery).orderBy(order).limit(limit);
+    // console.log("PR DANS GET PRODUCLIST : ");
+    // pr.forEach((p) => console.log(p.product?.title));
     return pr;
-  } catch (error) {
-    console.log('ERROR GET PRODUCTS LIST : ', error);
-    return [];      
+  } catch (error: any) {
+    console.log("ERROR GET PRODUCTS LIST : ", error?.message);
+    return [];
   }
-}
+};
 
 export const mapProductForList = (productsList: ProductForList[]) => {
   const mapped = productsList.reduce<ProductForList[]>((acc, row) => {
@@ -492,14 +502,17 @@ export const mapProductForList = (productsList: ProductForList[]) => {
   console.log("MAPPED : ", mapped.length);
 };
 
-export const createWhereConditionFromKeyword = (keyword: string, titleOnly: boolean) => {
+export const createWhereConditionFromKeyword = (
+  keyword: string,
+  titleOnly: boolean
+) => {
   const mappedKeyword = `%${keyword}%`;
   const withDescription = sql`product.title ILIKE ${mappedKeyword} OR product.description ILIKE ${mappedKeyword}`;
   const withoutDescription = sql`product.title ILIKE ${mappedKeyword}`;
 
   const where = titleOnly ? withoutDescription : withDescription;
   return where;
-}
+};
 
 export const searchOnDb = async (
   keyword: string,
@@ -507,19 +520,25 @@ export const searchOnDb = async (
 ): Promise<SearchResultType[]> => {
   try {
     const db = getDb();
-   
+
     const where = createWhereConditionFromKeyword(keyword, titleOnly);
 
     //LA SUBQUERY POUR RECUPERER LE COUNT TOTAL DE PRODUCT CORRESPONDANT A LA RECHERCHE
-    const sq = db.$with('count').as(db.select({total: count(products.id).as('compte')}).from(products).where(where))
+    const sq = db.$with("count").as(
+      db
+        .select({ total: count(products.id).as("compte") })
+        .from(products)
+        .where(where)
+    );
 
-    const result = await db.with(sq)
+    const result = await db
+      .with(sq)
       .select()
       .from(sq)
-      .leftJoin(products,where)
+      .leftJoin(products, where)
       .leftJoin(categoryTable, eq(products.categoryType, categoryTable.type))
-      .limit(3)
-    
+      .limit(3);
+
     return result;
   } catch (error) {
     console.log("ERROR SEARCHING ON DB : ", error);
@@ -527,33 +546,37 @@ export const searchOnDb = async (
   }
 };
 
-export const getProductListForSearch = async (keyword: string, titleOnly: boolean): Promise<ProductForList[]> => {
+export const getProductListForSearch = async (
+  keyword: string,
+  titleOnly: boolean
+): Promise<ProductForList[]> => {
   try {
     const db = getDb();
-    const data = await db.select().from(products)
-      .leftJoin(locations, eq(locations.id, products.id))
+    const data = await db
+      .select()
+      .from(products)
+      .leftJoin(locations, eq(locations.id, products.id));
     return [];
   } catch (error) {
-    console.log('ERROR GET PRODUCT LIST FOR SEARCH : ', error);
+    console.log("ERROR GET PRODUCT LIST FOR SEARCH : ", error);
     return [];
-  }  
+  }
+};
+
+export interface ISearchCondition {
+  where: SQL<unknown>;
+  order?: SQL<unknown>;
 }
 
-export const createSearchCondition = async (params: ISearchParams): Promise<SQL<unknown>> => {
-
+export const createSearchCondition =  (
+  params: ISearchParams
+): ISearchCondition => {
   const mappedKeyword = `%${params.keyword}%`;
-  const withDescription = sql`${products.title} ILIKE ${mappedKeyword} OR ${products.description} ILIKE ${mappedKeyword}`;
+  const withDescription = sql`(${products.title} ILIKE ${mappedKeyword} OR ${products.description} ILIKE ${mappedKeyword})`;
   const withoutDescription = sql`${products.title} ILIKE ${mappedKeyword}`;
 
   const conditions: SQL<unknown>[] = [];
   const orderBy: SQL<unknown>[] = [];
-
-  //KEYWORD ET TITLEONLY
-  if (params.titleOnly) {
-    conditions.push(withoutDescription);
-  } else {
-    conditions.push(withDescription);
-  }
 
   //CATEGORIE
   if (params.categorySelected?.type) {
@@ -563,11 +586,10 @@ export const createSearchCondition = async (params: ISearchParams): Promise<SQL<
 
   //PRICE
   if (params.donation) {
-    const cond = sql`${products.price} = 0`
+    const cond = sql`${products.price} = 0`;
     // console.log('ON RENTRE DANS DONATION ', cond.queryChunks);
     conditions.push(cond);
-  }
-  else {
+  } else {
     if (params.min) {
       const cond = sql`${products.price} >= ${params.min}`;
       conditions.push(cond);
@@ -578,20 +600,26 @@ export const createSearchCondition = async (params: ISearchParams): Promise<SQL<
     }
   }
 
+  type fields = keyof (typeof products);
+
   //SORT
   if (params.sort && params.sort[0] !== undefined) {
-    const [field, order] = params.sort.split('_');
-    const ord = sql`${field} ${order}`;
+    const [field, order] = params.sort.split("_");
+    const ord = sql`${products[field as fields]} ${order === 'asc'? sql`asc` : sql`desc`}`;
     orderBy.push(ord);
   }
 
-  console.log('___________________')
-  // const p = await getProductsList(where);
-  // console.log('P : ', p);
+  //KEYWORD ET TITLEONLY
+  if (params.titleOnly) {
+    conditions.push(withoutDescription);
+  } else {
+    conditions.push(withDescription);
+  }
 
+  console.log("___________________");
 
   //ON JOIN TOUTES LES CONDITIONS ET ON LA RETURN
   const where = sql.join(conditions, sql` AND `);
-  return where;
-  
-}
+  const order = orderBy.length ? sql.join(orderBy) : undefined
+  return {where, order};
+};

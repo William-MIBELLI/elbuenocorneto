@@ -43,6 +43,7 @@ export const navItems = [
 ];
 
 const Navbar = () => {
+  const [isSearchFocus, setIsSearchFocus] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const { data, status } = useSession();
   const [user, setUser] = useState(data?.user);
@@ -56,6 +57,7 @@ const Navbar = () => {
   return (
     <Nv
       maxWidth="lg"
+      position={!isSearchFocus ? "static" : undefined}
       height="5rem"
       isMenuOpen={isOpenMenu}
       onMenuOpenChange={setIsOpenMenu}
@@ -75,7 +77,7 @@ const Navbar = () => {
 
       {/* SEARCH SECTION WITH NEW BUTTON */}
 
-      <SearchInput/>
+      <SearchInput isSearchFocus={isSearchFocus} setIsSearchFocus={setIsSearchFocus} />
 
       {/* ITEMS SECTION WITH SIGNIN */}
 

@@ -459,13 +459,16 @@ export const searchWithFiltersACTION = async (
   fd: FormData
 ) => {
   try {
-    console.log('PARAMS DANS ACTION : ', params);
-    const where = await createSearchCondition(params);
-    const products = await getProductsList(where);
-    console.log('PRODUCTS DANS ACTION : ', products);
-    return {...initialState, success: true, products}
-  } catch (error) {
-    console.log("ERROR SEARCH WITH FITLERS ACTION : ", error);
+    if (!params.keyword.trim().length) {
+      throw new Error('EMPTY KEYWORD, FAST EXIT');
+    }
+    const {where, order} =  createSearchCondition(params);
+    const products = await getProductsList(where, order);
+
+    return { ...initialState, success: true, products };
+    
+  } catch (error: any) {
+    console.log("ERROR SEARCH WITH FITLERS ACTION : ", error?.message);
     return {...initialState, success: false};
   }
 };

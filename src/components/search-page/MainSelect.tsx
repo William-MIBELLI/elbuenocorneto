@@ -150,10 +150,10 @@ const MainSelect: FC<IProps> = ({  }) => {
           value={params.sort as string ?? [undefined]}
           name="sort"
         >
-          <Radio value="date_asc">Plus récentes</Radio>
-          <Radio value="date_desc">Plus anciennes</Radio>
-          <Radio value="createdAt_asc">Prix croissant</Radio>
-          <Radio value="createdAt_desc">Prix décroissant</Radio>
+          <Radio value="createdAt_asc">Plus récentes</Radio>
+          <Radio value="createdAt_desc">Plus anciennes</Radio>
+          <Radio value="price_asc">Prix croissant</Radio>
+          <Radio value="price_desc">Prix décroissant</Radio>
         </RadioGroup>
       </div>
       <Divider />

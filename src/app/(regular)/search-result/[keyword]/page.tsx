@@ -21,18 +21,9 @@ const page: FC<IProps> = async ({ params, searchParams }) => {
   const { keyword } = params;
   const { titleOnly } = searchParams;
 
-  const where = createWhereConditionFromKeyword(keyword, titleOnly === "true");
-  const test = createSearchCondition({
-    keyword: "chair",
-    titleOnly: true,
-    min: 200,
-    categorySelected: {
-      type: 'autre',
-      label: 'test'
-    }
-  });
+  const condition = createSearchCondition({keyword, titleOnly: titleOnly === "true"});
 
-  const result = await getProductsList(where);
+  const result = await getProductsList(condition.where);
 
   return (
     <SearchContextProvider>
