@@ -1,3 +1,4 @@
+import { SortType } from './../../context/search.context';
 import {
   CategoriesType,
   Details,
@@ -31,6 +32,7 @@ import {
 import { SQL, and, count, eq, ilike, or, sql } from "drizzle-orm";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { auth } from "@/auth";
+import { ISearchParams, SearchParamskeys } from "@/context/search.context";
 
 // export const getProductDetailsById = async (id: string) => {
 //   try {
@@ -446,7 +448,7 @@ export const getProductsList = async (where: SQL<unknown>, limit: number = 10 ):
     const db = getDb();
     const session = await auth();
 
-    const pr = await db
+    const query =  db
       .selectDistinctOn([products.id])
       .from(products)
       .leftJoin(
@@ -458,9 +460,12 @@ export const getProductsList = async (where: SQL<unknown>, limit: number = 10 ):
       )
       .leftJoin(locations, eq(locations.id, products.locationId))
       .leftJoin(images, eq(images.productId, products.id))
-      .where(where)
+      // .where(where)
       .limit(limit);
 
+    const dynamicQuery = query.$dynamic();
+    dynamicQuery.where(where);
+    const pr = await dynamicQuery
     return pr;
   } catch (error) {
     console.log('ERROR GET PRODUCTS LIST : ', error);
@@ -532,4 +537,61 @@ export const getProductListForSearch = async (keyword: string, titleOnly: boolea
     console.log('ERROR GET PRODUCT LIST FOR SEARCH : ', error);
     return [];
   }  
+}
+
+export const createSearchCondition = async (params: ISearchParams): Promise<SQL<unknown>> => {
+
+  const mappedKeyword = `%${params.keyword}%`;
+  const withDescription = sql`${products.title} ILIKE ${mappedKeyword} OR ${products.description} ILIKE ${mappedKeyword}`;
+  const withoutDescription = sql`${products.title} ILIKE ${mappedKeyword}`;
+
+  const conditions: SQL<unknown>[] = [];
+  const orderBy: SQL<unknown>[] = [];
+
+  //KEYWORD ET TITLEONLY
+  if (params.titleOnly) {
+    conditions.push(withoutDescription);
+  } else {
+    conditions.push(withDescription);
+  }
+
+  //CATEGORIE
+  if (params.categorySelected?.type) {
+    const cond = sql`${products.categoryType} = ${params.categorySelected.type}`;
+    conditions.push(cond);
+  }
+
+  //PRICE
+  if (params.donation) {
+    const cond = sql`${products.price} = 0`
+    // console.log('ON RENTRE DANS DONATION ', cond.queryChunks);
+    conditions.push(cond);
+  }
+  else {
+    if (params.min) {
+      const cond = sql`${products.price} >= ${params.min}`;
+      conditions.push(cond);
+    }
+    if (params.max) {
+      const cond = sql`${products.price} <= ${params.max}`;
+      conditions.push(cond);
+    }
+  }
+
+  //SORT
+  if (params.sort && params.sort[0] !== undefined) {
+    const [field, order] = params.sort.split('_');
+    const ord = sql`${field} ${order}`;
+    orderBy.push(ord);
+  }
+
+  console.log('___________________')
+  // const p = await getProductsList(where);
+  // console.log('P : ', p);
+
+
+  //ON JOIN TOUTES LES CONDITIONS ET ON LA RETURN
+  const where = sql.join(conditions, sql` AND `);
+  return where;
+  
 }

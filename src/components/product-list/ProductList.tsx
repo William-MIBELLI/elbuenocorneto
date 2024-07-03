@@ -19,8 +19,8 @@ interface IProps {
 
 const ProductList: FC<IProps> = ({ products }) => {
 
-  console.log('--------------------')
-  products.forEach(p => console.log(p?.product?.id))
+  // console.log('--------------------')
+  // products.forEach(p => console.log(p?.product?.id))
 
   return <div className="flex flex-col gap-3">
 

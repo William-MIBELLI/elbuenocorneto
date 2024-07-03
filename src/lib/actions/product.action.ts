@@ -1,7 +1,6 @@
 "use server";
 import { RedirectType, redirect, usePathname } from "next/navigation";
 
-
 import {
   AttributeSelect,
   ImageSelect,
@@ -13,7 +12,11 @@ import {
   deliveries,
 } from "@/drizzle/schema";
 import { DeliveryType } from "@/interfaces/IDelivery";
-import { IProductImage, ProductUpdateType } from "@/interfaces/IProducts";
+import {
+  IProductImage,
+  ProductForList,
+  ProductUpdateType,
+} from "@/interfaces/IProducts";
 import { parseWithZod } from "@conform-to/zod";
 import { ZodAny, ZodType, z } from "zod";
 import {
@@ -26,7 +29,9 @@ import {
 import {
   createProdAttrsOnDB,
   createProductOnDB,
+  createSearchCondition,
   deleteProductOnDB,
+  getProductsList,
   udpateProductOnDB,
   updateProdAttrOnDb,
 } from "../requests/product.request";
@@ -42,6 +47,8 @@ import { insertPDLOnDB, updatePDLonDB } from "../requests/delivery.request";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { ISearchParams } from "@/context/search.context";
+import Success from "@/components/new-product/Success";
 
 export const newProductACTION = async (initialState: unknown, fd: FormData) => {
   const parsedTitle = parseWithZod(fd, {
@@ -401,7 +408,7 @@ export const updatePDLACTION = async (
 };
 
 export const deleteProductAction = async (
-  data: { product: ProductSelect; redirection: boolean, redirectPath: string },
+  data: { product: ProductSelect; redirection: boolean; redirectPath: string },
   initialState: { success?: boolean; _error?: string },
   fd: FormData
 ) => {
@@ -409,7 +416,7 @@ export const deleteProductAction = async (
     const session = await auth();
     const { product } = data;
 
-    console.log('REDIRECTION PATH  DANS LE DELETE : ', data.redirection);
+    console.log("REDIRECTION PATH  DANS LE DELETE : ", data.redirection);
 
     //ON VERIFIE QUE LE PRODUCT A DELETE APPARTIENT BIEN A L'USER DE LA SESSION
     if (!session || session.user?.id !== product.userId) {
@@ -428,7 +435,6 @@ export const deleteProductAction = async (
 
     //ON REVALIDE LE PATH
     revalidatePath("/mes-annonces");
-
   } catch (error) {
     console.log("ERROR DELETE PRODUCT ACTION : ", error);
     return { ...initialState, success: false };
@@ -436,9 +442,30 @@ export const deleteProductAction = async (
 
   //SI REDIRECTION EST TRUE, ON REDIRIGE
   if (data.redirection) {
-    redirect(data.redirectPath)
+    redirect(data.redirectPath);
   }
 
   //SINON ON RETURN SUCCESS
   return { ...initialState, success: true };
+};
+
+export const searchWithFiltersACTION = async (
+  params: ISearchParams,
+  initialState: {
+    success: boolean;
+    products: ProductForList[];
+    error: string | null;
+  },
+  fd: FormData
+) => {
+  try {
+    console.log('PARAMS DANS ACTION : ', params);
+    const where = await createSearchCondition(params);
+    const products = await getProductsList(where);
+    console.log('PRODUCTS DANS ACTION : ', products);
+    return {...initialState, success: true, products}
+  } catch (error) {
+    console.log("ERROR SEARCH WITH FITLERS ACTION : ", error);
+    return {...initialState, success: false};
+  }
 };

@@ -1,6 +1,5 @@
 import { useSearchContext } from "@/context/search.context";
 import {
-  Button,
   Divider,
   Checkbox,
   RadioGroup,
@@ -8,41 +7,55 @@ import {
   Input,
 } from "@nextui-org/react";
 import {
-  X,
   ChevronRight,
   PackageOpen,
   Euro,
   ArrowDownNarrowWide,
+  
+  ListTodo,
 } from "lucide-react";
-import React, { Dispatch, FC, useEffect } from "react";
+import React, {  FC } from "react";
 
 interface IProps {
-  setDisplayCategories: Dispatch<boolean>;
+  // setDisplayCategories: Dispatch<boolean>;
 }
 
-const MainSelect: FC<IProps> = ({ setDisplayCategories }) => {
-
-  const { params, setParams } = useSearchContext();
-
+const MainSelect: FC<IProps> = ({  }) => {
+  const { params, setParams, setDisplayCategories } = useSearchContext();
 
   //GESTION DES INPUTS POUR METTRE A JOUR LE CONTEXT
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = event.target;
-    setParams({...params, [name]: !(name === "donation" || name === 'delivery') ? value: checked})
+    setParams({
+      ...params,
+      [name]: !(name === "donation" || name === "delivery" || name === 'titleOnly') ? value : checked,
+    });
   };
-
-  useEffect(() => {
-    console.log('USEEFFECT SUR LE PARAMS : ', params);
-  }, [params]);
 
 
   return (
     <>
+      {/* TITLE ONLY */}
+      <div className="section_sider">
+        <div className="flex items-center gap-2">
+          <Checkbox name="titleOnly" isSelected={params.titleOnly ?? false} onChange={onChangeHandler} />
+          <label htmlFor="titleOnly" className="font-semibold">
+            Rechercher dans le titre uniquement
+          </label>
+        </div>
+      </div>
+      <Divider />
+
       {/* CATEGORIES */}
       <div className="section_sider" onClick={() => setDisplayCategories(true)}>
-        <h3 className="font-semibold">Catégories</h3>
+        <div className="flex items-center gap-2">
+          <ListTodo color="lightblue" />
+          <h3 className="font-semibold">Catégories</h3>
+        </div>
         <div className="flex justify-between items-center cursor-pointer hover:bg-gray-100 rounded-xl">
-          <p className="text-sm">{params.categorySelected?.label ?? 'Toutes catégories'}</p>
+          <p className="text-sm">
+            {params.categorySelected?.label ?? "Toutes catégories"}
+          </p>
           <ChevronRight />
         </div>
       </div>
@@ -62,7 +75,7 @@ const MainSelect: FC<IProps> = ({ setDisplayCategories }) => {
             aria-label="Voir les annonces avec livraison également"
             name="delivery"
             onChange={onChangeHandler}
-            isSelected={params.delivery}
+            isSelected={params.delivery ?? false}
           />
         </div>
         <div className="flex gap-1">
@@ -90,7 +103,7 @@ const MainSelect: FC<IProps> = ({ setDisplayCategories }) => {
             name="min"
             isDisabled={params.donation}
             onChange={onChangeHandler}
-            value={params.min?.toString() ?? undefined}
+            value={params.min?.toString() ?? ""}
             endContent={
               <div className="flex items-center h-full gap-3">
                 <Divider orientation="vertical" />
@@ -105,7 +118,7 @@ const MainSelect: FC<IProps> = ({ setDisplayCategories }) => {
             name="max"
             isDisabled={params.donation}
             onChange={onChangeHandler}
-            value={params.max?.toString() ?? undefined}
+            value={params.max?.toString() ?? ""}
             endContent={
               <div className="flex items-center h-full gap-3">
                 <Divider orientation="vertical" />
@@ -119,7 +132,7 @@ const MainSelect: FC<IProps> = ({ setDisplayCategories }) => {
             name="donation"
             aria-label="Donc uniquement"
             onChange={onChangeHandler}
-            isSelected={params.donation}
+            isSelected={params.donation ?? false}
           />
           <label htmlFor="donation">Dons uniquement</label>
         </div>
@@ -132,11 +145,15 @@ const MainSelect: FC<IProps> = ({ setDisplayCategories }) => {
           <ArrowDownNarrowWide color="lightblue" />
           <h3 className="font-semibold">Tri</h3>
         </div>
-        <RadioGroup onChange={onChangeHandler} value={params.sort} name="sort">
+        <RadioGroup
+          onChange={onChangeHandler}
+          value={params.sort as string ?? [undefined]}
+          name="sort"
+        >
           <Radio value="date_asc">Plus récentes</Radio>
           <Radio value="date_desc">Plus anciennes</Radio>
-          <Radio value="price_asc">Prix croissant</Radio>
-          <Radio value="price_desc">Prix décroissant</Radio>
+          <Radio value="createdAt_asc">Prix croissant</Radio>
+          <Radio value="createdAt_desc">Prix décroissant</Radio>
         </RadioGroup>
       </div>
       <Divider />

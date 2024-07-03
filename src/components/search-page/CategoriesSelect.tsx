@@ -7,10 +7,10 @@ import { CategoriesType } from "@/interfaces/IProducts";
 import { useSearchContext } from "@/context/search.context";
 
 interface IProps {
-  setDisplayCategories: Dispatch<boolean>;
+  // setDisplayCategories: Dispatch<boolean>;
 }
 
-const CategoriesSelect: FC<IProps> = ({ setDisplayCategories }) => {
+const CategoriesSelect: FC<IProps> = ({  }) => {
   const { params, setParams, categories, setCategories } = useSearchContext();
   // const [categories, setCategories] = useState<CategorySelect[]>([]);
   const [loading, setLoading] = useState<boolean>(false);

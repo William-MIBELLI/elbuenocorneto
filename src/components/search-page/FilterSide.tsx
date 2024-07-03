@@ -4,24 +4,35 @@ import { ArrowLeft, X } from "lucide-react";
 import React, { FC, useEffect, useRef, useState } from "react";
 import Body from "./Body";
 import { useSearchContext } from "@/context/search.context";
+import MainSelect from "./MainSelect";
+import CategoriesSelect from "./CategoriesSelect";
+import { useFormState } from "react-dom";
+import { searchWithFiltersACTION } from "@/lib/actions/product.action";
 
 interface IProps {
   open: boolean;
 }
 
 const FilterSide: FC<IProps> = ({ open }) => {
-  const { displayCategories, setDisplayCategories, params: globalParams, setParams } = useSearchContext();
+  const { displayCategories, setDisplayCategories, params, setParams, products, setProducts } =
+    useSearchContext();
+  
   const container = useRef<HTMLDialogElement>(null);
-  const dial = useRef<HTMLDivElement>(null);
+  const dial = useRef<HTMLFormElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
+
   const [isOpen, setIsOpen] = useState<boolean>(open);
   const [firstTime, setFirstTime] = useState<boolean>(true);
-  const [params, setLocalParams] = useState(globalParams)
+  
+  const [state, action] = useFormState(searchWithFiltersACTION.bind(null, params), {success: false,products, error: null });
 
   useEffect(() => {
-    setLocalParams({...globalParams})
-  },[])
+    if (state && state?.success && state?.products) {
+      console.log('ON RENTRE DANS LE USEEFFECT, products : ', state.products);
+      setProducts(state.products);
+    }
+  },[state])
 
-  console.log('REFRESH')
   //GESTION DU DISPLAY
   useEffect(() => {
     if (isOpen) {
@@ -39,6 +50,10 @@ const FilterSide: FC<IProps> = ({ open }) => {
     setIsOpen(true);
   }, [open]);
 
+  useEffect(() => {
+    submitRef.current?.click();
+  },[params])
+
   //CLOSE DIALOG SI CLICK OUTSIDE SIDER
   const onCloserHandler = (
     e: React.MouseEvent<HTMLDialogElement, MouseEvent>
@@ -49,11 +64,17 @@ const FilterSide: FC<IProps> = ({ open }) => {
     }
   };
 
+  //RESET DE TOUS LES FILTRES, ON NE GARDE QUE LE KEYWORD
   const onResetHandler = () => {
-    console.log('RESET PARAMS')
-    const { keyword, titleOnly } = params;
-    setParams({ keyword, titleOnly })
-  }
+    console.log("RESET PARAMS");
+    const { keyword } = params;
+    setParams({
+      keyword,
+      titleOnly: false,
+      sort: undefined,
+    });
+  };
+
 
   return (
     <dialog
@@ -61,28 +82,33 @@ const FilterSide: FC<IProps> = ({ open }) => {
       ref={container}
       onClick={onCloserHandler}
     >
-      <div
+      <form
+        action={action}
         ref={dial}
         className="bg-white fixed min-h-screen  min-w-96 max-w-full right-0 top-0 p-4 flex flex-col gap-4 text-left"
       >
         {/* HEADER */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between font-bold text-lg">
           {displayCategories ? (
             <div className="flex items-center gap-2">
-              <Button isIconOnly className="bg-transparent" onClick={() => setDisplayCategories(false)}>
-                <ArrowLeft color="gray"/>
+              <Button
+                isIconOnly
+                className="bg-transparent"
+                onClick={() => setDisplayCategories(false)}
+              >
+                <ArrowLeft color="gray" />
               </Button>
-              <h3 className="font-bold">
-                Choisir une catégorie
-              </h3>
+              <h3>Choisir une catégorie</h3>
             </div>
           ) : (
-            <h3 className="text-lg font-semibold">Tous les filtres</h3>
+            <h3>Tous les filtres</h3>
           )}
           <Button
             className="bg-transparent"
             isIconOnly
-            onPress={() => {setIsOpen(false), setDisplayCategories(false)}}
+            onPress={() => {
+              setIsOpen(false), setDisplayCategories(false);
+            }}
           >
             <X color="gray" />
           </Button>
@@ -90,17 +116,20 @@ const FilterSide: FC<IProps> = ({ open }) => {
         <Divider />
 
         {/* BODY */}
-        <Body setIsOpen={setIsOpen} />
+        {!displayCategories ? <MainSelect /> : <CategoriesSelect />}
 
         {/* FOOTER */}
         <div className="absolute bottom-0 left-0 w-full">
           <Divider />
           <div className="flex justify-between p-4">
-            <Button className="button_secondary" onClick={onResetHandler}>Tout effacer</Button>
+            <Button className="button_secondary" onClick={onResetHandler}>
+              Tout effacer
+            </Button>
             <Button className="button_main">Rechercher</Button>
           </div>
         </div>
-      </div>
+        <button ref={submitRef} hidden type="submit">SUBMIT</button>
+      </form>
     </dialog>
   );
 };

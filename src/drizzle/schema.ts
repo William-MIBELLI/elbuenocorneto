@@ -137,6 +137,7 @@ export const products = pgTable("product", {
     .references(() => categoryTable.type),
   description: text("description").notNull(),
   state: StateEnum("state").notNull(),
+  // deliveryAvailable: boolean('delivery_available').default(true)
 });
 
 export const productsRelations = relations(products, ({ one, many }) => ({
