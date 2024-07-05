@@ -378,7 +378,8 @@ export type ProductForList = {
   product: ProductSelect | null,
   location: LocationSelect | null;
   image: ImageSelect | null;
-  favorites: FavoriteSelect | null
+  favorites: FavoriteSelect | null;
+  count?: {total: number}
 }
 
 export type SearchResultType = {

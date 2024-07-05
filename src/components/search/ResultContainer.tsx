@@ -55,7 +55,7 @@ const ResultContainer: FC<IProps> = ({ result, setOpenresult, titleOnly, setTitl
             </p>
           )
         }
-        <Button as={Link} href={`/search-result/${value}?titleOnly=${titleOnly}`} className="button_main" fullWidth>
+        <Button as={Link} href={`/search-result/${value}?titleOnly=${titleOnly}&page=1`} className="button_main" fullWidth>
           Afficher tous les résultats ({total})
         </Button>
       </div>

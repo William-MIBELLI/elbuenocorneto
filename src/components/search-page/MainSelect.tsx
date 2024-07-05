@@ -1,26 +1,19 @@
 import { useSearchContext } from "@/context/search.context";
-import {
-  Divider,
-  Checkbox,
-  RadioGroup,
-  Radio,
-  Input,
-} from "@nextui-org/react";
+import { Divider, Checkbox, RadioGroup, Radio, Input } from "@nextui-org/react";
 import {
   ChevronRight,
   PackageOpen,
   Euro,
   ArrowDownNarrowWide,
-  
   ListTodo,
 } from "lucide-react";
-import React, {  FC } from "react";
+import React, { FC } from "react";
 
 interface IProps {
   // setDisplayCategories: Dispatch<boolean>;
 }
 
-const MainSelect: FC<IProps> = ({  }) => {
+const MainSelect: FC<IProps> = ({}) => {
   const { params, setParams, setDisplayCategories } = useSearchContext();
 
   //GESTION DES INPUTS POUR METTRE A JOUR LE CONTEXT
@@ -28,17 +21,26 @@ const MainSelect: FC<IProps> = ({  }) => {
     const { name, value, checked } = event.target;
     setParams({
       ...params,
-      [name]: !(name === "donation" || name === "delivery" || name === 'titleOnly') ? value : checked,
+      [name]: !(
+        name === "donation" ||
+        name === "delivery" ||
+        name === "titleOnly"
+      )
+        ? value
+        : checked,
     });
   };
-
 
   return (
     <>
       {/* TITLE ONLY */}
       <div className="section_sider">
         <div className="flex items-center gap-2">
-          <Checkbox name="titleOnly" isSelected={params.titleOnly ?? false} onChange={onChangeHandler} />
+          <Checkbox
+            name="titleOnly"
+            isSelected={params.titleOnly ?? false}
+            onChange={onChangeHandler}
+          />
           <label htmlFor="titleOnly" className="font-semibold">
             Rechercher dans le titre uniquement
           </label>
@@ -54,7 +56,7 @@ const MainSelect: FC<IProps> = ({  }) => {
         </div>
         <div className="flex justify-between items-center cursor-pointer hover:bg-gray-100 rounded-xl">
           <p className="text-sm">
-            {params.categorySelected?.label ?? "Toutes catégories"}
+            {params.categorySelectedLabel ?? "Toutes catégories"}
           </p>
           <ChevronRight />
         </div>
@@ -147,7 +149,7 @@ const MainSelect: FC<IProps> = ({  }) => {
         </div>
         <RadioGroup
           onChange={onChangeHandler}
-          value={params.sort as string ?? [undefined]}
+          value={(params.sort as string) ?? [undefined]}
           name="sort"
         >
           <Radio value="createdAt_asc">Plus récentes</Radio>

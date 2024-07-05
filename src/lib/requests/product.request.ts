@@ -413,52 +413,65 @@ export const updateProdAttrOnDb = async (
   }
 };
 
-export const getProductsListByCategory = async (
-  category: CategoriesType
-): Promise<ProductForList[]> => {
-  try {
-    const db = getDb();
-    const session = await auth();
+// export const getProductsListByCategory = async (
+//   category: CategoriesType
+// ): Promise<ProductForList[]> => {
+//   try {
+//     const db = getDb();
+//     const session = await auth();
 
-    const sb = db.select().from(images).limit(1).as("image");
-    const pr = await db
-      .selectDistinctOn([products.id])
-      .from(products)
-      .leftJoin(
-        favoritesTable,
-        and(
-          eq(products.id, favoritesTable.productId),
-          eq(favoritesTable.userId, session?.user?.id ?? "1")
-        )
-      )
-      .leftJoin(locations, eq(locations.id, products.locationId))
-      .leftJoin(images, eq(images.productId, products.id))
-      .where(eq(products.categoryType, category))
-      .limit(10);
+//     const sb = db.select().from(images).limit(1).as("image");
+//     const pr = await db
+//       .selectDistinctOn([products.id])
+//       .from(products)
+//       .leftJoin(
+//         favoritesTable,
+//         and(
+//           eq(products.id, favoritesTable.productId),
+//           eq(favoritesTable.userId, session?.user?.id ?? "1")
+//         )
+//       )
+//       .leftJoin(locations, eq(locations.id, products.locationId))
+//       .leftJoin(images, eq(images.productId, products.id))
+//       .where(eq(products.categoryType, category))
+//       .limit(10);
 
-    return pr;
-  } catch (error) {
-    console.log("ERROR PR : ", error);
-    return [];
-  }
-};
+//     return pr;
+//   } catch (error) {
+//     console.log("ERROR PR : ", error);
+//     return [];
+//   }
+// };
 
 export const getProductsList = async (
   where: SQL<unknown>,
   order: SQL<unknown> = sql`${products.createdAt} desc`,
-  limit: number = 10
+  limit: number = 10,
+  page: number = 1
 ): Promise<ProductForList[]> => {
   try {
     const db = getDb();
     const session = await auth();
+    const offset = Math.abs(page - 1) * 10;
 
-    const sbImage =  db.selectDistinctOn([images.productId]).from(images).as('image');
+    const sbImage = db
+      .selectDistinctOn([images.productId])
+      .from(images)
+      .as("image");
 
-   
+    //LA SUBQUERY POUR RECUPERER LE COUNT TOTAL DE PRODUCT CORRESPONDANT A LA RECHERCHE
+    const sq = db.$with("count").as(
+      db
+        .select({ total: count(products.id).as("compte") })
+        .from(products)
+        .where(where)
+    );
 
     const pr: ProductForList[] = await db
+      .with(sq)
       .select()
-      .from(products)
+      .from(sq)
+      .leftJoin(products, where)
       .leftJoin(
         favoritesTable,
         and(
@@ -469,13 +482,10 @@ export const getProductsList = async (
       .leftJoin(locations, eq(locations.id, products.locationId))
       .leftJoin(sbImage, eq(sbImage.productId, products.id))
       .where(where)
-      .orderBy(order);
+      .orderBy(order)
+      .limit(limit)
+      .offset(offset);
 
-    // const dynamicQuery = query.$dynamic().where(where).as("sb");
-    // // dynamicQuery.where(where);
-    // const pr = await db.select().from(dynamicQuery).orderBy(order).limit(limit);
-    // console.log("PR DANS GET PRODUCLIST : ");
-    // pr.forEach((p) => console.log(p.product?.title));
     return pr;
   } catch (error: any) {
     console.log("ERROR GET PRODUCTS LIST : ", error?.message);
@@ -568,7 +578,7 @@ export interface ISearchCondition {
   order?: SQL<unknown>;
 }
 
-export const createSearchCondition =  (
+export const createSearchCondition = (
   params: ISearchParams
 ): ISearchCondition => {
   const mappedKeyword = `%${params.keyword}%`;
@@ -579,8 +589,8 @@ export const createSearchCondition =  (
   const orderBy: SQL<unknown>[] = [];
 
   //CATEGORIE
-  if (params.categorySelected?.type) {
-    const cond = sql`${products.categoryType} = ${params.categorySelected.type}`;
+  if (params.categorySelectedType) {
+    const cond = sql`${products.categoryType} = ${params.categorySelectedType}`;
     conditions.push(cond);
   }
 
@@ -600,12 +610,14 @@ export const createSearchCondition =  (
     }
   }
 
-  type fields = keyof (typeof products);
+  type fields = keyof typeof products;
 
   //SORT
   if (params.sort && params.sort[0] !== undefined) {
     const [field, order] = params.sort.split("_");
-    const ord = sql`${products[field as fields]} ${order === 'asc'? sql`asc` : sql`desc`}`;
+    const ord = sql`${products[field as fields]} ${
+      order === "asc" ? sql`asc` : sql`desc`
+    }`;
     orderBy.push(ord);
   }
 
@@ -620,6 +632,6 @@ export const createSearchCondition =  (
 
   //ON JOIN TOUTES LES CONDITIONS ET ON LA RETURN
   const where = sql.join(conditions, sql` AND `);
-  const order = orderBy.length ? sql.join(orderBy) : undefined
-  return {where, order};
+  const order = orderBy.length ? sql.join(orderBy) : undefined;
+  return { where, order };
 };

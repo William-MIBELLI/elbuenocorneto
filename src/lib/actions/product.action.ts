@@ -463,7 +463,7 @@ export const searchWithFiltersACTION = async (
       throw new Error('EMPTY KEYWORD, FAST EXIT');
     }
     const {where, order} =  createSearchCondition(params);
-    const products = await getProductsList(where, order);
+    const products = await getProductsList(where, order, undefined, params.page);
 
     return { ...initialState, success: true, products };
     

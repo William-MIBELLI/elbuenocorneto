@@ -38,7 +38,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
   //UPDATE DU RESULTAT DIRECTEMENT APRES QU'UN INPUT DU FILTER CHANGE DE VALUE
   useEffect(() => {
     if (state && state?.success && state?.products) {
-      console.log("ON RENTRE DANS LE USEEFFECT, products : ", state);
+      // console.log("ON RENTRE DANS LE USEEFFECT, products : ", state);
       setProducts(state.products);
     }
   }, [state]);
@@ -60,7 +60,9 @@ const FilterSide: FC<IProps> = ({ open }) => {
     setIsOpen(true);
   }, [open]);
 
+  //DECLENCHE LE SUBMIT QUAND ON CHANGE UN INPUT
   useEffect(() => {
+    // console.log('USEEFFECT DU CURRENT.CLICK');
     submitRef.current?.click();
   }, [params]);
 
@@ -76,7 +78,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
 
   //RESET DE TOUS LES FILTRES, ON NE GARDE QUE LE KEYWORD
   const onResetHandler = () => {
-    console.log("RESET PARAMS");
+    // console.log("RESET PARAMS");
     const { keyword } = params;
     setParams({
       keyword,
@@ -94,6 +96,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
       <form
         action={action}
         ref={dial}
+        noValidate
         className="bg-white fixed min-h-screen  min-w-96 max-w-full right-0 top-0 p-4 flex flex-col gap-4 text-left"
       >
         {/* HEADER */}

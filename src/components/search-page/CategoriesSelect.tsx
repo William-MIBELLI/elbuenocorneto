@@ -39,8 +39,8 @@ const CategoriesSelect: FC<IProps> = ({  }) => {
   //GESTION DE LA SELECTION DE LA CATEGORY
   const onClickHandler = (cat: CategoriesType | undefined, label: string) => {
     //SI LUSER RECLIQUE SUR LA MEME CATEGORY QUE CELLE DEJA STOCKEE, ON NE FAIT RIEN
-    if (cat !== params.categorySelected) {
-      setParams({ ...params, categorySelected: {type: cat, label} });
+    if (cat !== params.categorySelectedType) {
+      setParams({ ...params, categorySelectedType: cat, categorySelectedLabel: label});
     }
   };
 
@@ -52,14 +52,14 @@ const CategoriesSelect: FC<IProps> = ({  }) => {
         </div>
       ) : (
         <div
-        className={`flex items-center justify-between hover:bg-orange-100 p-1 ${params.categorySelected?.type === undefined ? 'bg-orange-50' : 'cursor-pointer'}`}
+        className={`flex items-center justify-between hover:bg-orange-100 p-1 ${params.categorySelectedType === undefined ? 'bg-orange-50' : 'cursor-pointer'}`}
         onClick={() => onClickHandler(undefined, 'Toutes catégories')}
         >
           <div className="flex gap-2 items-center">
             <List size={17} />
             <p className="font-semibold">Toute les catégories</p>
           </div>
-          {params.categorySelected?.type === undefined ? (
+          {params.categorySelectedType === undefined ? (
             <Check color="lightgreen" />
           ) : (
             <ChevronRight color="gray" />
@@ -70,14 +70,14 @@ const CategoriesSelect: FC<IProps> = ({  }) => {
         categories.map((cat) => (
           <div
             key={cat.id}
-            className={`flex items-center justify-between hover:bg-orange-100 p-1 ${params.categorySelected?.type === cat.type ? 'bg-orange-50' : 'cursor-pointer'}`}
+            className={`flex items-center justify-between hover:bg-orange-100 p-1 ${params.categorySelectedType === cat.type ? 'bg-orange-50' : 'cursor-pointer'}`}
             onClick={() => onClickHandler(cat.type, cat.label)}
           >
             <div className="flex gap-2 items-center">
               <IconCategorySelector category={cat.type} size={17} />
               <p>{cat.label}</p>
             </div>
-            {params.categorySelected?.type === cat.type ? (
+            {params.categorySelectedType === cat.type ? (
               <Check color="lightgreen" />
             ) : (
               <ChevronRight color="gray" />

@@ -19,7 +19,7 @@ const AddressSearchInput = () => {
   const [displaySlider, setDisplaySlider] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("VALUE : ", value);
+    // console.log("VALUE : ", value);
     setKm(kmValue[value as number]);
   }, [value]);
 

@@ -1,6 +1,8 @@
 import ProductList from '@/components/product-list/ProductList'
+import { products } from '@/drizzle/schema'
 import { CategoriesType, categoriesList, categoriesTypeList } from '@/interfaces/IProducts'
-import {  getProductsByCategory, getProductsListByCategory } from '@/lib/requests/product.request'
+import {  getProductsByCategory, getProductsList } from '@/lib/requests/product.request'
+import { sql } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import React, { FC } from 'react'
 
@@ -19,7 +21,7 @@ const page: FC<IProps> = async ({ params: { category } }) => {
     return notFound();
   }
 
-  const productsList = await getProductsListByCategory(category);
+  const productsList = await getProductsList(sql`${products.categoryType} = ${category}`);
 
 
   return (
@@ -28,7 +30,7 @@ const page: FC<IProps> = async ({ params: { category } }) => {
         <h1 className='text-3xl font-semibold'>
           Annonce "{categoriesList[category].label}" : Toute la France
         </h1>
-        <p className='font-semibold text-gray-400'>{productsList.length} annonces</p>
+        <p className='font-semibold text-gray-400'>{productsList[0]?.count?.total ?? 0} annonces</p>
       </div>
       <ProductList products={productsList} />
     </div>

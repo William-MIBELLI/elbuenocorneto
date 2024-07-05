@@ -36,16 +36,14 @@ export interface ISearchParams {
   radius?: number;
   delivery?: boolean;
   sort?: SortType | undefined;
-  categorySelected?: {
-    type: (typeof CategoryEnum.enumValues)[number] | undefined;
-    label: string;
-  };
+  categorySelectedType?: typeof CategoryEnum.enumValues[number] | undefined;
+  categorySelectedLabel?: string;
   donation?: boolean;
+  page?: number;
 }
 
 export type SearchParamskeys = keyof ISearchParams;
 
-// console.log('SEARCHPARAMSKEY : ', typeof SearchParamskeys)
 
 export const SearchContext = createContext<IContextType>({} as IContextType);
 
@@ -68,15 +66,15 @@ export const SearchContextProvider = ({ children }: Props) => {
   const [where, setWhere] = useState<SQL<unknown>>();
 
   useEffect(() => {
-    console.log('PRODUCT DANS CONTEXT : ', products);
+    // console.log('PRODUCT DANS CONTEXT : ', products);
   },[products])
 
   //NOMBRE DE FILTRES ACTIFS
   //////////  CEST DEGUEU, A IMPROVE /////////////
   useEffect(() => {
-    console.log("PARAMS : ", params);
+    // console.log("PARAMS : ", params);
     let nb = 0;
-    if (params.categorySelected?.type) {
+    if (params.categorySelectedType) {
       nb++;
     }
     if (params.delivery) {
