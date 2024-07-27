@@ -35,22 +35,22 @@ const Body: FC<IProps> = ({ result, paramsURL }) => {
     setCount(0);
   }, [products]);
 
-  //GESTION DU CLIC SUR LA PAGINATION
-  const onChangePagination = (page: number) => {
-    //ON MAP PARAMS POUR N'AVOIR QUE DES STRING, EN LUI PASSANT LE NUMERO DE PAGE SUR LEQUEL L'USER A CLIQUE
-    const mappedParams = paramsToQuery({ ...params, page });
+  // //GESTION DU CLIC SUR LA PAGINATION
+  // const onChangePagination = (page: number) => {
+  //   //ON MAP PARAMS POUR N'AVOIR QUE DES STRING, EN LUI PASSANT LE NUMERO DE PAGE SUR LEQUEL L'USER A CLIQUE
+  //   const mappedParams = paramsToQuery({ ...params, page });
 
-    //ON CREE UN NEW URLSEACRHPARAMS AVEC
-    const URLParams = new URLSearchParams(
-      mappedParams as Record<string, string>
-    );
+  //   //ON CREE UN NEW URLSEACRHPARAMS AVEC
+  //   const URLParams = new URLSearchParams(
+  //     mappedParams as Record<string, string>
+  //   );
 
-    //ON CREE LE PATH
-    const path = `/search-result/?${URLParams}`;
+  //   //ON CREE LE PATH
+  //   const path = `/search-result/?${URLParams}`;
 
-    //ON PUSH DANS LE ROUTER POUR TRIGGER UNE NOUVELLE REQUEST
-    router.push(path);
-  };
+  //   //ON PUSH DANS LE ROUTER POUR TRIGGER UNE NOUVELLE REQUEST
+  //   router.push(path);
+  // };
 
   return (
     <div className="w-full" key={actualPath}>
@@ -60,7 +60,7 @@ const Body: FC<IProps> = ({ result, paramsURL }) => {
         <p className="font-semibold text-gray-400">{count} annonces</p>
       </div>
       <ProductList products={products} />
-      {count > 10 && (
+      {/* {count > 10 && (
         <Pagination
           classNames={{
             base: ["flex justify-center my-4"],
@@ -69,7 +69,7 @@ const Body: FC<IProps> = ({ result, paramsURL }) => {
           page={page}
           onChange={onChangePagination}
         />
-      )}
+      )} */}
     </div>
   );
 };

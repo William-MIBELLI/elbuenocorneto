@@ -28,6 +28,8 @@ const MainSelect: FC<IProps> = ({}) => {
       )
         ? value
         : checked,
+      //ON MET PAGE A 1 A CHAQUE FOIS QU'ON CHANGE UN INPUT
+      page: 1,
     });
   };
 

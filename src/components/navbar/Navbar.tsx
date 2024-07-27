@@ -53,7 +53,7 @@ const Navbar = () => {
   }, [data]);
 
   return (
-    <Suspense>
+    <Suspense fallback={<Spinner/>}>
       <Nv
         maxWidth="lg"
         position={!isSearchFocus ? "static" : undefined}

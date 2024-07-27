@@ -32,8 +32,10 @@ interface IContextType {
   setList: Dispatch<LocationInsert[]>;
   selectedAddress: LocationInsert | undefined;
   setSelectedAddress: Dispatch<LocationInsert | undefined>;
-  updateFromSearchLocation: (loc: LocationInsert | undefined,
-    newParams: ISearchParams) => void;
+  updateFromSearchLocation: (
+    loc: LocationInsert | undefined,
+    newParams: ISearchParams
+  ) => void;
 }
 
 export type SortType =
@@ -115,14 +117,7 @@ export const SearchContextProvider = ({ children }: Props) => {
     };
     getProds();
   }, [params]);
-  
-  //ON UPDATE l'URL AVEC LES PARAMS
-  // useEffect(() => {
-  //   const query = paramsToQuery(params);
-  //   const USP = new URLSearchParams(query);
-  //   router.replace(`/search-result/?${USP}`);
-    
-  // }, [params]);
+
 
   //NOMBRE DE FILTRES ACTIFS
   //////////  CEST DEGUEU, A IMPROVE /////////////
@@ -169,7 +164,7 @@ export const SearchContextProvider = ({ children }: Props) => {
     setList,
     selectedAddress,
     setSelectedAddress,
-    updateFromSearchLocation
+    updateFromSearchLocation,
   };
   return (
     <SearchContext.Provider value={value}>{children}</SearchContext.Provider>

@@ -6,7 +6,7 @@ import { ChevronRight, SlidersHorizontal } from "lucide-react";
 import FilterSide from "./FilterSide";
 import { useSearchContext } from "@/context/search.context";
 import AddressSearchInput from "./AddressSearchInput";
-import { getPriceText } from "@/lib/helpers/search.helper";
+import { getPriceText, paramsToQuery } from "@/lib/helpers/search.helper";
 
 
 const FilterHeader = () => {
@@ -14,6 +14,13 @@ const FilterHeader = () => {
   const { displaySide, setDisplaySide, params, filters } = useSearchContext();
   const [priceText, setPriceText] = useState<string>('Prix');
 
+  //ON UPDATE l'URL AVEC LES PARAMS
+  useEffect(() => {
+    const query = paramsToQuery(params);
+    const USP = new URLSearchParams(query);
+    window.history.replaceState(null, '',`/search-result/?${USP}`);
+
+  }, [params]);
 
   //AFFICHAGE DU TEXT POUR LE PRIX SELON LES FILTRES DE RECHERCHES
   useEffect(() => {
