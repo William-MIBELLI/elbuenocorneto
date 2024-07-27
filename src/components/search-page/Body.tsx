@@ -5,8 +5,8 @@ import ProductList from "../product-list/ProductList";
 import { ProductForList } from "@/interfaces/IProducts";
 import { ISearchParams, useSearchContext } from "@/context/search.context";
 import { Button, Pagination } from "@nextui-org/react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { paramsToQuery, queryToParams } from "@/lib/helpers/search.helper";
+import { usePathname, useRouter,  } from "next/navigation";
+import { paramsToQuery } from "@/lib/helpers/search.helper";
 
 interface IProps {
   paramsURL: ISearchParams;
@@ -19,7 +19,6 @@ const Body: FC<IProps> = ({ result, paramsURL }) => {
   const [count, setCount] = useState<number>(0);
   const router = useRouter();
   const actualPath = usePathname();
-  const sp = useSearchParams();
 
   //AU MONTAGE, ON STOCKE LES PRODUCST DANS LE CONTEXT, ET ON PASSERA A PRODUCTLIST LES PRODUCTS DU CONTEXT
   //POUR FACILITER LE REFRESH

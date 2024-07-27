@@ -22,6 +22,8 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const ref = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => { console.log('SEARCHINPUT MOUNTED') },[])
 
   //SI L'USER CHANGE DE PAGE OU QUE LES SEARCH PARAMS CHANGENT, ON CACHE LE RESULT
   useEffect(() => {

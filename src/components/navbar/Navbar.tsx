@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import {
   Button,
   Input,
@@ -52,71 +52,72 @@ const Navbar = () => {
     setUser(data?.user);
   }, [data]);
 
-
-
   return (
-    <Nv
-      maxWidth="lg"
-      position={!isSearchFocus ? "static" : undefined}
-      height="5rem"
-      isMenuOpen={isOpenMenu}
-      onMenuOpenChange={setIsOpenMenu}
-      classNames={{
-        wrapper: ["md:px-0", "sm:px-6"],
-      }}
-    >
-      {/* BRAND SECTION */}
+    <Suspense>
+      <Nv
+        maxWidth="lg"
+        position={!isSearchFocus ? "static" : undefined}
+        height="5rem"
+        isMenuOpen={isOpenMenu}
+        onMenuOpenChange={setIsOpenMenu}
+        classNames={{
+          wrapper: ["md:px-0", "sm:px-6"],
+        }}
+      >
+        {/* BRAND SECTION */}
 
-      <NavbarContent>
-        <NavbarMenuToggle
-          className="md:hidden"
-          onChange={(isOpen) => setIsOpenMenu(isOpen)}
-        />
-        <Brand/>
-      </NavbarContent>
-
-      {/* SEARCH SECTION WITH NEW BUTTON */}
-
-      <SearchInput isSearchFocus={isSearchFocus} setIsSearchFocus={setIsSearchFocus} />
-
-      {/* ITEMS SECTION WITH SIGNIN */}
-
-      <NavbarContent className="hidden md:flex" justify="start">
-        {navItems.map((item) => (
-          <NavItem
-            key={Math.random()}
-            Icon={item.Icon}
-            target={item.target}
-            text={item.text}
+        <NavbarContent>
+          <NavbarMenuToggle
+            className="md:hidden"
+            onChange={(isOpen) => setIsOpenMenu(isOpen)}
           />
-        ))}
-      </NavbarContent>
+          <Brand />
+        </NavbarContent>
 
-      {/* AUTH */}
-      {
-        status === 'authenticated' ? (
-          <NavItem
-          Icon={UserRound}
-          text={user?.name || "Profile"}
-          target="/dashboard"
+        {/* SEARCH SECTION WITH NEW BUTTON */}
+
+        <SearchInput
+          isSearchFocus={isSearchFocus}
+          setIsSearchFocus={setIsSearchFocus}
         />
+
+        {/* ITEMS SECTION WITH SIGNIN */}
+
+        <NavbarContent className="hidden md:flex" justify="start">
+          {navItems.map((item) => (
+            <NavItem
+              key={Math.random()}
+              Icon={item.Icon}
+              target={item.target}
+              text={item.text}
+            />
+          ))}
+        </NavbarContent>
+
+        {/* AUTH */}
+        {status === "authenticated" ? (
+          <NavItem
+            Icon={UserRound}
+            text={user?.name || "Profile"}
+            target="/dashboard"
+          />
         ) : status === "unauthenticated" ? (
           <Button
-          as={Link}
-          href="/auth/login"
-          className="bg-gray-900 text-white"
-        >
-          Se connecter
-        </Button>
-          ) : (
-              <Spinner color="default" size="sm"/>
-        )
-      }
+            as={Link}
+            href="/auth/login"
+            className="bg-gray-900 text-white"
+          >
+            Se connecter
+          </Button>
+        ) : (
+          <Spinner color="default" size="sm" />
+        )}
 
-      {/* MOBILE MENU */}
+        {/* MOBILE MENU */}
 
-      <Menu setIsOpenMenu={setIsOpenMenu} />
-    </Nv>
+        <Menu setIsOpenMenu={setIsOpenMenu} />
+      </Nv>
+    </Suspense>
   );
 };
 
