@@ -1,3 +1,5 @@
+import { LocationInsert } from "@/drizzle/schema";
+import { fetchAddressFromAPI } from "@/lib/actions/location.action";
 import {
   Button,
   Divider,
@@ -7,95 +9,132 @@ import {
   PopoverTrigger,
   Slider,
   SliderValue,
+  Spinner,
 } from "@nextui-org/react";
-import { ChevronDown, Crosshair, MapPin } from "lucide-react";
-import { useEffect, useState } from "react";
-
-const kmValue = [1, 5, 10, 20, 30, 50, 100, 200];
+import { ChevronDown, Crosshair, LucideIcon, MapPin } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import PopoverContentOptions from "./PopoverContentOptions";
+import PopoverContentList from "./PopoverContentList";
+import { useSearchContext } from "@/context/search.context";
 
 const AddressSearchInput = () => {
-  const [value, setValue] = useState<SliderValue>(0);
-  const [km, setKm] = useState<number>(1);
-  const [displaySlider, setDisplaySlider] = useState<boolean>(false);
+  const { list, setList, selectedAddress, setSelectedAddress } =
+    useSearchContext();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [displayList, setDisplayList] = useState<boolean>(false);
+  const lastTimeTyping = useRef<number>();
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [value, setValue] = useState<string>(selectedAddress?.city || "");
+
+  //GESTION DU INPUT AVEC LE TIMEOUT ETC...
+  const onChangeHandler = async (value: string) => {
+    console.log('ONCHANGEHANDLER SUR LE INPUT');
+    setValue(value);
+    const timer = 100;
+    lastTimeTyping.current = Date.now();
+    setTimeout(async () => {
+      const now = Date.now();
+      const diff = now - lastTimeTyping.current!;
+      if (diff >= timer) {
+        setLoading(true);
+        if (value.length >= 3) {
+          const res = await fetchAddressFromAPI(value, true);
+
+          //ON STOCKE LE RESULTAT DANS LIST
+          setList(res);
+          setDisplayList(true);
+          setLoading(false);
+        }
+      }
+    }, timer);
+  };
 
   useEffect(() => {
-    // console.log("VALUE : ", value);
-    setKm(kmValue[value as number]);
-  }, [value]);
+    if (selectedAddress) {
+      return setValue(selectedAddress.city);
+    }
+    setValue("");
+  }, [selectedAddress]);
+
+  //GESTION DU CLICK SUR ADDRESS DE LA LIST
+  const onAddressClick = (address: LocationInsert) => {
+    console.log('ON ADDRESS CLICK')
+    setSelectedAddress(address);
+    setList([]);
+    if (triggerRef.current) {
+      triggerRef.current.click();
+    }
+  };
+
+
+  //POUR GERER LE DISPLAY DE LA LISTE, ON CHECK OU L'USER CLICK
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      listRef.current &&
+      !listRef.current.contains(event.target as Node)
+    ) {
+      setDisplayList(false);
+    }
+  };
+
+  //ON PASSE LE LISTENER A TOUT LE DOCUMENT
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <Popover
       backdrop="opaque"
       placement="bottom-end"
       classNames={{
-        base: [" w-60"],
+        base: [" w-72 translate-x-8"],
       }}
     >
-      <Input
-        variant="bordered"
-        isDisabled
-        startContent={<MapPin color="gray" />}
-        endContent={
-          <PopoverTrigger className="cursor-pointer">
-            <ChevronDown color="gray" size={32} />
-          </PopoverTrigger>
-        }
-        placeholder="Choisir une localisation"
-        classNames={{
-          base: ["w-fit"],
-          inputWrapper: ["border-gray-300"],
-        }}
-      />
-
-      {/* HEADER */}
-      <PopoverContent className="w-full py-4">
-        <div className="flex flex-col items-start w-full gap-4">
-          <h3 className="text-md font-semibold">Où voulez-vous chercher ?</h3>
-          <Divider />
-
-          {/* AROUND ME */}
-          <div className="flex flex-col items-start gap-2 w-full">
-            <div className="flex w-full p-2 items-center gap-2 hover:bg-gray-100 cursor-pointer" onClick={() => setDisplaySlider(true)}>
-              <Crosshair color="lightblue" />
-              <p>Autour de moi</p>
-            </div>
-            {displaySlider && (
-              <div className="w-full ">
-                <div className="flex  justify-between text-blue-400 font-semibold">
-                  <p>Dans un rayon de</p>
-                  <p>{km} Km</p>
-                </div>
-                <Slider
-                  size="sm"
-                  step={1}
-                  color="primary"
-                  maxValue={7}
-                  minValue={0}
-                  value={value}
-                  onChange={setValue}
-                  className="w-full"
-                />
+      <div className="relative">
+        <Input
+          onFocus={() => onChangeHandler(value)}
+          variant="bordered"
+          startContent={<MapPin color="lightblue" className="my-auto"/>}
+          endContent={
+            <PopoverTrigger className="cursor-pointer">
+              <div ref={triggerRef}>
+                <ChevronDown color="gray" size={24} />
               </div>
-            )}
+            </PopoverTrigger>
+          }
+          placeholder="Choisir une localisation"
+          classNames={{
+            base: ["w-fit "],
+            inputWrapper: ["border-gray-300"],
+          }}
+          onValueChange={onChangeHandler}
+          value={value}
+        />
+
+        {/* LIST DES ADDRESS DISPOS */}
+        {(list.length > 0 && displayList && value.length > 0) && (
+          <div
+            ref={listRef}
+            onClick={(e) => console.log('CLICK SUR LISTREF ', e.relatedTarget)}
+            className="flex flex-col bg-blue-500 absolute  max-h-52 overflow-y-auto  w-full z-50 border-gray-300 shadow-md border-2 rounded-lg"
+          >
+            {list.map((address) => (
+              <div
+                key={Math.random()}
+                className="cursor-pointer hover:bg-gray-100 py-2"
+                onClick={() => onAddressClick(address)}
+              >
+                {`${address.city} (${address.postcode.toString().slice(0, 2)})`}
+              </div>
+            ))}
           </div>
-
-          {/* EVERYWHERE */}
-          <div className="flex items-center gap-2 hover:bg-gray-100 cursor-pointer w-full p-2" onClick={() => setDisplaySlider(false)}>
-            <div>
-              <MapPin color="lightblue" />
-            </div>
-            <p>Toute la France</p>
-          </div>
-        </div>
-        <Divider className="my-3" />
-
-        {/* FOOTER */}
-        <div className="flex justify-between w-full">
-          <Button className="button_secondary">Effacer</Button>
-          <Button className="button_main">Rechercher</Button>
-        </div>
-
-      </PopoverContent>
+        )}
+      </div>
+      <PopoverContentOptions />
     </Popover>
   );
 };

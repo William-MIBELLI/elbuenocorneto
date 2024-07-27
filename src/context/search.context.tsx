@@ -1,7 +1,10 @@
 "use client";
-import { CategoryEnum, CategorySelect } from "@/drizzle/schema";
+import { CategoryEnum, CategorySelect, LocationInsert } from "@/drizzle/schema";
 import { CategoriesType, ProductForList } from "@/interfaces/IProducts";
-import { SQL, sql } from "drizzle-orm";
+import { searchWithFiltersACTION } from "@/lib/actions/product.action";
+import { paramsToQuery } from "@/lib/helpers/search.helper";
+import { ConsoleLogWriter, SQL, sql } from "drizzle-orm";
+import { useRouter } from "next/navigation";
 import {
   Dispatch,
   ReactNode,
@@ -10,6 +13,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useFormState } from "react-dom";
 
 interface IContextType {
   displaySide: boolean;
@@ -24,9 +28,19 @@ interface IContextType {
   setFilters: Dispatch<number | undefined>;
   products: ProductForList[];
   setProducts: Dispatch<ProductForList[]>;
+  list: LocationInsert[];
+  setList: Dispatch<LocationInsert[]>;
+  selectedAddress: LocationInsert | undefined;
+  setSelectedAddress: Dispatch<LocationInsert | undefined>;
+  updateFromSearchLocation: (loc: LocationInsert | undefined,
+    newParams: ISearchParams) => void;
 }
 
-export type SortType = "createdAt_asc" | "createdAt_desc" | "price_asc" | "price_desc";
+export type SortType =
+  | "createdAt_asc"
+  | "createdAt_desc"
+  | "price_asc"
+  | "price_desc";
 
 export interface ISearchParams {
   min?: number | undefined;
@@ -36,22 +50,21 @@ export interface ISearchParams {
   radius?: number;
   delivery?: boolean;
   sort?: SortType | undefined;
-  categorySelectedType?: typeof CategoryEnum.enumValues[number] | undefined;
+  categorySelectedType?: (typeof CategoryEnum.enumValues)[number] | undefined;
   categorySelectedLabel?: string;
   donation?: boolean;
   page?: number;
+  lat?: number;
+  lng?: number;
 }
 
 export type SearchParamskeys = keyof ISearchParams;
-
 
 export const SearchContext = createContext<IContextType>({} as IContextType);
 
 type Props = {
   children: ReactNode;
 };
-
-
 
 export const SearchContextProvider = ({ children }: Props) => {
   const [displaySide, setDisplaySide] = useState<boolean>(false);
@@ -63,17 +76,61 @@ export const SearchContextProvider = ({ children }: Props) => {
   const [categories, setCategories] = useState<CategorySelect[]>([]);
   const [filters, setFilters] = useState<number>();
   const [products, setProducts] = useState<ProductForList[]>([]);
-  const [where, setWhere] = useState<SQL<unknown>>();
+  const [list, setList] = useState<LocationInsert[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<LocationInsert>();
+  const router = useRouter();
 
+  //
+  const updateFromSearchLocation = (
+    loc: LocationInsert | undefined,
+    newParams: ISearchParams
+  ): void => {
+    setSelectedAddress(loc);
+    setParams(newParams);
+  };
+
+  //ON UPDATE PARAMS QUAND L'USER CHOISIT UNE LOCALISATION
   useEffect(() => {
-    // console.log('PRODUCT DANS CONTEXT : ', products);
-  },[products])
+    console.log("YSEEFFECT SELECTEADRESS DANS CONTEXT : ", selectedAddress);
+    //AVANT DE METTRE A JOUR, ON VERIFIE SI SELECTADDRESS !== UNDEFINED OU SI IL Y AVAIT UNE ADRESSE MAUS L'USER L'A SUPPRIME
+    if (selectedAddress || params.lat) {
+      //console.log('ON RENTRE DANS LE IF : ', params, selectedAddress);
+      const lat = selectedAddress?.coordonates?.lat || undefined;
+      const lng = selectedAddress?.coordonates?.lng || undefined;
+      const newParams = { ...params, lat, lng };
+      setParams(newParams);
+    }
+  }, [selectedAddress]);
+
+  //FETCH PRODUCTS QUAND PARAMS CHANGE
+  useEffect(() => {
+    console.log("USEFFEECT CREATESEARCHFIULTER DANS CONTETX");
+    const getProds = async () => {
+      const st = await searchWithFiltersACTION(
+        params,
+        { success: false, error: null, products },
+        new FormData()
+      );
+      setProducts(st.products);
+    };
+    getProds();
+  }, [params]);
+  
+  //ON UPDATE l'URL AVEC LES PARAMS
+  // useEffect(() => {
+  //   const query = paramsToQuery(params);
+  //   const USP = new URLSearchParams(query);
+  //   router.replace(`/search-result/?${USP}`);
+    
+  // }, [params]);
 
   //NOMBRE DE FILTRES ACTIFS
   //////////  CEST DEGUEU, A IMPROVE /////////////
   useEffect(() => {
-    // console.log("PARAMS : ", params);
     let nb = 0;
+    if (!params) {
+      return;
+    }
     if (params.categorySelectedType) {
       nb++;
     }
@@ -108,6 +165,11 @@ export const SearchContextProvider = ({ children }: Props) => {
     setFilters,
     products,
     setProducts,
+    list,
+    setList,
+    selectedAddress,
+    setSelectedAddress,
+    updateFromSearchLocation
   };
   return (
     <SearchContext.Provider value={value}>{children}</SearchContext.Provider>

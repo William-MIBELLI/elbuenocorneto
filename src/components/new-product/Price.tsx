@@ -45,7 +45,7 @@ const Price = () => {
       className="flex flex-col gap-4 text-left w-full"
       noValidate
     >
-      <div className={ categorySelected?.gotPrice ? 'null' : 'hidden'}>
+      <div className={ categorySelected?.gotPrice ? 'flex flex-col gap-4' : 'hidden'}>
         <h3 className="text-xl font-semibold">Quel est votre prix</h3>
         <Checkbox
           defaultSelected={product.price === 0}

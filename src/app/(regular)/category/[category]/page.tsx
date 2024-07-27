@@ -1,4 +1,5 @@
 import ProductList from '@/components/product-list/ProductList'
+import { ISearchParams } from '@/context/search.context'
 import { products } from '@/drizzle/schema'
 import { CategoriesType, categoriesList, categoriesTypeList } from '@/interfaces/IProducts'
 import {  getProductsByCategory, getProductsList } from '@/lib/requests/product.request'
@@ -21,7 +22,7 @@ const page: FC<IProps> = async ({ params: { category } }) => {
     return notFound();
   }
 
-  const productsList = await getProductsList(sql`${products.categoryType} = ${category}`);
+  const productsList = await getProductsList({categorySelectedType: category, page: 1, keyword: '', titleOnly: false});
 
 
   return (

@@ -25,23 +25,23 @@ const FilterSide: FC<IProps> = ({ open }) => {
 
   const container = useRef<HTMLDialogElement>(null);
   const dial = useRef<HTMLFormElement>(null);
-  const submitRef = useRef<HTMLButtonElement>(null);
+  // const submitRef = useRef<HTMLButtonElement>(null);
 
   const [isOpen, setIsOpen] = useState<boolean>(open);
   const [firstTime, setFirstTime] = useState<boolean>(true);
 
-  const [state, action] = useFormState(
-    searchWithFiltersACTION.bind(null, params),
-    { success: false, products, error: null }
-  );
+  // const [state, action] = useFormState(
+  //   searchWithFiltersACTION.bind(null, params),
+  //   { success: false, products, error: null }
+  // );
 
   //UPDATE DU RESULTAT DIRECTEMENT APRES QU'UN INPUT DU FILTER CHANGE DE VALUE
-  useEffect(() => {
-    if (state && state?.success && state?.products) {
-      // console.log("ON RENTRE DANS LE USEEFFECT, products : ", state);
-      setProducts(state.products);
-    }
-  }, [state]);
+  // useEffect(() => {
+  //   if (state && state?.success && state?.products) {
+  //     // console.log("ON RENTRE DANS LE USEEFFECT, products : ", state);
+  //     setProducts(state.products);
+  //   }
+  // }, [state]);
 
   //GESTION DU DISPLAY
   useEffect(() => {
@@ -61,10 +61,9 @@ const FilterSide: FC<IProps> = ({ open }) => {
   }, [open]);
 
   //DECLENCHE LE SUBMIT QUAND ON CHANGE UN INPUT
-  useEffect(() => {
-    // console.log('USEEFFECT DU CURRENT.CLICK');
-    submitRef.current?.click();
-  }, [params]);
+  // useEffect(() => {
+  //   submitRef.current?.click();
+  // }, [params]);
 
   //CLOSE DIALOG SI CLICK OUTSIDE SIDER
   const onCloserHandler = (
@@ -94,7 +93,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
       onClick={onCloserHandler}
     >
       <form
-        action={action}
+        // action={action}
         ref={dial}
         noValidate
         className="bg-white fixed min-h-screen  min-w-96 max-w-full right-0 top-0 p-4 flex flex-col gap-4 text-left"
@@ -140,9 +139,9 @@ const FilterSide: FC<IProps> = ({ open }) => {
             <Button className="button_main">Rechercher</Button>
           </div>
         </div>
-        <button ref={submitRef} hidden type="submit">
+        {/* <button ref={submitRef} hidden type="submit">
           SUBMIT
-        </button>
+        </button> */}
       </form>
     </dialog>
   );

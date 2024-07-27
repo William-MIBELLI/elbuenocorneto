@@ -24,7 +24,10 @@ export const mapLocationForStorage = (
       coordonates: item.geometry,
     };
 
-    locations.push(location);
+    //ON VERIFIE QUE CE NE SOIT PAS UN DOUBLON
+    if (!locations.find(loc => loc.city === location.city && loc.postcode === location.postcode)){
+      locations.push(location);
+    }
   });
   return locations;
 };
@@ -39,14 +42,15 @@ export interface IResponse {
   [key: string]: any;
 }
 
-export const fetchAddressFromAPI = async (keyword: string) => {
+export const fetchAddressFromAPI = async (keyword: string, city: boolean = false) => {
   try {
     const sanitizedKeys = keyword.replaceAll(" ", "+");
     const res = await fetch(
-      `https://api-adresse.data.gouv.fr/search/?q=${sanitizedKeys}&autocomplete=0`
+      `https://api-adresse.data.gouv.fr/search/?q=${sanitizedKeys}&autocomplete=1${city ? '&filter=locality&limit=20' : ''}`
     );
 
     if (res.status !== 200) {
+      console.log('RES : ', res)
       throw new Error();
     }
     const data: IResponse = await res.json();
@@ -55,14 +59,39 @@ export const fetchAddressFromAPI = async (keyword: string) => {
       const temp = { properties: item.properties, geometry: { lng, lat } };
       return temp;
     });
-    ///const locationList =   mappedResponse.map(async (item) => await mapLocationForStorage(item));
+
     const locationList = mapLocationForStorage(mappedResponse);
+
     return locationList;
   } catch (error) {
     console.log("ERROR FETCHING FROM API ADDRESS : ", error);
     return [];
   }
 };
+
+export const fetchAddressReverse = async ( location: GeolocationCoordinates) => {
+  try {
+    const { latitude, longitude } = location;
+    console.log('LOCATION : ', location);
+    const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${longitude}&lat=${latitude}`);
+    if (res.status !== 200) {
+      throw new Error('fetching fail with status : ' + res.status);
+    }
+    const data: IResponse = await res.json();
+    const mappedResponse: IMappedResponse[] = data.features.map((item) => {
+      const [lng, lat] = item.geometry.coordinates;
+      const temp = { properties: item.properties, geometry: { lng, lat } };
+      return temp;
+    });
+    ///const locationList =   mappedResponse.map(async (item) => await mapLocationForStorage(item));
+    const locationList = await mapLocationForStorage(mappedResponse);
+    console.log('LOCATION LIST DANS REVERSE : ', locationList);
+    return locationList[0];
+  } catch (error: any) {
+    console.log('ERROR REVERSE FETCH ADDRESS : ', error?.message ?? error);
+    return undefined
+  }
+}
 
 export const updateLocation = async (
   data: { address: LocationInsert; id: string },

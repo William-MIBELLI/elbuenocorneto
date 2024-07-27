@@ -4,7 +4,7 @@ import SellButton from "../sell-button/SellButton";
 import { ProductSelect } from "@/drizzle/schema";
 import { Search } from "lucide-react";
 import ResultContainer from "./ResultContainer";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { SearchResultType } from "@/interfaces/IProducts";
 
 interface IProps {
@@ -20,13 +20,14 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
   const lastTyping = useRef<number>();
   const [searchResult, setSearchResult] = useState<SearchResultType[]>([]);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const ref = useRef<HTMLDivElement>(null);
 
-  //SI L'USER CHANGE DE PAGE, ON CACHE LE RESULT
+  //SI L'USER CHANGE DE PAGE OU QUE LES SEARCH PARAMS CHANGENT, ON CACHE LE RESULT
   useEffect(() => {
     setOpenResult(false);
     setIsSearchFocus(false)
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   //CALL LA RECHERCHE AU CHANGEMENT DE VALUE DE LINPUT OU DE LA CHECKBOX POUR LE TITRE
   useEffect(() => {
@@ -69,15 +70,13 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
     }, 200);
   }
 
-
-
   //SI LINPUT PERD LE FOCUS, ON CHECK OU L'USER A CLICK
   const onBlurHandler = (
     event:
       | React.FocusEvent<HTMLInputElement, Element>
       | React.FocusEvent<Element, Element>
   ) => {
-    console.log('ONBLUR EVENT ');
+    console.log('ONBLUR EVENT ', event);
 
     //SI C'EST DANS RESULT, C'EST QUE L'USER A CLIQUE SUR UN LIEN, ON LAISSE LE RESULT AFFICHE
     if ((ref.current && !ref.current.contains(event.relatedTarget)) || !value.length) {
@@ -87,7 +86,7 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
     }
   };
 
-  //QUAND L'INPUT A LE FOCUS, ON DISPLAY RESULT ET ON CACHE LE BUTTON
+  //QUAND L'INPUT A LE FOCUS, ON DISPLAY RESULT ET ON CACHE LE BUTTON POUR DEPOSER UNE ANNONCE
   const onFocusHandler = () => {
     setIsSearchFocus(true);
     setOpenResult(true);

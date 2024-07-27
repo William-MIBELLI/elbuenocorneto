@@ -6,37 +6,20 @@ import { ChevronRight, SlidersHorizontal } from "lucide-react";
 import FilterSide from "./FilterSide";
 import { useSearchContext } from "@/context/search.context";
 import AddressSearchInput from "./AddressSearchInput";
+import { getPriceText } from "@/lib/helpers/search.helper";
 
-interface IProps {
-  keyword: string;
-  titleOnly: boolean;
-}
 
-const FilterHeader: FC<IProps> = ({ keyword, titleOnly }) => {
+const FilterHeader = () => {
 
-  const { displaySide, setDisplaySide, params, setParams, filters } = useSearchContext();
+  const { displaySide, setDisplaySide, params, filters } = useSearchContext();
   const [priceText, setPriceText] = useState<string>('Prix');
 
-  //AU MONTAGE, ON STOCKE KEYWORD ET TITLEONLY DANS LE CONTEXT
-  useEffect(() => {
-    setParams({ ...params, keyword, titleOnly });
-  }, []);
 
   //AFFICHAGE DU TEXT POUR LE PRIX SELON LES FILTRES DE RECHERCHES
   useEffect(() => {
-    if (params.donation) {
-      return setPriceText('Dons uniquement')
-    }
-    if (params.max && params.min) {
-      return setPriceText(`Entre ${params.min} et ${params.max}€`)
-    }
-    if (params.max) {
-      return setPriceText(`Jusqu'à ${params.max}€`)
-    }
-    if (params.min) {
-      return setPriceText(`A partir de ${params.min}€`)
-    }
-    return setPriceText('Prix')
+    const text = getPriceText(params);
+    setPriceText(text)
+
   },[params])
 
   const onClickHandler = () => {
@@ -44,7 +27,7 @@ const FilterHeader: FC<IProps> = ({ keyword, titleOnly }) => {
   };
 
   return (
-    <div className="flex w-full justify-left gap-4 relative">
+    <div className="flex w-full justify-left gap-4 top-4 z-30 bg-white">
 
       {/* ADDRESS */}
       <AddressSearchInput/>

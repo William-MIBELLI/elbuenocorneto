@@ -459,11 +459,11 @@ export const searchWithFiltersACTION = async (
   fd: FormData
 ) => {
   try {
+    console.log('SEARCHWITHFILTER');
     if (!params.keyword.trim().length) {
       throw new Error('EMPTY KEYWORD, FAST EXIT');
     }
-    const {where, order} =  createSearchCondition(params);
-    const products = await getProductsList(where, order, undefined, params.page);
+    const products = await getProductsList(params);
 
     return { ...initialState, success: true, products };
     

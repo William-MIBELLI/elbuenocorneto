@@ -29,10 +29,25 @@ import {
   products,
   users,
 } from "@/drizzle/schema";
-import { SQL, and, count, eq, ilike, or, sql } from "drizzle-orm";
+import {
+  SQL,
+  and,
+  count,
+  eq,
+  ilike,
+  or,
+  sql,
+  getTableColumns,
+} from "drizzle-orm";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { auth } from "@/auth";
 import { ISearchParams, SearchParamskeys } from "@/context/search.context";
+import {
+  alias,
+  PgSelect,
+  PgTableWithColumns,
+  SubqueryWithSelection,
+} from "drizzle-orm/pg-core";
 
 // export const getProductDetailsById = async (id: string) => {
 //   try {
@@ -443,55 +458,56 @@ export const updateProdAttrOnDb = async (
 //   }
 // };
 
-export const getProductsList = async (
-  where: SQL<unknown>,
-  order: SQL<unknown> = sql`${products.createdAt} desc`,
-  limit: number = 10,
-  page: number = 1
-): Promise<ProductForList[]> => {
-  try {
-    const db = getDb();
-    const session = await auth();
-    const offset = Math.abs(page - 1) * 10;
+// export const getProductsList = async (
+//   where: SQL<unknown>,
+//   order: SQL<unknown> = sql`${products.createdAt} desc`,
+//   from?: SubqueryWithSelection<any, "from">,
+//   limit: number = 10,
+//   page: number = 1
+// ): Promise<ProductForList[]> => {
+//   try {
+//     const db = getDb();
+//     const session = await auth();
+//     const offset = Math.abs(page - 1) * 10;
 
-    const sbImage = db
-      .selectDistinctOn([images.productId])
-      .from(images)
-      .as("image");
+//     const sbImage = db
+//       .selectDistinctOn([images.productId])
+//       .from(images)
+//       .as("image");
 
-    //LA SUBQUERY POUR RECUPERER LE COUNT TOTAL DE PRODUCT CORRESPONDANT A LA RECHERCHE
-    const sq = db.$with("count").as(
-      db
-        .select({ total: count(products.id).as("compte") })
-        .from(products)
-        .where(where)
-    );
+//     const sq = db.$with("count").as(
+//       db
+//         .select({ total: count(products.id).as("compte") })
+//         .from(products)
+//         .leftJoin(locations, eq(locations.id, products.locationId))
+//         .where(where)
+//     );
 
-    const pr: ProductForList[] = await db
-      .with(sq)
-      .select()
-      .from(sq)
-      .leftJoin(products, where)
-      .leftJoin(
-        favoritesTable,
-        and(
-          eq(products.id, favoritesTable.productId),
-          eq(favoritesTable.userId, session?.user?.id ?? "1")
-        )
-      )
-      .leftJoin(locations, eq(locations.id, products.locationId))
-      .leftJoin(sbImage, eq(sbImage.productId, products.id))
-      .where(where)
-      .orderBy(order)
-      .limit(limit)
-      .offset(offset);
+//     const pr: ProductForList[] = await db
+//       .with(sq)
+//       .select()
+//       .from(sq)
+//       .leftJoin(products, where)
+//       .leftJoin(
+//         favoritesTable,
+//         and(
+//           eq(products.id, favoritesTable.productId),
+//           eq(favoritesTable.userId, session?.user?.id ?? "1")
+//         )
+//       )
+//       .leftJoin(locations, eq(locations.id, products.locationId))
+//       .leftJoin(sbImage, eq(sbImage.productId, products.id))
+//       .where(where)
+//       .orderBy(order)
+//       .limit(limit)
+//       .offset(offset);
 
-    return pr;
-  } catch (error: any) {
-    console.log("ERROR GET PRODUCTS LIST : ", error?.message);
-    return [];
-  }
-};
+//     return pr;
+//   } catch (error: any) {
+//     console.log("ERROR GET PRODUCTS LIST : ", error?.message);
+//     return [];
+//   }
+// };
 
 export const mapProductForList = (productsList: ProductForList[]) => {
   const mapped = productsList.reduce<ProductForList[]>((acc, row) => {
@@ -576,6 +592,7 @@ export const getProductListForSearch = async (
 export interface ISearchCondition {
   where: SQL<unknown>;
   order?: SQL<unknown>;
+  from?: SubqueryWithSelection<any, "from">;
 }
 
 export const createSearchCondition = (
@@ -584,9 +601,36 @@ export const createSearchCondition = (
   const mappedKeyword = `%${params.keyword}%`;
   const withDescription = sql`(${products.title} ILIKE ${mappedKeyword} OR ${products.description} ILIKE ${mappedKeyword})`;
   const withoutDescription = sql`${products.title} ILIKE ${mappedKeyword}`;
+  const db = getDb();
 
   const conditions: SQL<unknown>[] = [];
   const orderBy: SQL<unknown>[] = [];
+  const fromSq: SubqueryWithSelection<any, "from">[] = [];
+
+  //LOCATION
+  // if (params.lat && params.lng && params.radius) {
+  //   const sq: SubqueryWithSelection<any, "from"> = db
+  //   .select({ productId: products.id})
+  //   .from(locations).leftJoin(products, eq(products.locationId, locations.id))
+  //   .where(
+  //     sql`earth_distance(
+  //       ll_to_earth(
+  //         (${locations.coordonates}->>'lat')::numeric,
+  //         (${locations.coordonates}->>'lng')::numeric
+  //       ),
+  //       ll_to_earth(${params.lat},${params.lng})
+  //     )/1000 < ${params.radius}`
+  //   ).as('from');
+  //   fromSq.push(sq);
+  //   const cond = sql`earth_distance(
+  //     ll_to_earth(
+  //       (${locations.coordonates}->>'lat')::numeric,
+  //       (${locations.coordonates}->>'lng')::numeric
+  //     ),
+  //     ll_to_earth(${params.lat},${params.lng})
+  //   )/1000 < ${params.radius}`;
+  //   conditions.push(cond);
+  // }
 
   //CATEGORIE
   if (params.categorySelectedType) {
@@ -633,5 +677,102 @@ export const createSearchCondition = (
   //ON JOIN TOUTES LES CONDITIONS ET ON LA RETURN
   const where = sql.join(conditions, sql` AND `);
   const order = orderBy.length ? sql.join(orderBy) : undefined;
-  return { where, order };
+  return { where, order, from: fromSq[0] };
 };
+
+export const getProductsList = async (
+  params: ISearchParams
+): Promise<ProductForList[]> => {
+  try {
+    const db = getDb();
+    const condition = createSearchCondition(params);
+    const { where, order } = condition;
+    const session = await auth();
+    const offset = Math.abs((params.page ?? 1) - 1) * 10;
+    console.log("PARAMS DANSS GETPRODUCTSLIST : ", params);
+
+    //SQ POUR RECUPERER UNE IMAGE DU PRODUCT
+    const sbImage = db
+      .selectDistinctOn([images.productId])
+      .from(images)
+      .as("image");
+
+    //SUBQUERY SELON LA LOCATION ET LE RADIUS
+    const sq =
+      params.lng && params.lat && params.radius
+        ? db
+            .select({ id: products.id })
+            .from(products)
+            .leftJoin(locations, eq(products.locationId, locations.id))
+            .where(
+              sql`earth_distance(
+          ll_to_earth(
+            (${locations.coordonates}->>'lat')::numeric,
+            (${locations.coordonates}->>'lng')::numeric
+          ),
+          ll_to_earth(${params.lat},${params.lng})
+        )/1000 < ${params.radius}`
+            )
+            .as("sq")
+        : db
+            .select({ id: products.id })
+            .from(products)
+            .as("sq");
+
+    //LA SUBQUERY POUR RECUPERER LE COUNT TOTAL DE PRODUCT CORRESPONDANT A LA RECHERCHE
+    const sqWith = db.$with("count").as(
+      db
+        .select({ total: count(sq.id).as("compte") })
+        //ON RECUPERER LE NOMBRE DE RAWS DE LA SQ AVEC LA LOCATION
+        .from(sq)
+        .leftJoin(products, eq(sq.id, products.id))
+        .leftJoin(locations, eq(locations.id, products.locationId))
+        .where(where)
+    );
+
+    //LA REQUETE GLOBALE
+    const dynamicQuery = db
+      //ON AJOUTE LE NOMBRE DE RAWS AU RESULTAT
+      .with(sqWith)
+      .select()
+      .from(sqWith)
+      .leftJoin(products, where)
+      .leftJoin(locations, eq(locations.id, products.locationId))
+      .leftJoin(
+        favoritesTable,
+        and(
+          eq(products.id, favoritesTable.productId),
+          eq(favoritesTable.userId, session?.user?.id ?? "1")
+        )
+      )
+      .leftJoin(sbImage, eq(sbImage.productId, products.id))
+      .where(where)
+      .orderBy(order ?? sql`${products.createdAt} desc`)
+      .limit(10)
+      .offset(offset)
+      .$dynamic();
+
+    const prods =
+      params.lat && params.lng && params.radius
+        ? await withLocation(dynamicQuery, params)
+        : await dynamicQuery;
+
+    return prods;
+  } catch (error: any) {
+    console.log("ERROR GET PRODUCT BY LOCATION : ", error?.message);
+    return [];
+  }
+};
+
+export function withLocation<T extends PgSelect>(qb: T, params: ISearchParams) {
+  return qb.where(
+    sql`earth_distance(
+      ll_to_earth(
+        (${locations.coordonates}->>'lat')::numeric,
+        (${locations.coordonates}->>'lng')::numeric
+      ),
+      ll_to_earth(${params.lat},${params.lng})
+    )/1000 < ${params.radius}`
+  );
+}
+
