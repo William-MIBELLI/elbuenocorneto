@@ -8,6 +8,7 @@ import {
   searchTable,
 } from "@/drizzle/schema";
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export const createSearchOnDB = async (search: SearchInsert) => {
   try {
@@ -17,6 +18,8 @@ export const createSearchOnDB = async (search: SearchInsert) => {
       .values(search)
       .returning()
       .then((r) => r[0]);
+    // revalidatePath("/my-search", "page");
+    console.log("SEARCH CREATED REQUEST APRES REVALIDATE PATH: ", res);
     return res;
   } catch (error) {
     console.log("ERROR CREATING SEARCH : ", error);

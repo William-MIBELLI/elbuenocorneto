@@ -689,7 +689,7 @@ export const getProductsList = async (
     const { where, order } = condition;
     const session = await auth();
     const offset = Math.abs((params.page ?? 1) - 1) * 10;
-    console.log("PARAMS DANSS GETPRODUCTSLIST : ", params);
+    //console.log("PARAMS DANSS GETPRODUCTSLIST : ", params);
 
     //SQ POUR RECUPERER UNE IMAGE DU PRODUCT
     const sbImage = db

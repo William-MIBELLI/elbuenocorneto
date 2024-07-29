@@ -93,7 +93,7 @@ export const SearchContextProvider = ({ children }: Props) => {
 
   //ON UPDATE PARAMS QUAND L'USER CHOISIT UNE LOCALISATION
   useEffect(() => {
-    console.log("YSEEFFECT SELECTEADRESS DANS CONTEXT : ", selectedAddress);
+    // console.log("YSEEFFECT SELECTEADRESS DANS CONTEXT : ", selectedAddress);
     //AVANT DE METTRE A JOUR, ON VERIFIE SI SELECTADDRESS !== UNDEFINED OU SI IL Y AVAIT UNE ADRESSE MAUS L'USER L'A SUPPRIME
     if (selectedAddress || params.lat) {
       //console.log('ON RENTRE DANS LE IF : ', params, selectedAddress);
@@ -106,7 +106,7 @@ export const SearchContextProvider = ({ children }: Props) => {
 
   //FETCH PRODUCTS QUAND PARAMS CHANGE
   useEffect(() => {
-    console.log("USEFFEECT CREATESEARCHFIULTER DANS CONTETX");
+    // console.log("USEFFEECT CREATESEARCHFIULTER DANS CONTETX");
     const getProds = async () => {
       const st = await searchWithFiltersACTION(
         params,

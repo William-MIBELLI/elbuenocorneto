@@ -20,7 +20,8 @@ interface IProps {
   searchParams: QueryParams;
 }
 
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 const page: FC<IProps> = async ({ searchParams }) => {
   console.log("REFRESH PAGE !!!!!!!!!!!!");
   //ON MAP LES QUERIES DE L'URL EN ISearchParams

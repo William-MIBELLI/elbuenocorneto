@@ -15,7 +15,8 @@ import {
   ArrowDownNarrowWide,
   ListTodo,
 } from "lucide-react";
-import React, { FC } from "react";
+import { revalidatePath } from "next/cache";
+import React, { FC, useEffect } from "react";
 import { useFormState } from "react-dom";
 
 interface IProps {
@@ -47,6 +48,15 @@ const MainSelect: FC<IProps> = ({}) => {
     createSearchACTION.bind(null, { params, location: selectedAddress }),
     { success: false, error: "" }
   );
+
+  //ON RESET LE CACHE DE LA PAGE MY-SEARCH
+  useEffect(() => {
+    console.log("STATE DANS LE USEFFECT: ", state);
+    if (state.success) {
+      //revalidatePath("/my-search");
+      console.log("SEARCH SAVED");
+    }
+  }, [state]);
 
   return (
     <>

@@ -4,7 +4,7 @@ import { ISearchParams } from "./../../context/search.context";
 import { auth } from "@/auth";
 import { createLocationOnDB } from "../requests/location.request";
 import { v4 as uuidv4 } from "uuid";
-import { checkSearchExist, createSearchOnDB } from "../requests/search.request";
+import { checkSearchExist, createSearchOnDB, deleteSearchOnDB } from "../requests/search.request";
 import { revalidatePath } from "next/cache";
 
 
@@ -14,7 +14,6 @@ export const createSearchACTION = async (
   fd: FormData
 ) => {
   try {
-    console.log('CREATESEARCHACTION : ', data);
     const { params, location } = data;
     const session = await auth();
 
@@ -55,11 +54,9 @@ export const createSearchACTION = async (
     if (!savedSearch) {
       throw new Error("Search not saved");
     }
-      
-
-    //ON RETURN SUCCESS
-    revalidatePath("/my-search");
-    return {...state, success: true};
+   
+    return { ...state, success: true };
+    
   } catch (error: any) {
     console.log("ERROR IN SEARCH ACTION", error?.message);
     return { success: false, error: error?.message };
@@ -73,13 +70,16 @@ export const deleteSearchACTION = async (data: {id: string},state: { error: stri
     //ON CHECK SI L'UTILISATEUR EST CONNECTE
     if (!session || !session.user || !session.user.id)
       throw new Error("User not connected");
-    const { user } = session;
 
     //ON DELETE LA RECHERCHE
-    
+    const isDeleted = await deleteSearchOnDB(data.id, session.user.id);
 
-    console.log("DELETESEARCHACTION : ", state);
+    if (!isDeleted) {
+      throw new Error("Search not deleted");
+    }
+    revalidatePath("/my-search");
     return { success: true, error: "" };
+
   } catch (error: any) {
     console.log("ERROR IN DELETE SEARCH ACTION", error?.message);
     return { success: false, error: error?.message };

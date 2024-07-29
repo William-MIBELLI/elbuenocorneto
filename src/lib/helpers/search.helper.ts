@@ -43,7 +43,7 @@ export const paramsToQuery = (
         return item[1] !== undefined;
       })
   );
-  console.log("MAPPED DANS LA FUNCTION : ", mapped);
+  //console.log("MAPPED DANS LA FUNCTION : ", mapped);
   return mapped;
 };
 

@@ -459,7 +459,7 @@ export const searchWithFiltersACTION = async (
   fd: FormData
 ) => {
   try {
-    console.log('SEARCHWITHFILTER');
+    //console.log('SEARCHWITHFILTER');
     if (!params.keyword.trim().length) {
       throw new Error('EMPTY KEYWORD, FAST EXIT');
     }

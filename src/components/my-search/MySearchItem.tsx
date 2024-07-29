@@ -3,7 +3,7 @@ import { SearchSelect } from "@/drizzle/schema";
 import { ISearchItem } from "@/lib/requests/search.request";
 import { Button } from "@nextui-org/react";
 import { Layers3, Pen, Trash } from "lucide-react";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import IconCategorySelector from "../icon-category-selector/IconCategorySelector";
 import { getPriceText, paramsToQuery } from "@/lib/helpers/search.helper";
 import { useRouter } from "next/navigation";
@@ -12,9 +12,10 @@ import { useFormState } from "react-dom";
 
 interface IProps {
   item: ISearchItem;
+  deleteOnState: (id: string) => void;
 }
 
-const MySearchItem: FC<IProps> = ({ item }) => {
+const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
   const {
     search: { searchParams },
     location,
@@ -34,6 +35,13 @@ const MySearchItem: FC<IProps> = ({ item }) => {
     success: false,
     error: "",
   });
+
+  //ON SUPPRIME L'ITEM DE LA LISTE POUR REFRESH L'UI
+  useEffect(() => {
+    if (state.success) {
+      deleteOnState(item.search.id);
+    }
+  }, [state.success]);
 
   return (
 
@@ -96,6 +104,7 @@ const MySearchItem: FC<IProps> = ({ item }) => {
         </Button>
         <form action={action}>
           <Button
+            type="submit"
             startContent={<Trash size={15} />}
             className="font-semibold bg-transparent hover:bg-red-100 text-red-500"
           >

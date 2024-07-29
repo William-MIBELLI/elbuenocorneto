@@ -25,9 +25,9 @@ const ProductList: FC<IProps> = ({ products }) => {
   const router = useRouter();
   const total = 
     products[0]?.count?.total ? Math.ceil(products[0]?.count?.total / 10) : 1;
-  console.log("--------------------");
-  console.log("SEARCHPARAMS : ", params.toString());
-  console.log('TOTAL : ', total);
+  // console.log("--------------------");
+  // console.log("SEARCHPARAMS : ", params.toString());
+  // console.log('TOTAL : ', total);
   // products.forEach(p => console.log(p?.product?.id))
 
   const onChangePagination = (page: number) => {
