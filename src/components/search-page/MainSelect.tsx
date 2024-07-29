@@ -1,5 +1,13 @@
 import { useSearchContext } from "@/context/search.context";
-import { Divider, Checkbox, RadioGroup, Radio, Input } from "@nextui-org/react";
+import { createSearchACTION } from "@/lib/actions/search.action";
+import {
+  Divider,
+  Checkbox,
+  RadioGroup,
+  Radio,
+  Input,
+  Button,
+} from "@nextui-org/react";
 import {
   ChevronRight,
   PackageOpen,
@@ -8,13 +16,15 @@ import {
   ListTodo,
 } from "lucide-react";
 import React, { FC } from "react";
+import { useFormState } from "react-dom";
 
 interface IProps {
   // setDisplayCategories: Dispatch<boolean>;
 }
 
 const MainSelect: FC<IProps> = ({}) => {
-  const { params, setParams, setDisplayCategories } = useSearchContext();
+  const { params, setParams, setDisplayCategories, selectedAddress } =
+    useSearchContext();
 
   //GESTION DES INPUTS POUR METTRE A JOUR LE CONTEXT
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +42,11 @@ const MainSelect: FC<IProps> = ({}) => {
       page: 1,
     });
   };
+
+  const [state, action] = useFormState(
+    createSearchACTION.bind(null, { params, location: selectedAddress }),
+    { success: false, error: "" }
+  );
 
   return (
     <>
@@ -161,6 +176,19 @@ const MainSelect: FC<IProps> = ({}) => {
         </RadioGroup>
       </div>
       <Divider />
+
+      {/* SAVE SEARCH */}
+      <form action={action} className="w-full flex flex-col gap-3" noValidate>
+        <Button type="submit" fullWidth className="button_main">
+          Sauvegarder ma recherche
+        </Button>
+        {state.success && (
+          <p className="text-green-500 text-xs text-center">Recherche sauvegardée</p>
+        )}
+        {
+          state.error && <p className="text-red-500 text-xs text-center">{state.error}</p>
+        }
+      </form>
     </>
   );
 };

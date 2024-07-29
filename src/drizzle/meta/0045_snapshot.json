@@ -1,7 +1,5 @@
 {
-  "id": "9c4548f3-e082-4a27-91b5-d486c8af3f4e",
-  "prevId": "fc3df0e2-9549-4b9c-810b-cf5a3e2ef7b7",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "public.attribute_category_jonc": {
@@ -34,28 +32,28 @@
         "attribute_category_jonc_category_type_category_category_enum_fk": {
           "name": "attribute_category_jonc_category_type_category_category_enum_fk",
           "tableFrom": "attribute_category_jonc",
-          "tableTo": "category",
           "columnsFrom": [
             "category_type"
           ],
+          "tableTo": "category",
           "columnsTo": [
             "category_enum"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "attribute_category_jonc_attribute_name_attribute_name_fk": {
           "name": "attribute_category_jonc_attribute_name_attribute_name_fk",
           "tableFrom": "attribute_category_jonc",
-          "tableTo": "attribute",
           "columnsFrom": [
             "attribute_name"
           ],
+          "tableTo": "attribute",
           "columnsTo": [
             "name"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -111,10 +109,10 @@
       "uniqueConstraints": {
         "attribute_name_unique": {
           "name": "attribute_name_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "name"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
@@ -192,25 +190,25 @@
         "category_parent_id_category_id_fk": {
           "name": "category_parent_id_category_id_fk",
           "tableFrom": "category",
-          "tableTo": "category",
           "columnsFrom": [
             "parent_id"
           ],
+          "tableTo": "category",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "category_category_enum_unique": {
           "name": "category_category_enum_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "category_enum"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
@@ -301,15 +299,15 @@
         "image_product_id_product_id_fk": {
           "name": "image_product_id_product_id_fk",
           "tableFrom": "image",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -396,28 +394,28 @@
         "product_attribute_jonc_product_id_product_id_fk": {
           "name": "product_attribute_jonc_product_id_product_id_fk",
           "tableFrom": "product_attribute_jonc",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_attribute_jonc_attribute_id_attribute_id_fk": {
           "name": "product_attribute_jonc_attribute_id_attribute_id_fk",
           "tableFrom": "product_attribute_jonc",
-          "tableTo": "attribute",
           "columnsFrom": [
             "attribute_id"
           ],
+          "tableTo": "attribute",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -445,28 +443,28 @@
         "product_delivery_link_product_id_product_id_fk": {
           "name": "product_delivery_link_product_id_product_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_delivery_link_delivery_id_deliveries_id_fk": {
           "name": "product_delivery_link_delivery_id_deliveries_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "deliveries",
           "columnsFrom": [
             "delivery_id"
           ],
+          "tableTo": "deliveries",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -539,41 +537,41 @@
         "product_user_id_user_id_fk": {
           "name": "product_user_id_user_id_fk",
           "tableFrom": "product",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_location_id_location_id_fk": {
           "name": "product_location_id_location_id_fk",
           "tableFrom": "product",
-          "tableTo": "location",
           "columnsFrom": [
             "location_id"
           ],
+          "tableTo": "location",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_category_type_category_category_enum_fk": {
           "name": "product_category_type_category_category_enum_fk",
           "tableFrom": "product",
-          "tableTo": "category",
           "columnsFrom": [
             "category_type"
           ],
+          "tableTo": "category",
           "columnsTo": [
             "category_enum"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -687,25 +685,25 @@
         "user_location_id_location_id_fk": {
           "name": "user_location_id_location_id_fk",
           "tableFrom": "user",
-          "tableTo": "location",
           "columnsFrom": [
             "location_id"
           ],
+          "tableTo": "location",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "user_email_unique": {
           "name": "user_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
@@ -840,8 +838,10 @@
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "9c4548f3-e082-4a27-91b5-d486c8af3f4e",
+  "prevId": "fc3df0e2-9549-4b9c-810b-cf5a3e2ef7b7"
 }

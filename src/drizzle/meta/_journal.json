@@ -302,6 +302,13 @@
       "when": 1720534049219,
       "tag": "0047_foamy_owl",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "6",
+      "when": 1722181361004,
+      "tag": "0048_redundant_black_bolt",
+      "breakpoints": true
     }
   ]
 }

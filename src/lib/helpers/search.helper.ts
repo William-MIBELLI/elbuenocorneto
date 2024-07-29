@@ -62,5 +62,5 @@ export const getPriceText = (
   if (params.min) {
     return `A partir de ${params.min}€`;
   }
-  return "Prix";
+  return "Tous les prix";
 };

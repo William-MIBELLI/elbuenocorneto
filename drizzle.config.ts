@@ -29,6 +29,7 @@ export default defineConfig({
   },
   migrations: {
     schema: 'public'
-  }
+  },
+  extensionsFilters: ['postgis']
 
 });

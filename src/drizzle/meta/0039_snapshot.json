@@ -1,7 +1,5 @@
 {
-  "id": "e1e94afc-6a8e-4a62-b5e8-437cd65c89e3",
-  "prevId": "4de3e160-28ab-43ff-b3cb-1674bfb55159",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "public.attribute_category_jonc": {
@@ -32,28 +30,28 @@
         "attribute_category_jonc_category_id_category_id_fk": {
           "name": "attribute_category_jonc_category_id_category_id_fk",
           "tableFrom": "attribute_category_jonc",
-          "tableTo": "category",
           "columnsFrom": [
             "category_id"
           ],
+          "tableTo": "category",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "attribute_category_jonc_attribute_id_attribute_id_fk": {
           "name": "attribute_category_jonc_attribute_id_attribute_id_fk",
           "tableFrom": "attribute_category_jonc",
-          "tableTo": "attribute",
           "columnsFrom": [
             "attribute_id"
           ],
+          "tableTo": "attribute",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -160,15 +158,15 @@
         "category_parent_id_category_id_fk": {
           "name": "category_parent_id_category_id_fk",
           "tableFrom": "category",
-          "tableTo": "category",
           "columnsFrom": [
             "parent_id"
           ],
+          "tableTo": "category",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -261,15 +259,15 @@
         "image_product_id_product_id_fk": {
           "name": "image_product_id_product_id_fk",
           "tableFrom": "image",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -356,28 +354,28 @@
         "product_attribute_jonc_product_id_product_id_fk": {
           "name": "product_attribute_jonc_product_id_product_id_fk",
           "tableFrom": "product_attribute_jonc",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "product_attribute_jonc_attribute_id_attribute_category_jonc_id_fk": {
           "name": "product_attribute_jonc_attribute_id_attribute_category_jonc_id_fk",
           "tableFrom": "product_attribute_jonc",
-          "tableTo": "attribute_category_jonc",
           "columnsFrom": [
             "attribute_id"
           ],
+          "tableTo": "attribute_category_jonc",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -405,28 +403,28 @@
         "product_delivery_link_product_id_product_id_fk": {
           "name": "product_delivery_link_product_id_product_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "product",
           "columnsFrom": [
             "product_id"
           ],
+          "tableTo": "product",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_delivery_link_delivery_id_deliveries_id_fk": {
           "name": "product_delivery_link_delivery_id_deliveries_id_fk",
           "tableFrom": "product_delivery_link",
-          "tableTo": "deliveries",
           "columnsFrom": [
             "delivery_id"
           ],
+          "tableTo": "deliveries",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -498,41 +496,41 @@
         "product_user_id_user_id_fk": {
           "name": "product_user_id_user_id_fk",
           "tableFrom": "product",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_location_id_location_id_fk": {
           "name": "product_location_id_location_id_fk",
           "tableFrom": "product",
-          "tableTo": "location",
           "columnsFrom": [
             "location_id"
           ],
+          "tableTo": "location",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "product_category_id_category_id_fk": {
           "name": "product_category_id_category_id_fk",
           "tableFrom": "product",
-          "tableTo": "category",
           "columnsFrom": [
             "category_id"
           ],
+          "tableTo": "category",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -646,25 +644,25 @@
         "user_location_id_location_id_fk": {
           "name": "user_location_id_location_id_fk",
           "tableFrom": "user",
-          "tableTo": "location",
           "columnsFrom": [
             "location_id"
           ],
+          "tableTo": "location",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "user_email_unique": {
           "name": "user_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
@@ -763,8 +761,10 @@
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "e1e94afc-6a8e-4a62-b5e8-437cd65c89e3",
+  "prevId": "4de3e160-28ab-43ff-b3cb-1674bfb55159"
 }

@@ -1,3 +1,4 @@
+import { ISearchParams } from '@/context/search.context';
 import {
   timestamp,
   pgTable,
@@ -342,3 +343,15 @@ export const favoritesRelations = relations(favoritesTable, ({ one }) => ({
 
 export type FavoriteSelect = typeof favoritesTable.$inferSelect;
 export type Favoriteinsert = typeof favoritesTable.$inferInsert;
+
+export const searchTable = pgTable("search", {
+  id: text("id").primaryKey().notNull(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: 'cascade'}),
+  createdAt: timestamp("created_at").defaultNow(),
+  searchParams: json("search_params").$type<ISearchParams>().notNull(),
+  locationId: text("location_id").references(() => locations.id, { onDelete: 'cascade' }),
+  name: text("name")
+})
+
+export type SearchInsert = typeof searchTable.$inferInsert;
+export type SearchSelect = typeof searchTable.$inferSelect;

@@ -1,5 +1,5 @@
 {
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "public._prisma_migrations": {
@@ -100,11 +100,19 @@
       },
       "indexes": {
         "Session_sessionToken_key": {
-          "name": "Session_sessionToken_key",
           "columns": [
-            "sessionToken"
+            {
+              "expression": "sessionToken",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "Session_sessionToken_key",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
@@ -187,11 +195,19 @@
       },
       "indexes": {
         "Authenticator_credentialID_key": {
-          "name": "Authenticator_credentialID_key",
           "columns": [
-            "credentialID"
+            {
+              "expression": "credentialID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "Authenticator_credentialID_key",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
@@ -269,11 +285,19 @@
       },
       "indexes": {
         "User_email_key": {
-          "name": "User_email_key",
           "columns": [
-            "email"
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": true
+          "with": {},
+          "name": "User_email_key",
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},

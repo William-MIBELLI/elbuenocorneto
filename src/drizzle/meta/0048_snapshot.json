@@ -12,43 +12,45 @@
           "primaryKey": true,
           "notNull": true
         },
-        "category_id": {
-          "name": "category_id",
-          "type": "text",
+        "category_type": {
+          "name": "category_type",
+          "type": "category_enum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
-        "attribute_id": {
-          "name": "attribute_id",
-          "type": "text",
+        "attribute_name": {
+          "name": "attribute_name",
+          "type": "attribute_name_enum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "attribute_category_jonc_category_id_category_id_fk": {
-          "name": "attribute_category_jonc_category_id_category_id_fk",
+        "attribute_category_jonc_category_type_category_category_enum_fk": {
+          "name": "attribute_category_jonc_category_type_category_category_enum_fk",
           "tableFrom": "attribute_category_jonc",
           "columnsFrom": [
-            "category_id"
+            "category_type"
           ],
           "tableTo": "category",
           "columnsTo": [
-            "id"
+            "category_enum"
           ],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
-        "attribute_category_jonc_attribute_id_attribute_id_fk": {
-          "name": "attribute_category_jonc_attribute_id_attribute_id_fk",
+        "attribute_category_jonc_attribute_name_attribute_name_fk": {
+          "name": "attribute_category_jonc_attribute_name_attribute_name_fk",
           "tableFrom": "attribute_category_jonc",
           "columnsFrom": [
-            "attribute_id"
+            "attribute_name"
           ],
           "tableTo": "attribute",
           "columnsTo": [
-            "id"
+            "name"
           ],
           "onUpdate": "no action",
           "onDelete": "no action"
@@ -69,7 +71,8 @@
         },
         "name": {
           "name": "name",
-          "type": "text",
+          "type": "attribute_name_enum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -103,7 +106,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "attribute_name_unique": {
+          "name": "attribute_name_unique",
+          "columns": [
+            "name"
+          ],
+          "nullsNotDistinct": false
+        }
+      }
     },
     "public.category": {
       "name": "category",
@@ -151,6 +162,27 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "available_to_delivery": {
+          "name": "available_to_delivery",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "got_price": {
+          "name": "got_price",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "got_state": {
+          "name": "got_state",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
         }
       },
       "indexes": {},
@@ -170,7 +202,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "category_category_enum_unique": {
+          "name": "category_category_enum_unique",
+          "columns": [
+            "category_enum"
+          ],
+          "nullsNotDistinct": false
+        }
+      }
     },
     "public.deliveries": {
       "name": "deliveries",
@@ -228,6 +268,61 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.favorites": {
+      "name": "favorites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "favorites_product_id_product_id_fk": {
+          "name": "favorites_product_id_product_id_fk",
+          "tableFrom": "favorites",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "tableTo": "product",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "favorites_user_id_user_id_fk": {
+          "name": "favorites_user_id_user_id_fk",
+          "tableFrom": "favorites",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "tableTo": "user",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -344,7 +439,7 @@
         },
         "value": {
           "name": "value",
-          "type": "json",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
@@ -362,15 +457,15 @@
             "id"
           ],
           "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "cascade"
         },
-        "product_attribute_jonc_attribute_id_attribute_category_jonc_id_fk": {
-          "name": "product_attribute_jonc_attribute_id_attribute_category_jonc_id_fk",
+        "product_attribute_jonc_attribute_id_attribute_id_fk": {
+          "name": "product_attribute_jonc_attribute_id_attribute_id_fk",
           "tableFrom": "product_attribute_jonc",
           "columnsFrom": [
             "attribute_id"
           ],
-          "tableTo": "attribute_category_jonc",
+          "tableTo": "attribute",
           "columnsTo": [
             "id"
           ],
@@ -471,9 +566,10 @@
           "notNull": false,
           "default": "now()"
         },
-        "category_id": {
-          "name": "category_id",
-          "type": "text",
+        "category_type": {
+          "name": "category_type",
+          "type": "category_enum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -519,18 +615,92 @@
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
-        "product_category_id_category_id_fk": {
-          "name": "product_category_id_category_id_fk",
+        "product_category_type_category_category_enum_fk": {
+          "name": "product_category_type_category_category_enum_fk",
           "tableFrom": "product",
           "columnsFrom": [
-            "category_id"
+            "category_type"
           ],
           "tableTo": "category",
+          "columnsTo": [
+            "category_enum"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.search": {
+      "name": "search",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "search_params": {
+          "name": "search_params",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "search_user_id_user_id_fk": {
+          "name": "search_user_id_user_id_fk",
+          "tableFrom": "search",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
           "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "cascade"
+        },
+        "search_location_id_location_id_fk": {
+          "name": "search_location_id_location_id_fk",
+          "tableFrom": "search",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "tableTo": "location",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -704,6 +874,32 @@
     }
   },
   "enums": {
+    "public.attribute_name_enum": {
+      "name": "attribute_name_enum",
+      "schema": "public",
+      "values": [
+        "carBrand",
+        "year",
+        "milling",
+        "fuel",
+        "power",
+        "doors",
+        "livingSpace",
+        "habitationType",
+        "garden",
+        "color",
+        "clothMaterial",
+        "objectMaterial",
+        "model",
+        "brand",
+        "stockage",
+        "memory",
+        "age",
+        "size",
+        "contractType",
+        "wage"
+      ]
+    },
     "public.attribute_type": {
       "name": "attribute_type",
       "schema": "public",
@@ -727,6 +923,26 @@
         "electronique",
         "loisir",
         "autre"
+      ]
+    },
+    "public.state_enum": {
+      "name": "state_enum",
+      "schema": "public",
+      "values": [
+        "Etat neuf",
+        "Très bon état",
+        "Bon état",
+        "Etat satisfaisant"
+      ]
+    },
+    "public.attribute_type_enum": {
+      "name": "attribute_type_enum",
+      "schema": "public",
+      "values": [
+        "text",
+        "number",
+        "select",
+        "boolean"
       ]
     },
     "public.type": {
@@ -755,6 +971,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "b2360af7-5e7f-4730-90e9-6ddacf0257c2",
-  "prevId": "e593bdb6-78f9-48b9-87a1-15d443723d99"
+  "id": "e4a2725b-5d19-4bb9-80a9-e00a078f6c0a",
+  "prevId": "a383e05c-997c-4dee-afff-93d2d614412f"
 }

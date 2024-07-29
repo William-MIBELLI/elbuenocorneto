@@ -24,7 +24,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
   } = useSearchContext();
 
   const container = useRef<HTMLDialogElement>(null);
-  const dial = useRef<HTMLFormElement>(null);
+  const dial = useRef<HTMLDivElement>(null);
   // const submitRef = useRef<HTMLButtonElement>(null);
 
   const [isOpen, setIsOpen] = useState<boolean>(open);
@@ -92,10 +92,9 @@ const FilterSide: FC<IProps> = ({ open }) => {
       ref={container}
       onClick={onCloserHandler}
     >
-      <form
+      <div
         // action={action}
         ref={dial}
-        noValidate
         className="bg-white fixed min-h-screen  min-w-96 max-w-full right-0 top-0 p-4 flex flex-col gap-4 text-left"
       >
         {/* HEADER */}
@@ -142,7 +141,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
         {/* <button ref={submitRef} hidden type="submit">
           SUBMIT
         </button> */}
-      </form>
+      </div>
     </dialog>
   );
 };
