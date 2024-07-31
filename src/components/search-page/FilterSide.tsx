@@ -135,7 +135,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
             <Button className="button_secondary" onClick={onResetHandler}>
               Tout effacer
             </Button>
-            <Button className="button_main">Rechercher</Button>
+            <Button className="button_main" onClick={() => setIsOpen(false)} >Rechercher</Button>
           </div>
         </div>
         {/* <button ref={submitRef} hidden type="submit">

@@ -10,7 +10,7 @@ import { paramsToQuery } from "@/lib/helpers/search.helper";
 
 interface IProps {
   paramsURL: ISearchParams;
-  result: ProductForList[];
+  result?: ProductForList[];
 }
 
 const Body: FC<IProps> = ({ result, paramsURL }) => {
@@ -24,7 +24,7 @@ const Body: FC<IProps> = ({ result, paramsURL }) => {
   //POUR FACILITER LE REFRESH
   useEffect(() => {
     setParams(paramsURL);
-    setProducts(result);
+    // setProducts(result);
   }, [paramsURL]);
 
   //ON RESRESH LE NOMBRE D'ANNONCE QUAND IL Y A EU UNE NOUVELLE REQUEST ET QUE LE RESULTAT A CHANGE

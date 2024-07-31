@@ -20,6 +20,7 @@ export const queryToParams = (query: QueryParams): ISearchParams => {
     page: query.page ? +query.page : 1,
     lat: query.lat ? +query.lat ?? undefined : undefined,
     lng: query.lng ? +query.lng ?? undefined : undefined,
+    id: query.id?.toString() ?? undefined
   };
 
   const mapped = Object.fromEntries(

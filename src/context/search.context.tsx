@@ -58,6 +58,7 @@ export interface ISearchParams {
   page?: number;
   lat?: number;
   lng?: number;
+  id?: string | undefined;
 }
 
 export type SearchParamskeys = keyof ISearchParams;
@@ -103,6 +104,15 @@ export const SearchContextProvider = ({ children }: Props) => {
       setParams(newParams);
     }
   }, [selectedAddress]);
+
+  //ON UPDATE l'URL AVEC LES PARAMS
+  useEffect(() => {
+    const query = paramsToQuery(params);
+    const USP = new URLSearchParams(query);
+    window.history.replaceState(null, '',`/search-result/?${USP}`);
+
+  }, [params]);
+
 
   //FETCH PRODUCTS QUAND PARAMS CHANGE
   useEffect(() => {

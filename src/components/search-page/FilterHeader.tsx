@@ -14,14 +14,7 @@ const FilterHeader = () => {
   const { displaySide, setDisplaySide, params, filters } = useSearchContext();
   const [priceText, setPriceText] = useState<string>('Prix');
 
-  //ON UPDATE l'URL AVEC LES PARAMS
-  useEffect(() => {
-    const query = paramsToQuery(params);
-    const USP = new URLSearchParams(query);
-    window.history.replaceState(null, '',`/search-result/?${USP}`);
-
-  }, [params]);
-
+  
   //AFFICHAGE DU TEXT POUR LE PRIX SELON LES FILTRES DE RECHERCHES
   useEffect(() => {
     const text = getPriceText(params);

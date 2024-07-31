@@ -28,12 +28,12 @@ const page: FC<IProps> = async ({ searchParams }) => {
   const params = queryToParams(searchParams);
 
   //ON REQUEST LA DB AVEC LA CONDITION
-  const result = await getProductsList(params);
+  //const result = await getProductsList(params);
 
   //ON PASSE L'ENSEMBLE A BODY, ON POURRA AINSI TOUT STOCKER DANS LE CONTEXT
   return (
     <SearchContextProvider>
-      <Body key={Math.random()} result={result} paramsURL={params} />
+      <Body key={Math.random()}  paramsURL={params} />
     </SearchContextProvider>
   );
 };

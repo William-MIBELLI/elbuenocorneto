@@ -9,6 +9,8 @@ import {
 } from "@/drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { AnyPgColumn } from 'drizzle-orm/pg-core';
+import { ISearchParams } from "@/context/search.context";
 
 export const createSearchOnDB = async (search: SearchInsert) => {
   try {
@@ -32,8 +34,10 @@ export interface ISearchItem {
   location: LocationSelect | null;
 }
 
-export const getSearchsByUserID = async (
-  userId: string
+type SearchTableKeys = keyof typeof searchTable['_']['columns'];
+
+export const getSearchs = async <T extends Partial<SearchTableKeys>>(
+  col: T, value: any
 ): Promise<ISearchItem[]> => {
   try {
     const db = getDb();
@@ -41,7 +45,7 @@ export const getSearchsByUserID = async (
       .select()
       .from(searchTable)
       .leftJoin(locations, eq(searchTable.locationId, locations.id))
-      .where(eq(searchTable.userId, userId))
+      .where(eq(searchTable[col], value))
       .then((r) => r);
     return res;
   } catch (error) {
@@ -90,3 +94,20 @@ export const deleteSearchOnDB = async (
     return false;
   }
 };
+
+export const updateSearchOnDB = async (updatedSearch: SearchInsert, id: string) => {
+  try {
+    console.log('DATA DANS UPDATE SEARCH : ', updatedSearch, id);
+    const db = getDb();
+    const res = await db
+      .update(searchTable)
+      .set(updatedSearch)
+      .where(eq(searchTable.id, id))
+      .returning()
+      .then((r) => r[0]);
+    return res;
+  } catch (error: any) {
+    console.log("ERROR UPDATING SEARCH : ", error?.message);
+    return null;
+  }
+}

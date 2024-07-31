@@ -1,5 +1,5 @@
 import { useSearchContext } from "@/context/search.context";
-import { createSearchACTION } from "@/lib/actions/search.action";
+import { createSearchACTION, updateSearchACTION } from "@/lib/actions/search.action";
 import {
   Divider,
   Checkbox,
@@ -45,16 +45,22 @@ const MainSelect: FC<IProps> = ({}) => {
   };
 
   const [state, action] = useFormState(
-    createSearchACTION.bind(null, { params, location: selectedAddress }),
-    { success: false, error: "" }
+    params.id
+      ? updateSearchACTION.bind(null, { params, location: selectedAddress })
+      : createSearchACTION.bind(null, { params, location: selectedAddress }),
+    { success: false, error: "", newParams: undefined }
   );
+  // const revalidate = async (path: string) => {
+  //   'use server';
+  //   //revalidatePath(path);
+  // }
 
   //ON RESET LE CACHE DE LA PAGE MY-SEARCH
   useEffect(() => {
     console.log("STATE DANS LE USEFFECT: ", state);
-    if (state.success) {
-      //revalidatePath("/my-search");
-      console.log("SEARCH SAVED");
+    if (state.success && state.newParams) {
+      console.log('ON MET A JOUR LES PARAMS DEPUIS LE STATE : ',params, state.newParams);
+      setParams(state.newParams);
     }
   }, [state]);
 
@@ -187,16 +193,16 @@ const MainSelect: FC<IProps> = ({}) => {
       </div>
       <Divider />
 
-      {/* SAVE SEARCH */}
+      {/* SAVE / UPDATE SEARCH */}
       <form action={action} className="w-full flex flex-col gap-3" noValidate>
         <Button type="submit" fullWidth className="button_main">
-          Sauvegarder ma recherche
+          { params.id ? "Mettre à jour la recherche" : "Sauvegarder la recherche" }
         </Button>
         {state.success && (
           <p className="text-green-500 text-xs text-center">Recherche sauvegardée</p>
         )}
         {
-          state.error && <p className="text-red-500 text-xs text-center">{state.error}</p>
+          (state.error && !state.success) && <p className="text-red-500 text-xs text-center">{state.error}</p>
         }
       </form>
     </>

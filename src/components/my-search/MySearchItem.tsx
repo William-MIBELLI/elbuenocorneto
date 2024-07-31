@@ -26,7 +26,7 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
 
   //ON REDIRIGE VERS LA PAGE DE RECHERCHE AVEC LES PARAMS
   const onRedirectClick = () => {
-    const query = paramsToQuery(searchParams);
+    const query = paramsToQuery({...searchParams, id: item.search.id});
     const USP = new URLSearchParams(query);
     router.push(`/search-result/?${USP}`);
   }
