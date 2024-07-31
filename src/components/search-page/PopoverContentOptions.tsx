@@ -84,9 +84,9 @@ const PopoverContentOptions = () => {
     //ON CREE UN NOUVEAU PARAMS
     const newParams: ISearchParams = {
       ...params,
-      radius: kmValue[value as number],
       lat: aroundMe?.coordonates?.lat,
       lng: aroundMe?.coordonates?.lng,
+      radius: aroundMe?.coordonates?.lng && aroundMe?.coordonates?.lat ? kmValue[value as number] : undefined,
     };
 
     //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT

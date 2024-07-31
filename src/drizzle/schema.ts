@@ -349,7 +349,7 @@ export const searchTable = pgTable("search", {
   userId: text("user_id").notNull().references(() => users.id, { onDelete: 'cascade'}),
   createdAt: timestamp("created_at").defaultNow(),
   searchParams: json("search_params").$type<ISearchParams>().notNull(),
-  locationId: text("location_id").references(() => locations.id, { onDelete: 'cascade' }),
+  locationId: text("location_id").references(() => locations.id, { onDelete: 'set null' }),
   name: text("name")
 })
 

@@ -181,7 +181,11 @@ export const updateSearchACTION = async (
           //ON VERIFIE QU'ELLE A BIEN ETE CREEE
           if (!updatedLoc) throw new Error("Location not created");
           
-        } 
+        }
+        //SI LA LOCATION ET LES PARAMS SONT IDENTIQUES, ON RENVOIE UNE ERREUR
+        else if (isSameLoc && isSame) {
+          throw new Error("Cette recherche existe déjà");
+        }
       } else {
         //SI PAS DANCIENNE LOCATION, ON CREE LA NOUVELLE
         const loc = await createLocationOnDB(location);
@@ -191,6 +195,13 @@ export const updateSearchACTION = async (
       }
     }
 
+    //SI PAS DE LOCATION, ON SUPPRIME L'ANCIENNE
+    if ((!params.lat && !params.lng && !params.radius) && oldSearch.location?.id) {
+      const isDeleted = await deleteLocationOnDB(oldSearch.location.id);
+
+      if (!isDeleted) throw new Error("Location not deleted");
+    }
+
     
 
     //ON UPDATE LA RECHERCHE
@@ -198,7 +209,7 @@ export const updateSearchACTION = async (
       {
         ...oldSearch.search,
         searchParams: params,
-        locationId: oldSearch?.location?.id || location?.id || undefined,
+        locationId: location ? oldSearch?.location?.id || location.id : null,
       },
       oldSearch.search.id
     );
