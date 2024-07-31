@@ -134,7 +134,7 @@ const AddressSearchInput = () => {
           </div>
         )}
       </div>
-      <PopoverContentOptions />
+      <PopoverContentOptions trigger={triggerRef.current} />
     </Popover>
   );
 };

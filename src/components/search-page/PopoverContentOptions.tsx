@@ -12,11 +12,15 @@ import {
 } from "@nextui-org/react";
 import { CheckIcon, Crosshair, MapPin, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 const kmValue = [1, 5, 10, 20, 30, 50, 100, 200];
 
-const PopoverContentOptions = () => {
+interface IProps {
+  trigger: HTMLDivElement | null;
+}
+
+const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
   const router = useRouter();
   const [displaySlider, setDisplaySlider] = useState<boolean>(false);
   const {
@@ -96,8 +100,14 @@ const PopoverContentOptions = () => {
     const query = new URLSearchParams(paramsToQuery(newParams));
     console.log("ON EST DANS SUBMIT : ", newParams);
 
+    //ON CLOSE LA POPOVER
+    if (trigger) {
+      trigger.click();
+    }
+
     //ON REMPLACE L'URL AVEC
-    router.push(`/search-result?${query}`);
+    window.history.replaceState({}, "", `/search-result?${query}`);
+    //router.push(`/search-result?${query}`);
   };
 
   useEffect(() => {}, [params]);
