@@ -56,7 +56,7 @@ export const paramsToQuery = (
         return item[1] !== undefined;
       })
   );
-  //console.log("MAPPED DANS LA FUNCTION : ", mapped);
+  //console.log("MAPPED DANS LA FUNCTION : ", mapped, params);
   return mapped;
 };
 
@@ -83,23 +83,24 @@ export const compareSearchs = (current: SearchInsert | ISearchParams, target: IS
   //ON CREE UN TABLEAU AVEC LES KEYS A IGNORER
   const ignore: Partial<keyof SearchInsert>[] = ["userId", "id", "locationId", 'createdAt', 'page'];
 
-  // console.log('CURRENT : ', current);
-  // console.log('target : ', target);
+  //console.log('CURRENT : ', current);
+  //console.log('target : ', target);
 
   //ON LOOP SUR CHAQUE KEY DE LA SEARCH
   for (const key in current) {
-    //SI LA KEY N'EST PAS DANS LA TARGET, ON RETOURNE FALSE
-    // if (!(key in target)) return false;
 
     //SI LA KEY EST DANS LA TARGET MAIS LES VALUES SONT DIFFERENTES, ON RETOURNE FALSE
     if (current[key as keyof ISearchParams] !== target[key as keyof ISearchParams]) {
-      if (!ignore.includes(key as keyof SearchInsert) && target[key as keyof ISearchParams] !== undefined || null) {
-        console.log('DIFFERENT VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
+      if (!ignore.includes(key as keyof SearchInsert) && current[key as keyof ISearchParams] !== undefined || null) {
+        // //console.log('DIFFERENT VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
         return false
       }
-      console.log('DIFFERENT VALUE IGNORED : ',key , current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
+      // //console.log('DIFFERENT VALUE IGNORED : ',key , current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
     }
-    console.log('SAME VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
+    // //console.log('SAME VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
   }
+  console.log('SAME : ', current, target)
   return true
 }
+
+

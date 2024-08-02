@@ -32,6 +32,7 @@ export const createSearchACTION = async (
     const { params, location } = data;
     const session = await auth();
 
+    console.log('DATA DANS CREATE SEARCH ACTION : ', data);
     //ON CHECK SI L'UTILISATEUR EST CONNECTE
     if (!session || !session.user || !session.user.id) {
       throw new Error("User not connected");
@@ -138,7 +139,7 @@ export const updateSearchACTION = async (
 
     const { search, location } = data;
 
-    console.log('DATA DANS UPDATE SEARCH ACTION : ', data);
+    //console.log('DATA DANS UPDATE SEARCH ACTION : ', data);
 
     //ON CHECK SI LA RECHERCHE EXISTE
     const existingSearch = await getSearchs("id", search.id);
@@ -160,7 +161,7 @@ export const updateSearchACTION = async (
 
     //SI ON A UNE NOUVELLE LOCATION
     if (location?.coordonates) {
-      console.log('OLCDSEACRH : ', oldSearch);
+      //console.log('OLCDSEACRH : ', oldSearch);
       //ON CHECK SI IL Y EN A UNE ANCIENNE
       if (OldLocation?.coordonates) {
         //ON LES DESTRUCTURE POUR ENLEVER L'ID
@@ -173,7 +174,7 @@ export const updateSearchACTION = async (
         console.log('IS SAME LOC : ', isSameLoc, newLng, oldLng, newLat, oldLat);
         //SI LES LOCATIONS SONT DIFFERENTES
         if (!isSameLoc) {
-          console.log('ON RENTRE DANS LE IF DE LOCATIONS DIFFERENTES');
+          // console.log('ON RENTRE DANS LE IF DE LOCATIONS DIFFERENTES');
           //ON MET A JOUR L'ANCIENNE LOCATION AVEC LES PROPRIETES DE LA NOUVELLE
           const updatedLoc = await updateLocationOnDB(
             {...location, id: oldSearch.locationId!},
@@ -236,3 +237,7 @@ export const updateSearchACTION = async (
     return { ...state, success: false, error: error?.message };
   }
 };
+
+export const revalidatePathAfterSuccess = async (path: string) => {
+  revalidatePath(path);
+}

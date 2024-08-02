@@ -18,7 +18,7 @@ import PopoverContentList from "./PopoverContentList";
 import { useSearchContext } from "@/context/search.context";
 
 const AddressSearchInput = () => {
-  const { list, setList, selectedAddress, setSelectedAddress } =
+  const { list, setList, selectedAddress, updateLocation } =
     useSearchContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [displayList, setDisplayList] = useState<boolean>(false);
@@ -50,7 +50,9 @@ const AddressSearchInput = () => {
     }, timer);
   };
 
+  //ON UPDATE VALUE SI IL Y A UNE ADDRESS SELECTIONNEE DANS LE CONTEXT
   useEffect(() => {
+    console.log('USE EFFECT SUR LE SELECTED ADDRESS', selectedAddress);
     if (selectedAddress) {
       return setValue(selectedAddress.city);
     }
@@ -60,7 +62,7 @@ const AddressSearchInput = () => {
   //GESTION DU CLICK SUR ADDRESS DE LA LIST
   const onAddressClick = (address: LocationInsert) => {
     console.log('ON ADDRESS CLICK')
-    setSelectedAddress(address);
+    updateLocation(address);
     setList([]);
     if (triggerRef.current) {
       triggerRef.current.click();
@@ -119,7 +121,7 @@ const AddressSearchInput = () => {
         {(list.length > 0 && displayList && value.length > 0) && (
           <div
             ref={listRef}
-            onClick={(e) => console.log('CLICK SUR LISTREF ', e.relatedTarget)}
+            // onClick={(e) => console.log('CLICK SUR LISTREF ', e.relatedTarget)}
             className="flex flex-col bg-blue-500 absolute  max-h-52 overflow-y-auto  w-full z-50 border-gray-300 shadow-md border-2 rounded-lg"
           >
             {list.map((address) => (

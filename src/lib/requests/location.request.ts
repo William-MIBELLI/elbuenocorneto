@@ -4,6 +4,7 @@ import { LocationInsert, locations, LocationSelect } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 
 export const createLocationOnDB = async (data: LocationInsert) => {
+  // console.log('DATA DANS CREATE LOC : ', data);
   try {
     const db = getDb();
     const loc = await db
@@ -12,15 +13,15 @@ export const createLocationOnDB = async (data: LocationInsert) => {
       .returning()
       .then((r) => r[0]);
     return loc;
-  } catch (error) {
-    console.log("ERROR CREATING LOCATION : ", error);
+  } catch (error: any) {
+    console.log("ERROR CREATING LOCATION : ", error?.message);
     return null;
   }
 };
 
 export const updateLocationOnDB = async (data: LocationInsert, id: string) => {
   try {
-    console.log('DATA DANS UPDATE LOC : ', data, id);
+    // console.log('DATA DANS UPDATE LOC : ', data, id);
     const db = getDb();
     const res = await db
       .update(locations)
@@ -28,7 +29,7 @@ export const updateLocationOnDB = async (data: LocationInsert, id: string) => {
       .where(eq(locations.id, id))
       .returning()
       .then((r) => r[0]);
-    console.log("RES DANS UPDATE LOC : ", res);
+    // console.log("RES DANS UPDATE LOC : ", res);
     return res ?? null;
   } catch (error: any) {
     console.log("ERROR UPDATE LOCATION REQUEST : ", error?.message);

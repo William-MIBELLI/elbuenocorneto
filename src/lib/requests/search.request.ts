@@ -25,8 +25,8 @@ export const createSearchOnDB = async (search: SearchInsert) => {
     // revalidatePath("/my-search", "page");
     console.log("SEARCH CREATED REQUEST APRES REVALIDATE PATH: ", res);
     return res;
-  } catch (error) {
-    console.log("ERROR CREATING SEARCH : ", error);
+  } catch (error: any) {
+    console.log("ERROR CREATING SEARCH : ", error?.message);
     return null;
   }
 };
@@ -75,7 +75,7 @@ export const checkSearchExist = async (searchToSave: SearchInsert | ISearchParam
     for(const r of res) {
       const isSame = compareSearchs(r, searchToSave);
       if (isSame) {
-        console.log('!!!!!!!!!!!!!  SAME IS TRUE  !!!!!!!!!!!!!!!');
+        // console.log('!!!!!!!!!!!!!  SAME IS TRUE  !!!!!!!!!!!!!!!', r, searchToSave);
         return true;
       };
     }

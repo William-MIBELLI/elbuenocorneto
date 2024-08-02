@@ -18,7 +18,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
     displayCategories,
     setDisplayCategories,
     params,
-    setParams,
+    updateParams,
     products,
     setProducts,
   } = useSearchContext();
@@ -79,7 +79,7 @@ const FilterSide: FC<IProps> = ({ open }) => {
   const onResetHandler = () => {
     // console.log("RESET PARAMS");
     const { keyword } = params;
-    setParams({
+    updateParams({
       keyword,
       titleOnly: false,
       sort: undefined,

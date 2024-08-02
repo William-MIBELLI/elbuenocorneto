@@ -7,7 +7,7 @@ import React, { FC } from 'react'
 
 const PopoverContentList = () => {
 
-  const { list, setList, setSelectedAddress } = useSearchContext();
+  const { list, setList,  } = useSearchContext();
 
  
   return (

@@ -12,6 +12,7 @@ import {
 } from "@nextui-org/react";
 import { CheckIcon, Crosshair, MapPin, X } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
+import { set } from "zod";
 
 const kmValue = [1, 5, 10, 20, 30, 50, 100, 200];
 
@@ -23,10 +24,9 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
   const [displaySlider, setDisplaySlider] = useState<boolean>(false);
   const {
     selectedAddress,
-    setSelectedAddress,
     params,
-    setParams,
-    updateFromSearchLocation,
+    updateLocation,
+    updateParams
   } = useSearchContext();
   const [value, setValue] = useState<SliderValue>(
     kmValue.findIndex((e) => e === params.radius || 1) || 0
@@ -34,14 +34,13 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
   const [km, setKm] = useState<number>(
     params.radius || kmValue[(value as number) || 0]
   );
-  const [aroundMe, setAroundMe] = useState<LocationInsert | undefined>(
-    selectedAddress
-  );
+
 
   //CORRESPONDANCE ENTRE LA VALEUR DU SLIDER ET LES KM
-  useEffect(() => {
-    setKm(kmValue[(value as number) || 0]);
-  }, [value]);
+  // useEffect(() => {
+  //   setKm(kmValue[(value as number) || 0]);
+  //   // setParams({...params, radius: kmValue[(value as number) || 0]});
+  // }, [value]);
 
   useEffect(() => {
     setKm(params.radius || kmValue[(value as number) || 0]);
@@ -49,6 +48,13 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
       setValue(kmValue.findIndex((e) => e === params.radius));
     }
   }, [params.radius]);
+
+  const onSLiderChange = (value: SliderValue) => {
+    setValue(value);
+    const km = kmValue[(value as number) || 0];
+    setKm(km);
+    updateParams({ ...params, radius: km });
+  }
 
   //CLICK SUR "AUTOUR DE MOI"
   const aroundMeClickHandler = async () => {
@@ -60,8 +66,12 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
           JSON.parse(JSON.stringify(position.coords))
         );
 
-        //ON LA STOCKE DANS aroundMe
-        setAroundMe(loc);
+        //ON LA STOCKE DANS SELECTADDRESS
+        updateLocation(loc);
+
+        //ON RESET LA SLIDER A ZERO
+        setValue(0);
+        setKm(1);
 
         //ON AFFICHE LE SLIDER
         setDisplaySlider(true);
@@ -76,10 +86,10 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
 
   //CLICK "TOUTE LA FRANCE"
   const onRemoveAroundMe = () => {
-    setAroundMe(undefined);
-    setSelectedAddress(undefined);
+    updateLocation(undefined);
     setValue(0);
     setDisplaySlider(false);
+    //updateParams({ ...params, lat: undefined, lng: undefined, radius: undefined });
 
     // //ON CREE UN NOUVEAU PARAMS
     // const newParams: ISearchParams = {
@@ -106,12 +116,11 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
     // //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT
     // updateFromSearchLocation(aroundMe, newParams);
 
-    //ON CREE LA QUERY SELON LES NOUVEAUX PARAMS
-    const query = new URLSearchParams(paramsToQuery(params));
-    console.log("ON EST DANS SUBMIT : ", params, aroundMe);
+    // //ON CREE LA QUERY SELON LES NOUVEAUX PARAMS
+    // const query = new URLSearchParams(paramsToQuery(params));
     
-        //ON REMPLACE L'URL AVEC
-        window.history.replaceState({}, "", `/search-result?${query}`);
+    //     //ON REMPLACE L'URL AVEC
+    //     window.history.replaceState({}, "", `/search-result?${query}`);
 
     //ON CLOSE LA POPOVER
     if (trigger) {
@@ -119,28 +128,28 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
     }
   };
 
-  useEffect(() => {
-    //ON CREE UN NOUVEAU PARAMS
-    const newParams: ISearchParams = {
-      ...params,
-      locationId: aroundMe?.id,
-      lat: aroundMe?.coordonates?.lat || 3,
-      lng: aroundMe?.coordonates?.lng || 3,
-      radius: aroundMe?.coordonates?.lng && aroundMe?.coordonates?.lat ? kmValue[value as number] : undefined,
-    };
+  // useEffect(() => {
+  //   //ON CREE UN NOUVEAU PARAMS
+  //   const newParams: ISearchParams = {
+  //     ...params,
+  //     locationId: aroundMe?.id,
+  //     lat: aroundMe?.coordonates?.lat || 3,
+  //     lng: aroundMe?.coordonates?.lng || 3,
+  //     radius: aroundMe?.coordonates?.lng && aroundMe?.coordonates?.lat ? kmValue[value as number] : undefined,
+  //   };
     
-    console.log("AROUND ME DANS LE USEEFFECT: ", aroundMe, newParams);
-    //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT
-    updateFromSearchLocation(aroundMe, newParams);
+  //   console.log("AROUND ME DANS LE USEEFFECT: ", aroundMe, newParams);
+  //   //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT
+  //   updateFromSearchLocation(aroundMe, newParams);
 
-    // ON CREE LA QUERY SELON LES NOUVEAUX PARAMS
-    // const query = new URLSearchParams(paramsToQuery(newParams));
-    // console.log("ON EST DANS SUBMIT : ", newParams);
+  //   // ON CREE LA QUERY SELON LES NOUVEAUX PARAMS
+  //   // const query = new URLSearchParams(paramsToQuery(newParams));
+  //   // console.log("ON EST DANS SUBMIT : ", newParams);
 
-    // ON REMPLACE L'URL AVEC
-    // window.history.replaceState({}, "", `/search-result?${query}`);
+  //   // ON REMPLACE L'URL AVEC
+  //   // window.history.replaceState({}, "", `/search-result?${query}`);
 
-  }, [aroundMe]);
+  // }, [aroundMe]);
 
   return (
     <PopoverContent className="w-full py-4">
@@ -151,9 +160,9 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
         {/* AROUND ME */}
         <div className="flex flex-col items-start gap-2 w-full">
           {/* SELECTED CITY */}
-          {aroundMe ? (
+          {selectedAddress ? (
             <div className="text-xs px-2 py-0.5 bg-blue-100 rounded-lg text-blue-600 relative">
-              {aroundMe.city}
+              {selectedAddress.city}
               <div
                 className="absolute -right-1 -top-1 bg-blue-600 rounded-full text-blue-100 cursor-pointer"
                 onClick={onRemoveAroundMe}
@@ -171,11 +180,11 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
             </div>
           )}
 
-          {(displaySlider || aroundMe) && (
+          {(displaySlider || selectedAddress) && (
             <div className="w-full ">
               <div className="flex  justify-between text-blue-400 font-semibold">
                 <p>Dans un rayon de</p>
-                <p>{km} Km</p>
+                <p>{kmValue[value as number]} Km</p>
               </div>
               <Slider
                 size="sm"
@@ -184,7 +193,7 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
                 maxValue={7}
                 minValue={0}
                 value={value}
-                onChange={setValue}
+                onChange={onSLiderChange}
                 className="w-full"
               />
             </div>
@@ -200,7 +209,7 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
             <MapPin color="lightblue" />
           </div>
           <p>Toute la France</p>
-          {!aroundMe && <CheckIcon color="lightgreen" />}
+          {!selectedAddress && <CheckIcon color="lightgreen" />}
         </div>
       </div>
       <Divider className="my-3" />

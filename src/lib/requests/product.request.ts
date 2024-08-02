@@ -672,7 +672,7 @@ export const createSearchCondition = (
     conditions.push(withDescription);
   }
 
-  console.log("___________________");
+  // console.log("___________________");
 
   //ON JOIN TOUTES LES CONDITIONS ET ON LA RETURN
   const where = sql.join(conditions, sql` AND `);

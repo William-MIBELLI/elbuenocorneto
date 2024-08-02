@@ -1,5 +1,5 @@
 import { useSearchContext } from "@/context/search.context";
-import { createSearchACTION, updateSearchACTION } from "@/lib/actions/search.action";
+import { createSearchACTION, revalidatePathAfterSuccess, updateSearchACTION } from "@/lib/actions/search.action";
 import {
   Divider,
   Checkbox,
@@ -24,13 +24,13 @@ interface IProps {
 }
 
 const MainSelect: FC<IProps> = ({}) => {
-  const { params, setParams, setDisplayCategories, selectedAddress } =
+  const { params, updateParams, setDisplayCategories, selectedAddress } =
     useSearchContext();
 
   //GESTION DES INPUTS POUR METTRE A JOUR LE CONTEXT
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = event.target;
-    setParams({
+    updateParams({
       ...params,
       [name]: !(
         name === "donation" ||
@@ -59,8 +59,8 @@ const MainSelect: FC<IProps> = ({}) => {
   useEffect(() => {
     //console.log("STATE DANS LE USEFFECT: ", state);
     if (state.success && state.newParams) {
-      //console.log('ON MET A JOUR LES PARAMS DEPUIS LE STATE : ',params, state.newParams);
-      setParams(state.newParams);
+      // console.log('ON MET A JOUR LES PARAMS DEPUIS LE STATE : ',params, state.newParams);
+      updateParams(state.newParams);
     }
   }, [state]);
 

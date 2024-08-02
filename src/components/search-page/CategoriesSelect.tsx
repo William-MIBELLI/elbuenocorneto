@@ -11,7 +11,7 @@ interface IProps {
 }
 
 const CategoriesSelect: FC<IProps> = ({  }) => {
-  const { params, setParams, categories, setCategories } = useSearchContext();
+  const { params, updateParams, categories, setCategories } = useSearchContext();
   // const [categories, setCategories] = useState<CategorySelect[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -40,7 +40,7 @@ const CategoriesSelect: FC<IProps> = ({  }) => {
   const onClickHandler = (cat: CategoriesType | undefined, label: string) => {
     //SI LUSER RECLIQUE SUR LA MEME CATEGORY QUE CELLE DEJA STOCKEE, ON NE FAIT RIEN
     if (cat !== params.categorySelectedType) {
-      setParams({ ...params, categorySelectedType: cat, categorySelectedLabel: label});
+      updateParams({ ...params, categorySelectedType: cat, categorySelectedLabel: label});
     }
   };
 
