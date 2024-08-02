@@ -17,13 +17,14 @@ import {
 } from "../requests/search.request";
 import { revalidatePath } from "next/cache";
 import { rest } from "lodash";
+import { compareSearchs } from "../helpers/search.helper";
 
 export const createSearchACTION = async (
   data: { params: ISearchParams; location: LocationInsert | undefined },
   state: {
     success: boolean;
     error: string;
-    newParams?: ISearchParams | undefined;
+    newParams?: SearchInsert | undefined;
   },
   fd: FormData
 ) => {
@@ -32,29 +33,29 @@ export const createSearchACTION = async (
     const session = await auth();
 
     //ON CHECK SI L'UTILISATEUR EST CONNECTE
-    if (!session || !session.user || !session.user.id)
+    if (!session || !session.user || !session.user.id) {
       throw new Error("User not connected");
-    const { user } = session;
+    }
 
     //ON CREE LE SEARCHINSERT
     const searchToSave: SearchInsert = {
       id: uuidv4(),
       userId: session.user.id,
-      searchParams: params,
       locationId: location?.id,
+      ...params
     };
 
     //ON CHECK SI LA RECHERCHE EST DEJA EXISTANTE
-    const exisitingSearch = await checkSearchExist(searchToSave);
+    const exisitingSearch = await checkSearchExist(searchToSave, session.user.id);
 
-    if (exisitingSearch && exisitingSearch.length > 0) {
+    if (exisitingSearch) {
       throw new Error("Search already exist");
     }
 
     //SI LNG LAT ET RADIUS, ON CHECK SI LOCATION EST BIEN DEFINI
     if (params.lng && params.lat && params.radius) {
       if (!location) {
-        throw new Error("Location not defined");
+        throw new Error("Location not defined but got coordonates and radius");
       }
 
       //ON CREE LA LOCATION ET ON RECUPERE SON ID
@@ -78,7 +79,7 @@ export const createSearchACTION = async (
       ...state,
       success: true,
       error: "",
-      newParams: { ...savedSearch.searchParams, id: savedSearch.id },
+      newParams: savedSearch,
     };
   } catch (error: any) {
     console.log("ERROR IN SEARCH ACTION", error?.message);
@@ -118,13 +119,13 @@ export const deleteSearchACTION = async (
 
 export const updateSearchACTION = async (
   data: {
-    params: ISearchParams;
+    search: ISearchParams;
     location: LocationInsert | undefined;
   },
   state: {
     success: boolean;
     error: string;
-    newParams?: ISearchParams | undefined;
+    newParams?: SearchInsert | undefined;
   },
   fd: FormData
 ) => {
@@ -135,22 +136,23 @@ export const updateSearchACTION = async (
     if (!session || !session.user || !session.user.id)
       throw new Error("User not connected");
 
-    const { params, location } = data;
+    const { search, location } = data;
+
+    console.log('DATA DANS UPDATE SEARCH ACTION : ', data);
 
     //ON CHECK SI LA RECHERCHE EXISTE
-    const existingSearch = await getSearchs("id", params.id);
+    const existingSearch = await getSearchs("id", search.id);
 
     if (existingSearch.length === 0) {
       throw new Error("Search not found");
     }
 
-    const oldSearch = existingSearch[0];
+    const oldSearchItem = existingSearch[0];
+    const { search: oldSearch, location: OldLocation } = oldSearchItem;
 
-    //ON COMPARE LES ANCIENS PARAMS AVEC LES NOUVEAUX
-    const isSame =
-      JSON.stringify(oldSearch.search.searchParams) === JSON.stringify(params);
+    //ON CHECK SI L'USER A DEJA UNE SEARCH IDENTIQUE
+    const isSame = await checkSearchExist(search, session.user.id);
 
-    console.log("IS SAME : ", isSame, oldSearch.search.searchParams, params);
     //SI LES PARAMS SONT LES MEMES ET QU'IL N'Y A PAS DE LOCATION, ON RENVOIE UNE ERREUR
     if (isSame && !location) {
       throw new Error("Same search params");
@@ -160,10 +162,10 @@ export const updateSearchACTION = async (
     if (location?.coordonates) {
       console.log('OLCDSEACRH : ', oldSearch);
       //ON CHECK SI IL Y EN A UNE ANCIENNE
-      if (oldSearch.location?.coordonates) {
+      if (OldLocation?.coordonates) {
         //ON LES DESTRUCTURE POUR ENLEVER L'ID
         const { lng: newLng, lat: newLat } = location.coordonates;
-        const { lng: oldLng, lat: oldLat} = oldSearch.location.coordonates;
+        const { lng: oldLng, lat: oldLat} = OldLocation.coordonates;
 
         //ON LES COMPARE
         const isSameLoc = newLng === oldLng && newLat === oldLat;
@@ -174,8 +176,8 @@ export const updateSearchACTION = async (
           console.log('ON RENTRE DANS LE IF DE LOCATIONS DIFFERENTES');
           //ON MET A JOUR L'ANCIENNE LOCATION AVEC LES PROPRIETES DE LA NOUVELLE
           const updatedLoc = await updateLocationOnDB(
-            {...location, id: oldSearch.search.locationId!},
-            oldSearch.location.id
+            {...location, id: oldSearch.locationId!},
+            oldSearchItem?.location?.id!
           );
 
           //ON VERIFIE QU'ELLE A BIEN ETE CREEE
@@ -196,8 +198,8 @@ export const updateSearchACTION = async (
     }
 
     //SI PAS DE LOCATION, ON SUPPRIME L'ANCIENNE
-    if ((!params.lat && !params.lng && !params.radius) && oldSearch.location?.id) {
-      const isDeleted = await deleteLocationOnDB(oldSearch.location.id);
+    if ((!search.lat && !search.lng && !search.radius) && oldSearchItem.location?.id) {
+      const isDeleted = await deleteLocationOnDB(oldSearchItem.location.id);
 
       if (!isDeleted) throw new Error("Location not deleted");
     }
@@ -207,11 +209,13 @@ export const updateSearchACTION = async (
     //ON UPDATE LA RECHERCHE
     const updatedSearch = await updateSearchOnDB(
       {
-        ...oldSearch.search,
-        searchParams: params,
-        locationId: location ? oldSearch?.location?.id || location.id : null,
+        ...search,
+        createdAt: new Date(),
+        locationId: location ? oldSearchItem?.location?.id || location.id : null,
+        userId: session.user.id,
+        id: oldSearch.id,
       },
-      oldSearch.search.id
+      oldSearch.id
     );
 
     //ON CHECK SI LA RECHERCHE A ETE UPDATE
@@ -219,13 +223,13 @@ export const updateSearchACTION = async (
       throw new Error("Search not updated");
     }
 
-    console.log('UPDATED SEARCH DANS ACTION  : ', updatedSearch);
+    // console.log('UPDATED SEARCH DANS ACTION  : ', updatedSearch);
 
     //ON RETURN SUCCESS
     return {
       success: true,
       error: "",
-      newParams: { ...updatedSearch.searchParams, id: updatedSearch.id },
+      newParams: updatedSearch,
     };
   } catch (error: any) {
     console.log("ERROR IN UPDATE SEARCH ACTION", error?.message);

@@ -1,3 +1,4 @@
+'use server'
 import { check } from "drizzle-orm/mysql-core";
 import { getDb } from "@/drizzle/db";
 import {
@@ -11,6 +12,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { ISearchParams } from "@/context/search.context";
+import { compareSearchs } from "../helpers/search.helper";
 
 export const createSearchOnDB = async (search: SearchInsert) => {
   try {
@@ -54,27 +56,34 @@ export const getSearchs = async <T extends Partial<SearchTableKeys>>(
   }
 };
 
-export const checkSearchExist = async (searchToSave: SearchInsert) => {
+export const checkSearchExist = async (searchToSave: SearchInsert | ISearchParams, userId: string): Promise<boolean> => {
   try {
     const db = getDb();
-    const { userId, searchParams } = searchToSave;
+    const { id, locationId, ...searchParams } = searchToSave;
 
     //ON RECUPERE TOUTES LES RECHERCHES DE L'UTILISATEUR
     const res = await db
       .select()
       .from(searchTable)
-      .where(and(eq(searchTable.userId, userId)))
+      .where(eq(searchTable.userId, userId))
       .then((r) => r);
 
     //ON FILTRE LES RECHERCHES QUI ONT LES MEMES PARAMS
-    const mapped = res.filter((r) => {
-      return JSON.stringify(r.searchParams) === JSON.stringify(searchParams);
-    });
+    // const mapped = res.filter((current) => {
+    //   return compareSearchs(current, searchToSave);
+    // });
+    for(const r of res) {
+      const isSame = compareSearchs(r, searchToSave);
+      if (isSame) {
+        console.log('!!!!!!!!!!!!!  SAME IS TRUE  !!!!!!!!!!!!!!!');
+        return true;
+      };
+    }
 
-    return mapped;
+    return false;
   } catch (error) {
     console.log("ERROR CHECKING SEARCH EXIST : ", error);
-    return null;
+    return false;
   }
 };
 
@@ -97,7 +106,7 @@ export const deleteSearchOnDB = async (
 
 export const updateSearchOnDB = async (updatedSearch: SearchInsert, id: string) => {
   try {
-    console.log('DATA DANS UPDATE SEARCH : ', updatedSearch, id);
+    // console.log('DATA DANS UPDATE SEARCH : ', updatedSearch, id);
     const db = getDb();
     const res = await db
       .update(searchTable)

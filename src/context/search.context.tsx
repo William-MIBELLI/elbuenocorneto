@@ -1,8 +1,9 @@
 "use client";
-import { CategoryEnum, CategorySelect, LocationInsert } from "@/drizzle/schema";
+import { CategoryEnum, CategorySelect, LocationInsert, SearchInsert } from "@/drizzle/schema";
 import { CategoriesType, ProductForList } from "@/interfaces/IProducts";
 import { searchWithFiltersACTION } from "@/lib/actions/product.action";
 import { paramsToQuery } from "@/lib/helpers/search.helper";
+import { getLocationByIdOnDB } from "@/lib/requests/location.request";
 import { ConsoleLogWriter, SQL, sql } from "drizzle-orm";
 import { useRouter } from "next/navigation";
 import {
@@ -44,20 +45,8 @@ export type SortType =
   | "price_asc"
   | "price_desc";
 
-export interface ISearchParams {
-  min?: number | undefined;
-  max?: number | undefined;
-  keyword: string;
-  titleOnly: boolean;
-  radius?: number;
-  delivery?: boolean;
-  sort?: SortType | undefined;
-  categorySelectedType?: (typeof CategoryEnum.enumValues)[number] | undefined;
-  categorySelectedLabel?: string;
-  donation?: boolean;
-  page?: number;
-  lat?: number;
-  lng?: number;
+
+export interface ISearchParams extends Omit<SearchInsert, 'id' | 'userId'> {
   id?: string | undefined;
 }
 
@@ -92,13 +81,17 @@ export const SearchContextProvider = ({ children }: Props) => {
     setParams(newParams);
   };
 
+  useEffect(() => {
+    console.log('PARAMS DANS LE USEEFFECT : ', params);
+  }, [params]);
+
   //ON UPDATE PARAMS QUAND L'USER CHOISIT UNE LOCALISATION
   useEffect(() => {
     // console.log("YSEEFFECT SELECTEADRESS DANS CONTEXT : ", selectedAddress);
     //AVANT DE METTRE A JOUR, ON VERIFIE SI SELECTADDRESS !== UNDEFINED OU SI IL Y AVAIT UNE ADRESSE MAUS L'USER L'A SUPPRIME
     if (selectedAddress || params.lat) {
       //console.log('ON RENTRE DANS LE IF : ', params, selectedAddress);
-      const lat = selectedAddress?.coordonates?.lat || undefined;
+      const lat = selectedAddress?.coordonates?.lat|| undefined;
       const lng = selectedAddress?.coordonates?.lng || undefined;
       const newParams = { ...params, lat, lng };
       setParams(newParams);
@@ -127,6 +120,18 @@ export const SearchContextProvider = ({ children }: Props) => {
     };
     getProds();
   }, [params]);
+
+  //SI LOCATION.ID DANS PARAMS, ON RECUPERE LA LOCATION DANS LA DB
+  useEffect(() => {
+    if (params.locationId) {
+      console.log("USEFFEECT LOCATIONID DANS CONTETX");
+      const getLoc = async () => {
+        const loc = await getLocationByIdOnDB(params.locationId!);
+        setSelectedAddress(loc);
+      };
+      getLoc();
+    }
+  }, [params.locationId]);
 
 
   //NOMBRE DE FILTRES ACTIFS

@@ -1,4 +1,4 @@
-import { ISearchParams } from '@/context/search.context';
+import { ISearchParams } from "@/context/search.context";
 import {
   timestamp,
   pgTable,
@@ -12,6 +12,8 @@ import {
   varchar,
   boolean,
   AnyPgColumn,
+  decimal,
+  customType,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -58,24 +60,31 @@ export const AttributeNameEnum = pgEnum("attribute_name_enum", [
   "milling",
   "fuel",
   "power",
-  'doors',
-  'livingSpace',
-  'habitationType',
-  'garden',
-  'color',
-  'clothMaterial',
-  'objectMaterial',
-  'model',
-  'brand',
-  'stockage',
-  'memory',
-  'age',
-  'size',
-  'contractType',
-  'wage'
+  "doors",
+  "livingSpace",
+  "habitationType",
+  "garden",
+  "color",
+  "clothMaterial",
+  "objectMaterial",
+  "model",
+  "brand",
+  "stockage",
+  "memory",
+  "age",
+  "size",
+  "contractType",
+  "wage",
 ]);
 
-export type attrNameType = typeof AttributeNameEnum.enumValues[number]
+export const SortEnum = pgEnum("sort_enum", [
+  "createdAt_asc",
+  "createdAt_desc",
+  "price_asc",
+  "price_desc",
+]);
+
+export type attrNameType = (typeof AttributeNameEnum.enumValues)[number];
 
 export const users = pgTable("user", {
   id: text("id").primaryKey(),
@@ -104,7 +113,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     fields: [users.locationId],
     references: [locations.id],
   }),
-  favorites: many(favoritesTable)
+  favorites: many(favoritesTable),
 }));
 
 export type SelectUser = typeof users.$inferSelect;
@@ -133,7 +142,7 @@ export const products = pgTable("product", {
     .notNull()
     .references(() => locations.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
-  categoryType: CategoryEnum('category_type')
+  categoryType: CategoryEnum("category_type")
     .notNull()
     .references(() => categoryTable.type),
   description: text("description").notNull(),
@@ -154,10 +163,10 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   pdl: many(productDeliveryLink),
   category: one(categoryTable, {
     fields: [products.categoryType],
-    references: [categoryTable.type]
+    references: [categoryTable.type],
   }),
   attributes: many(productAttributeJONC),
-  favorites: many(favoritesTable)
+  favorites: many(favoritesTable),
 }));
 
 export type ProductInsert = typeof products.$inferInsert;
@@ -247,20 +256,20 @@ export const categoryTable = pgTable("category", {
   imageUrl: text("image_url").notNull(),
   type: CategoryEnum("category_enum").notNull().unique(),
   availableToDelivery: boolean("available_to_delivery").default(true),
-  gotPrice: boolean('got_price').default(true),
-  gotState: boolean('got_state').default(true)
+  gotPrice: boolean("got_price").default(true),
+  gotState: boolean("got_state").default(true),
 });
 
 export const categoryRelations = relations(categoryTable, ({ many }) => ({
-  attrRel: many(attributesTable)
-}))
+  attrRel: many(attributesTable),
+}));
 
 export type CategorySelect = typeof categoryTable.$inferSelect;
 export type CategoryInsert = typeof categoryTable.$inferInsert;
 
 export const attributesTable = pgTable("attribute", {
   id: text("id").primaryKey().notNull(),
-  name: AttributeNameEnum('name').notNull().unique(),
+  name: AttributeNameEnum("name").notNull().unique(),
   type: attributeTypeEnum("type").notNull(),
   label: text("label").notNull(),
   required: boolean("required").default(true),
@@ -269,8 +278,8 @@ export const attributesTable = pgTable("attribute", {
 
 export const attributeRelations = relations(attributesTable, ({ many }) => ({
   attrToCat: many(categoryTable),
-  attrProd: many(products)
-}))
+  attrProd: many(products),
+}));
 
 export type AttributeSelect = typeof attributesTable.$inferSelect;
 export type AttributeInsert = typeof attributesTable.$inferInsert;
@@ -288,13 +297,13 @@ export const attributeCategoryJONC = pgTable("attribute_category_jonc", {
 export const attrCatRelations = relations(attributeCategoryJONC, ({ one }) => ({
   attribute: one(attributesTable, {
     fields: [attributeCategoryJONC.attributeName],
-    references: [attributesTable.id]
+    references: [attributesTable.id],
   }),
   category: one(categoryTable, {
     fields: [attributeCategoryJONC.categoryType],
-    references: [categoryTable.type]
-  })
-}))
+    references: [categoryTable.type],
+  }),
+}));
 
 export type AttrCatSelect = typeof attributeCategoryJONC.$inferSelect;
 export type AttrCatInsert = typeof attributeCategoryJONC.$inferInsert;
@@ -303,7 +312,7 @@ export const productAttributeJONC = pgTable("product_attribute_jonc", {
   id: text("id").primaryKey().notNull(),
   productId: text("product_id")
     .notNull()
-    .references(() => products.id, { onDelete: 'cascade'}),
+    .references(() => products.id, { onDelete: "cascade" }),
   attributeId: text("attribute_id")
     .notNull()
     .references(() => attributesTable.id),
@@ -313,45 +322,82 @@ export const productAttributeJONC = pgTable("product_attribute_jonc", {
 export const prodAttrRelations = relations(productAttributeJONC, ({ one }) => ({
   product: one(products, {
     fields: [productAttributeJONC.productId],
-    references: [products.id]
+    references: [products.id],
   }),
   attribute: one(attributesTable, {
     fields: [productAttributeJONC.attributeId],
-    references: [attributesTable.id]
-  })
-}))
+    references: [attributesTable.id],
+  }),
+}));
 
 export type ProdAttrSelect = typeof productAttributeJONC.$inferSelect;
 export type ProdAttrInsert = typeof productAttributeJONC.$inferInsert;
 
 export const favoritesTable = pgTable("favorites", {
-  id: text('id').primaryKey().notNull(),
-  productId: text("product_id").references(() => products.id,{ onDelete: 'cascade'}),
-  userId: text("user_id").references(() => users.id, { onDelete: 'cascade'})
-})
+  id: text("id").primaryKey().notNull(),
+  productId: text("product_id").references(() => products.id, {
+    onDelete: "cascade",
+  }),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+});
 
 export const favoritesRelations = relations(favoritesTable, ({ one }) => ({
   productId: one(products, {
     fields: [favoritesTable.productId],
-    references: [products.id]
+    references: [products.id],
   }),
   userId: one(users, {
     fields: [favoritesTable.userId],
-    references: [users.id]
-  })
-}))
+    references: [users.id],
+  }),
+}));
 
 export type FavoriteSelect = typeof favoritesTable.$inferSelect;
 export type Favoriteinsert = typeof favoritesTable.$inferInsert;
 
+type NumericConfig = {
+  precision?: number;
+  scale?: number;
+};
+
+export const numericCasted = customType<{
+  data: number;
+  driverData: string;
+  config: NumericConfig;
+}>({
+  dataType: (config) => {
+    if (config?.precision && config?.scale) {
+      return `numeric(${config.precision}, ${config.scale})`;
+    }
+    return "numeric";
+  },
+  fromDriver: (value: string) => Number.parseFloat(value), // note: precision loss for very large/small digits so area to refactor if needed
+  toDriver: (value: number) => value.toString(),
+});
+
 export const searchTable = pgTable("search", {
   id: text("id").primaryKey().notNull(),
-  userId: text("user_id").notNull().references(() => users.id, { onDelete: 'cascade'}),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
-  searchParams: json("search_params").$type<ISearchParams>().notNull(),
-  locationId: text("location_id").references(() => locations.id, { onDelete: 'set null' }),
-  name: text("name")
-})
+  locationId: text("location_id").references(() => locations.id, {
+    onDelete: "set null",
+  }),
+  min: integer("min"),
+  max: integer("max"),
+  keyword: text("keyword").notNull(),
+  titleOnly: boolean("title_only").default(false),
+  radius: integer("radius"),
+  delivery: boolean("delivery").default(false),
+  sort: SortEnum("sort"),
+  categorySelectedType: CategoryEnum("category_selected_type"),
+  categorySelectedLabel: text("category_selected_label"),
+  donation: boolean("donation").default(false),
+  page: integer("page").default(1),
+  lat: numericCasted("lat", { precision: 10, scale: 6 }),
+  lng: numericCasted("lng", { precision: 10, scale: 6 }),
+});
 
 export type SearchInsert = typeof searchTable.$inferInsert;
 export type SearchSelect = typeof searchTable.$inferSelect;

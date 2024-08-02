@@ -16,25 +16,31 @@ interface IProps {
 }
 
 const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
-  const {
-    search: { searchParams },
-    location,
-  } = item;
-  const { keyword, categorySelectedType, categorySelectedLabel, radius } = searchParams;
+  const { search: searchParams, location } = item;
+  const { keyword, categorySelectedType, categorySelectedLabel, radius } =
+    searchParams;
   const priceToDisplay = getPriceText(searchParams);
   const router = useRouter();
 
   //ON REDIRIGE VERS LA PAGE DE RECHERCHE AVEC LES PARAMS
-  const onRedirectClick = () => {
-    const query = paramsToQuery({...searchParams, id: item.search.id});
+  const onRedirectClick = (isUpdate: boolean) => {
+    const query = paramsToQuery({
+      ...searchParams,
+      //SI C'EST UNE UPDATE ON PASSE L'ID
+      id: isUpdate ?  searchParams.id : undefined,
+    });
     const USP = new URLSearchParams(query);
     router.push(`/search-result/?${USP}`);
-  }
+  };
 
-  const [state, action] = useFormState(deleteSearchACTION.bind(null, {id: item.search.id}), {
-    success: false,
-    error: "",
-  });
+  //CLICK SUR LE BOUTON SUPPRIMER
+  const [state, action] = useFormState(
+    deleteSearchACTION.bind(null, { id: item.search.id }),
+    {
+      success: false,
+      error: "",
+    }
+  );
 
   //ON SUPPRIME L'ITEM DE LA LISTE POUR REFRESH L'UI
   useEffect(() => {
@@ -44,12 +50,12 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
   }, [state.success]);
 
   return (
-
-    <div onClick={onRedirectClick} className="border-1 border-gray-300 rounded-lg p-4 flex cursor-pointer hover:shadow-md">
-
+    <div
+      onClick={() => onRedirectClick(false)}
+      className="border-1 border-gray-300 rounded-lg p-4 flex cursor-pointer hover:shadow-md"
+    >
       {/* LEFT SIDE */}
       <div className=" w-2/3 flex flex-col items-start gap-2">
-        
         {/* CATEGORIE */}
         <div className="flex gap-1 text-xs items-center bg-gray-200 rounded-lg w-fit px-2 py-0.5 text-gray-900">
           {categorySelectedType ? (
@@ -79,24 +85,27 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
 
         {/* LOCATION */}
         <div>
-          {
-            location ? (
-              <p className="text-xs text-gray-500">Autour de {location.city} ({location.postcode}), dans un rayon de {radius}Km.</p>
-            ) : (
-              <p className="text-xs text-gray-500">Toute la France</p>
-            )
-          }
+          {location ? (
+            <p className="text-xs text-gray-500">
+              Autour de {location.city} ({location.postcode}), dans un rayon de{" "}
+              {radius}Km.
+            </p>
+          ) : (
+            <p className="text-xs text-gray-500">Toute la France</p>
+          )}
         </div>
 
         {/* DATE */}
-        <p className="text-xs text-gray-500">Crée le {new Date(item.search.createdAt!).toLocaleDateString()}</p>
-
+        <p className="text-xs text-gray-500">
+          Crée le {new Date(item.search.createdAt!).toLocaleDateString()}
+        </p>
       </div>
-        
-      {/* RIGHT SIDE */}  
+
+      {/* RIGHT SIDE */}
       <div className=" w-1/3 flex gap-3 justify-end">
         <Button
-          isDisabled
+          onClick={() => onRedirectClick(true)}
+
           startContent={<Pen size={15} />}
           className="font-semibold bg-transparent hover:bg-blue-100 text-blue-900"
         >

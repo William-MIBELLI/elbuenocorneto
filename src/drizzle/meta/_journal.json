@@ -316,6 +316,13 @@
       "when": 1722432026600,
       "tag": "0049_warm_nightmare",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1722535668490,
+      "tag": "0050_secret_tigra",
+      "breakpoints": true
     }
   ]
 }

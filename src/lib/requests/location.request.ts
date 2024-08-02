@@ -1,5 +1,6 @@
+"use server"
 import { getDb } from "@/drizzle/db";
-import { LocationInsert, locations } from "@/drizzle/schema";
+import { LocationInsert, locations, LocationSelect } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 
 export const createLocationOnDB = async (data: LocationInsert) => {
@@ -46,5 +47,20 @@ export const deleteLocationOnDB = async (id: string) => {
   } catch (error) {
     console.log("ERROR DELETING LOCATION REQUEST : ", error);
     return null;
+  }
+}
+
+export const getLocationByIdOnDB = async (id: string): Promise<LocationSelect | undefined> => {
+  try {
+    const db = getDb();
+    const loc = await db
+      .select()
+      .from(locations)
+      .where(eq(locations.id, id))
+      .then((r) => r[0]);
+    return loc;
+  } catch (error) {
+    console.log("ERROR GETTING LOCATION : ", error);
+    return undefined;
   }
 }

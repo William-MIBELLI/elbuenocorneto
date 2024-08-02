@@ -46,7 +46,7 @@ const MainSelect: FC<IProps> = ({}) => {
 
   const [state, action] = useFormState(
     params.id
-      ? updateSearchACTION.bind(null, { params, location: selectedAddress })
+      ? updateSearchACTION.bind(null, { search: params, location: selectedAddress })
       : createSearchACTION.bind(null, { params, location: selectedAddress }),
     { success: false, error: "", newParams: undefined }
   );
@@ -57,9 +57,9 @@ const MainSelect: FC<IProps> = ({}) => {
 
   //ON RESET LE CACHE DE LA PAGE MY-SEARCH
   useEffect(() => {
-    console.log("STATE DANS LE USEFFECT: ", state);
+    //console.log("STATE DANS LE USEFFECT: ", state);
     if (state.success && state.newParams) {
-      console.log('ON MET A JOUR LES PARAMS DEPUIS LE STATE : ',params, state.newParams);
+      //console.log('ON MET A JOUR LES PARAMS DEPUIS LE STATE : ',params, state.newParams);
       setParams(state.newParams);
     }
   }, [state]);
@@ -136,7 +136,7 @@ const MainSelect: FC<IProps> = ({}) => {
             variant="bordered"
             type="number"
             name="min"
-            isDisabled={params.donation}
+            isDisabled={params?.donation ?? false}
             onChange={onChangeHandler}
             value={params.min?.toString() ?? ""}
             endContent={
@@ -151,7 +151,7 @@ const MainSelect: FC<IProps> = ({}) => {
             type="number"
             variant="bordered"
             name="max"
-            isDisabled={params.donation}
+            isDisabled={params.donation ?? false}
             onChange={onChangeHandler}
             value={params.max?.toString() ?? ""}
             endContent={
@@ -199,7 +199,7 @@ const MainSelect: FC<IProps> = ({}) => {
           { params.id ? "Mettre à jour la recherche" : "Sauvegarder la recherche" }
         </Button>
         {state.success && (
-          <p className="text-green-500 text-xs text-center">Recherche sauvegardée</p>
+          <p className="text-green-500 text-xs text-center">{params.id ? 'Recherche mise a jour' : 'Recherche sauvegardée' }</p>
         )}
         {
           (state.error && !state.success) && <p className="text-red-500 text-xs text-center">{state.error}</p>

@@ -11,7 +11,6 @@ import {
   SliderValue,
 } from "@nextui-org/react";
 import { CheckIcon, Crosshair, MapPin, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React, { FC, useEffect, useState } from "react";
 
 const kmValue = [1, 5, 10, 20, 30, 50, 100, 200];
@@ -21,7 +20,6 @@ interface IProps {
 }
 
 const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
-  const router = useRouter();
   const [displaySlider, setDisplaySlider] = useState<boolean>(false);
   const {
     selectedAddress,
@@ -70,7 +68,7 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
       },
       (error) => {
         console.log(
-          "VOUS DEVEZ AUTORISEZ LA LOCALISATION DANS VOTRE NAVIGATEUR."
+          "VOUS DEVEZ AUTORISER LA LOCALISATION DANS VOTRE NAVIGATEUR."
         );
       }
     );
@@ -79,38 +77,70 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
   //CLICK "TOUTE LA FRANCE"
   const onRemoveAroundMe = () => {
     setAroundMe(undefined);
+    setSelectedAddress(undefined);
     setValue(0);
     setDisplaySlider(false);
+
+    // //ON CREE UN NOUVEAU PARAMS
+    // const newParams: ISearchParams = {
+    //   ...params,
+    //   lat: aroundMe?.coordonates?.lat,
+    //   lng: aroundMe?.coordonates?.lng,
+    //   radius: aroundMe?.coordonates?.lng && aroundMe?.coordonates?.lat ? kmValue[value as number] : undefined,
+    // };
+
+    // //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT
+    // updateFromSearchLocation(aroundMe, newParams);
   };
 
   //CLICK SUR RECHERCHER
   const onClickHandler = async () => {
-    //ON CREE UN NOUVEAU PARAMS
-    const newParams: ISearchParams = {
-      ...params,
-      lat: aroundMe?.coordonates?.lat,
-      lng: aroundMe?.coordonates?.lng,
-      radius: aroundMe?.coordonates?.lng && aroundMe?.coordonates?.lat ? kmValue[value as number] : undefined,
-    };
+    // //ON CREE UN NOUVEAU PARAMS
+    // const newParams: ISearchParams = {
+    //   ...params,
+    //   lat: aroundMe?.coordonates?.lat,
+    //   lng: aroundMe?.coordonates?.lng,
+    //   radius: aroundMe?.coordonates?.lng && aroundMe?.coordonates?.lat ? kmValue[value as number] : undefined,
+    // };
 
-    //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT
-    updateFromSearchLocation(aroundMe, newParams);
+    // //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT
+    // updateFromSearchLocation(aroundMe, newParams);
 
     //ON CREE LA QUERY SELON LES NOUVEAUX PARAMS
-    const query = new URLSearchParams(paramsToQuery(newParams));
-    console.log("ON EST DANS SUBMIT : ", newParams);
+    const query = new URLSearchParams(paramsToQuery(params));
+    console.log("ON EST DANS SUBMIT : ", params, aroundMe);
+    
+        //ON REMPLACE L'URL AVEC
+        window.history.replaceState({}, "", `/search-result?${query}`);
 
     //ON CLOSE LA POPOVER
     if (trigger) {
       trigger.click();
     }
-
-    //ON REMPLACE L'URL AVEC
-    window.history.replaceState({}, "", `/search-result?${query}`);
-    //router.push(`/search-result?${query}`);
   };
 
-  useEffect(() => {}, [params]);
+  useEffect(() => {
+    //ON CREE UN NOUVEAU PARAMS
+    const newParams: ISearchParams = {
+      ...params,
+      locationId: aroundMe?.id,
+      lat: aroundMe?.coordonates?.lat || 3,
+      lng: aroundMe?.coordonates?.lng || 3,
+      radius: aroundMe?.coordonates?.lng && aroundMe?.coordonates?.lat ? kmValue[value as number] : undefined,
+    };
+    
+    console.log("AROUND ME DANS LE USEEFFECT: ", aroundMe, newParams);
+    //ON MET A JOUR PARAMS ET SELECTEDADDRESS DANS LE CONTEXT
+    updateFromSearchLocation(aroundMe, newParams);
+
+    // ON CREE LA QUERY SELON LES NOUVEAUX PARAMS
+    // const query = new URLSearchParams(paramsToQuery(newParams));
+    // console.log("ON EST DANS SUBMIT : ", newParams);
+
+    // ON REMPLACE L'URL AVEC
+    // window.history.replaceState({}, "", `/search-result?${query}`);
+
+  }, [aroundMe]);
 
   return (
     <PopoverContent className="w-full py-4">
