@@ -39,6 +39,7 @@ const CategoriesSelect: FC<IProps> = ({  }) => {
   //GESTION DE LA SELECTION DE LA CATEGORY
   const onClickHandler = (cat: CategoriesType | undefined, label: string) => {
     //SI LUSER RECLIQUE SUR LA MEME CATEGORY QUE CELLE DEJA STOCKEE, ON NE FAIT RIEN
+    console.log('ON CLICK HANDLER CATGEORIES : ', cat, params.categorySelectedType);
     if (cat !== params.categorySelectedType) {
       updateParams({ ...params, categorySelectedType: cat, categorySelectedLabel: label});
     }

@@ -51,7 +51,7 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
 
   return (
     <div
-      onClick={() => onRedirectClick(false)}
+      onClick={() => onRedirectClick(true)}
       className="border-1 border-gray-300 rounded-lg p-4 flex cursor-pointer hover:shadow-md"
     >
       {/* LEFT SIDE */}

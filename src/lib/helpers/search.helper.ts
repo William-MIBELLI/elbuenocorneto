@@ -3,12 +3,10 @@ import { ISearchParams, SortType } from "@/context/search.context";
 import { CategoryEnum, SearchInsert } from "@/drizzle/schema";
 import { user } from "@nextui-org/theme";
 
-
-
-
-export const queryToParams = (query: QueryParams): ISearchParams => {
-
-
+export const queryToParams = (
+  query: QueryParams,
+  withUndefined = false
+): ISearchParams => {
   const params = {
     ...query,
     titleOnly: query.titleOnly === "true",
@@ -28,26 +26,33 @@ export const queryToParams = (query: QueryParams): ISearchParams => {
     lng: query.lng ? +query.lng ?? undefined : undefined,
     id: query.id?.toString() ?? undefined,
     locationId: query.locationId?.toString() ?? undefined,
-    createdAt: query.createdAt ? new Date(query.createdAt as string) : undefined,
+    createdAt: query.createdAt
+      ? new Date(query.createdAt as string)
+      : undefined,
   };
 
   const mapped = Object.fromEntries(
     Object.entries(params).filter(([key, value]) => value !== undefined)
   );
-  return mapped as unknown as ISearchParams;
+
+  //SI ON NE BEUT PAS LES UNDEFINED
+  if (!withUndefined) {
+    return mapped as unknown as ISearchParams;
+  }
+
+  return params;
 };
 
 export const paramsToQuery = (
   params: ISearchParams
 ): Record<string, string> => {
-
-  const ignore: Partial<keyof SearchInsert>[] = [ 'createdAt', 'userId' ];
-
+  const ignore: Partial<keyof SearchInsert>[] = ["createdAt", "userId"];
 
   const mapped = Object.fromEntries(
     Object.entries(params)
       .map(([key, value]) => {
-        return (value !== undefined || value?.length !== 0) && !ignore.includes(key as keyof SearchInsert)
+        return (value !== undefined || value?.length !== 0) &&
+          !ignore.includes(key as keyof SearchInsert)
           ? [key, value?.toString()]
           : [];
       })
@@ -78,29 +83,53 @@ export const getPriceText = (
   return "Tous les prix";
 };
 
-export const compareSearchs = (current: SearchInsert | ISearchParams, target: ISearchParams): boolean => {
-
+export const compareSearchs = (
+  current: SearchInsert | ISearchParams,
+  target: ISearchParams
+): boolean => {
   //ON CREE UN TABLEAU AVEC LES KEYS A IGNORER
-  const ignore: Partial<keyof SearchInsert>[] = ["userId", "id", "locationId", 'createdAt', 'page'];
+  const ignore: Partial<keyof SearchInsert>[] = [
+    "userId",
+    "id",
+    "locationId",
+    "createdAt",
+    "page",
+  ];
 
   //console.log('CURRENT : ', current);
   //console.log('target : ', target);
 
   //ON LOOP SUR CHAQUE KEY DE LA SEARCH
   for (const key in current) {
-
     //SI LA KEY EST DANS LA TARGET MAIS LES VALUES SONT DIFFERENTES, ON RETOURNE FALSE
-    if (current[key as keyof ISearchParams] !== target[key as keyof ISearchParams]) {
-      if (!ignore.includes(key as keyof SearchInsert) && current[key as keyof ISearchParams] !== undefined || null) {
+    if (
+      current[key as keyof ISearchParams] !== target[key as keyof ISearchParams]
+    ) {
+      if (
+        (!ignore.includes(key as keyof SearchInsert) &&
+          current[key as keyof ISearchParams] !== undefined) ||
+        null
+      ) {
         // //console.log('DIFFERENT VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
-        return false
+        return false;
       }
       // //console.log('DIFFERENT VALUE IGNORED : ',key , current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
     }
     // //console.log('SAME VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
   }
-  console.log('SAME : ', current, target)
-  return true
-}
+  console.log("SAME : ", current, target);
+  return true;
+};
 
-
+export const generateFullSearchInsert = (
+  params: SearchInsert
+): SearchInsert => {
+  const query = paramsToQuery(params);
+  const fullParams = queryToParams(query as QueryParams, true);
+  const mappedFullParams = Object.fromEntries(Object.entries(fullParams).map(
+    ([key, value]) => {
+      return value === undefined ? [key, null] : [key, value];
+    }
+  ));
+  return { ...params, ...mappedFullParams, createdAt: new Date(Date.now())};
+};

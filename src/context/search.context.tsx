@@ -2,7 +2,7 @@
 import { CategoryEnum, CategorySelect, LocationInsert, SearchInsert } from "@/drizzle/schema";
 import { CategoriesType, ProductForList } from "@/interfaces/IProducts";
 import { searchWithFiltersACTION } from "@/lib/actions/product.action";
-import { paramsToQuery } from "@/lib/helpers/search.helper";
+import { generateFullSearchInsert, paramsToQuery } from "@/lib/helpers/search.helper";
 import { getLocationByIdOnDB } from "@/lib/requests/location.request";
 import { ConsoleLogWriter, SQL, sql } from "drizzle-orm";
 import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
@@ -107,30 +107,35 @@ export const SearchContextProvider = ({ children }: Props) => {
   // }, [params]);
 
   const resetState = async (newParams: ISearchParams) => {
-    // const resestedParams: ISearchParams = { keyword: params.keyword, titleOnly: params.titleOnly };
-    // setParams(newParams);
-    console.log('NEW PARAMS DANS RESETSTATE : ', newParams);
+   
+    //ON MET A ZERO PRODUCTS, LIST ET SELECTEDADDRESS
     setProducts([]);
-    setCategories([]);
+    //setCategories([]);
     setList([]);
     setSelectedAddress(undefined);
-    // getProds(newParams);
+
+    //ET ON MET A JOUR LES PARMS AVEC LES NOUVEAUX PARAMS
     updateParams(newParams);
   }
 
  
 
   const getProds = async (params: ISearchParams) => {
+
+    //ON FETCH LES PRODUCTS AVEC LES NOUVEAUX PARAMS
     const st = await searchWithFiltersACTION(
       params,
       { success: false, error: null, products },
       new FormData()
     );
+
+    //ON MET A JOUR LES PRODUCTS DANS LE STATE
     setProducts(st.products);
   };
 
   const updateParams = async (newParams: ISearchParams): Promise<void> => {
 
+    // console.log('NEW PARAMS DANS UPDATEPARAMS : ', newParams);
     //ON MET A JOUR LES PARAMS
     setParams(newParams);
 
@@ -151,6 +156,10 @@ export const SearchContextProvider = ({ children }: Props) => {
 
   };
 
+  useEffect(() => {
+    // console.log('PARAMS DANS LE USEEFFECT : ', params);
+  },[params]);
+
   const updateLocation = (loc: LocationInsert | undefined): void => {
 
     //ON MET A JOUR LE STATE DE LA LOCATION
@@ -160,7 +169,7 @@ export const SearchContextProvider = ({ children }: Props) => {
     const lat = loc?.coordonates?.lat || undefined;
     const lng = loc?.coordonates?.lng || undefined;
     const newParams: ISearchParams = { ...params, lat, lng, locationId: loc?.id, radius: 1 };
-    console.log('NEW PARAMS DANS UPDATELOCATION : ', newParams);
+    // console.log('NEW PARAMS DANS UPDATELOCATION : ', newParams);
     setParams(newParams);
 
     //ON RECUPERE LES PRODUITS AVEC LES NOUVEAUX PARAMS

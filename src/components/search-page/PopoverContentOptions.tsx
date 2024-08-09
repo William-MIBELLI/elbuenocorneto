@@ -28,6 +28,7 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
     updateLocation,
     updateParams
   } = useSearchContext();
+  const [errorLocation, setErrorLocation] = useState<string | undefined>();
   const [value, setValue] = useState<SliderValue>(
     kmValue.findIndex((e) => e === params.radius || 1) || 0
   );
@@ -49,12 +50,22 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
     }
   }, [params.radius]);
 
+  //QUAND L'USER CHANGE LA VALEUR DU SLIDER
   const onSLiderChange = (value: SliderValue) => {
     setValue(value);
     const km = kmValue[(value as number) || 0];
     setKm(km);
-    updateParams({ ...params, radius: km });
   }
+  
+  //ON MET UN TIMEOUT POUR EVITER DE TROP DE REQUETES
+  useEffect(() => {
+    const to = setTimeout(() => {
+      //ON UPDATE LES PARAMS
+      console.log("ON UPDATE LES PARAMS DANS LE SLIDER");
+      updateParams({ ...params, radius: km });
+    }, 500);
+    return () => clearTimeout(to);
+  },[value])
 
   //CLICK SUR "AUTOUR DE MOI"
   const aroundMeClickHandler = async () => {
@@ -66,6 +77,10 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
           JSON.parse(JSON.stringify(position.coords))
         );
 
+        //SI PAS DE LOC, ON DISPLAY UNE ERREUR ET ON FAST RETURN
+        if (!loc) {
+          return setErrorLocation('Impossible de récupérer votre position');
+        }
         //ON LA STOCKE DANS SELECTADDRESS
         updateLocation(loc);
 
@@ -77,8 +92,8 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
         setDisplaySlider(true);
       },
       (error) => {
-        console.log(
-          "VOUS DEVEZ AUTORISER LA LOCALISATION DANS VOTRE NAVIGATEUR."
+        setErrorLocation(
+          "Vous devez autoriser la localisation dans votre navigateur."
         );
       }
     );
@@ -179,6 +194,13 @@ const PopoverContentOptions: FC<IProps> = ({ trigger }) => {
               <p>Autour de moi</p>
             </div>
           )}
+
+          {/* ERROR LOCATION AROUND ME */}
+          {
+            errorLocation && (
+              <div className="error_message">{errorLocation}</div>
+            )
+          }
 
           {(displaySlider || selectedAddress) && (
             <div className="w-full ">

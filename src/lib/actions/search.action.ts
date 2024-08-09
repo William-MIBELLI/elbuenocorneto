@@ -17,7 +17,7 @@ import {
 } from "../requests/search.request";
 import { revalidatePath } from "next/cache";
 import { rest } from "lodash";
-import { compareSearchs } from "../helpers/search.helper";
+import { compareSearchs, generateFullSearchInsert, queryToParams } from "../helpers/search.helper";
 
 export const createSearchACTION = async (
   data: { params: ISearchParams; location: LocationInsert | undefined },
@@ -139,7 +139,7 @@ export const updateSearchACTION = async (
 
     const { search, location } = data;
 
-    //console.log('DATA DANS UPDATE SEARCH ACTION : ', data);
+    console.log('DATA DANS UPDATE SEARCH ACTION : ', data);
 
     //ON CHECK SI LA RECHERCHE EXISTE
     const existingSearch = await getSearchs("id", search.id);
@@ -205,17 +205,22 @@ export const updateSearchACTION = async (
       if (!isDeleted) throw new Error("Location not deleted");
     }
 
+    const newParams: SearchInsert = {
+      ...search,
+      locationId: location ? oldSearchItem?.location?.id || location.id : null,
+      userId: session.user.id,
+      id: oldSearch.id,
+    };
+
+    const fullNewSearch = generateFullSearchInsert(newParams);
+
+    // const np = queryToParams(newParams);
     
+    console.log('NEW PARAMS DANS UPDATE SEARCH ACTION : ', newParams, fullNewSearch);
 
     //ON UPDATE LA RECHERCHE
     const updatedSearch = await updateSearchOnDB(
-      {
-        ...search,
-        createdAt: new Date(),
-        locationId: location ? oldSearchItem?.location?.id || location.id : null,
-        userId: session.user.id,
-        id: oldSearch.id,
-      },
+      fullNewSearch,
       oldSearch.id
     );
 

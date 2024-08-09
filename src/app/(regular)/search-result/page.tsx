@@ -24,11 +24,9 @@ export const dynamic = 'force-dynamic';
 
 const page: FC<IProps> = async ({ searchParams }) => {
   console.log("REFRESH PAGE !!!!!!!!!!!!");
-  //ON MAP LES QUERIES DE L'URL EN ISearchParams
-  const params = queryToParams(searchParams);
 
-  //ON REQUEST LA DB AVEC LA CONDITION
-  //const result = await getProductsList(params);
+  //ON MAP LES QUERIES DE L'URL EN ISearchParams AVEC LES UNDEFINED
+  const params = queryToParams(searchParams, true);
 
   //ON PASSE L'ENSEMBLE A BODY, ON POURRA AINSI TOUT STOCKER DANS LE CONTEXT
   return (

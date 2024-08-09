@@ -1,16 +1,18 @@
 "use client";
-import { ISearchItem } from "@/lib/requests/search.request";
+import { getSearchs, ISearchItem } from "@/lib/requests/search.request";
 import React, { FC, useEffect, useState } from "react";
 import MySearchItem from "./MySearchItem";
 import { X } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 interface IProps {
-  searchItems: ISearchItem[];
+  // searchItems: ISearchItem[];
 }
 
-const MySearchList: FC<IProps> = ({ searchItems }) => {
-  const [searchs, setSearchs] = useState<ISearchItem[]>(searchItems);
+const MySearchList: FC<IProps> = () => {
+  const [searchs, setSearchs] = useState<ISearchItem[]>([]);
   const [displayAlert, setDisplayAlert] = useState<boolean>(false);
+  const session = useSession();
 
   //ON SUPPRIME L'ITEM DE LA LISTE POUR REFRESH L'UI
   const onDeleteSearch = (id: string) => {
@@ -18,6 +20,15 @@ const MySearchList: FC<IProps> = ({ searchItems }) => {
     setSearchs(searchs.filter((item) => item.search.id !== id));
     setDisplayAlert(true);
   };
+
+  //AU MONTAGE ON FETCH LES SEARCHS DE L'USER
+  useEffect(() => {
+    const fetchSearchs = async () => {
+      const searchItems = await getSearchs("userId", session?.data?.user?.id);
+      setSearchs(searchItems);
+    };
+    fetchSearchs();
+  },[session])
 
   //ON AFFICHE L'ALERT PENDANT 3 SECONDES
   useEffect(() => {

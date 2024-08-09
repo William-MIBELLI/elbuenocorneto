@@ -122,7 +122,7 @@ const AddressSearchInput = () => {
           <div
             ref={listRef}
             // onClick={(e) => console.log('CLICK SUR LISTREF ', e.relatedTarget)}
-            className="flex flex-col bg-blue-500 absolute  max-h-52 overflow-y-auto  w-full z-50 border-gray-300 shadow-md border-2 rounded-lg"
+            className="flex flex-col bg-white absolute  max-h-52 overflow-y-auto  w-full z-50 border-gray-300 shadow-md border-2 rounded-lg"
           >
             {list.map((address) => (
               <div

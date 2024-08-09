@@ -83,9 +83,22 @@ export const fetchAddressReverse = async ( location: GeolocationCoordinates) => 
       const temp = { properties: item.properties, geometry: { lng, lat } };
       return temp;
     });
-    ///const locationList =   mappedResponse.map(async (item) => await mapLocationForStorage(item));
-    const locationList = await mapLocationForStorage(mappedResponse);
-    console.log('LOCATION LIST DANS REVERSE : ', locationList);
+
+    const locationList =  await mapLocationForStorage(mappedResponse);
+
+    //SI PAS DE RESULTATS, ON RETOURNE LA POSITION DE L'USER
+    if (locationList.length === 0) {
+      const myPosition: LocationInsert = {
+        id: uuidv4(),
+        label: "Votre position",
+        streetName: "",
+        postcode: 0,
+        city: "Votre position",
+        coordonates: { lat: latitude, lng: longitude },
+      };
+      return myPosition;
+    }
+    //SINON ON RETURN LE 1ER RESULTAT
     return locationList[0];
   } catch (error: any) {
     console.log('ERROR REVERSE FETCH ADDRESS : ', error?.message ?? error);
