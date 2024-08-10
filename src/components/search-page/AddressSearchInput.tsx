@@ -1,20 +1,13 @@
 import { LocationInsert } from "@/drizzle/schema";
 import { fetchAddressFromAPI } from "@/lib/actions/location.action";
 import {
-  Button,
-  Divider,
   Input,
   Popover,
-  PopoverContent,
   PopoverTrigger,
-  Slider,
-  SliderValue,
-  Spinner,
 } from "@nextui-org/react";
-import { ChevronDown, Crosshair, LucideIcon, MapPin } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import PopoverContentOptions from "./PopoverContentOptions";
-import PopoverContentList from "./PopoverContentList";
 import { useSearchContext } from "@/context/search.context";
 
 const AddressSearchInput = () => {
@@ -52,7 +45,6 @@ const AddressSearchInput = () => {
 
   //ON UPDATE VALUE SI IL Y A UNE ADDRESS SELECTIONNEE DANS LE CONTEXT
   useEffect(() => {
-    console.log('USE EFFECT SUR LE SELECTED ADDRESS', selectedAddress);
     if (selectedAddress) {
       return setValue(selectedAddress.city);
     }
@@ -61,7 +53,6 @@ const AddressSearchInput = () => {
 
   //GESTION DU CLICK SUR ADDRESS DE LA LIST
   const onAddressClick = (address: LocationInsert) => {
-    console.log('ON ADDRESS CLICK')
     updateLocation(address);
     setList([]);
     if (triggerRef.current) {
@@ -121,7 +112,6 @@ const AddressSearchInput = () => {
         {(list.length > 0 && displayList && value.length > 0) && (
           <div
             ref={listRef}
-            // onClick={(e) => console.log('CLICK SUR LISTREF ', e.relatedTarget)}
             className="flex flex-col bg-white absolute  max-h-52 overflow-y-auto  w-full z-50 border-gray-300 shadow-md border-2 rounded-lg"
           >
             {list.map((address) => (

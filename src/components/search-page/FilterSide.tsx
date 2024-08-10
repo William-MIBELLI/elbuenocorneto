@@ -2,12 +2,9 @@
 import { Button, Divider } from "@nextui-org/react";
 import { ArrowLeft, X } from "lucide-react";
 import React, { FC, useEffect, useRef, useState } from "react";
-import Body from "./Body";
 import { useSearchContext } from "@/context/search.context";
 import MainSelect from "./MainSelect";
 import CategoriesSelect from "./CategoriesSelect";
-import { useFormState } from "react-dom";
-import { searchWithFiltersACTION } from "@/lib/actions/product.action";
 
 interface IProps {
   open: boolean;
@@ -19,29 +16,14 @@ const FilterSide: FC<IProps> = ({ open }) => {
     setDisplayCategories,
     params,
     updateParams,
-    products,
-    setProducts,
   } = useSearchContext();
 
   const container = useRef<HTMLDialogElement>(null);
   const dial = useRef<HTMLDivElement>(null);
-  // const submitRef = useRef<HTMLButtonElement>(null);
 
   const [isOpen, setIsOpen] = useState<boolean>(open);
   const [firstTime, setFirstTime] = useState<boolean>(true);
 
-  // const [state, action] = useFormState(
-  //   searchWithFiltersACTION.bind(null, params),
-  //   { success: false, products, error: null }
-  // );
-
-  //UPDATE DU RESULTAT DIRECTEMENT APRES QU'UN INPUT DU FILTER CHANGE DE VALUE
-  // useEffect(() => {
-  //   if (state && state?.success && state?.products) {
-  //     // console.log("ON RENTRE DANS LE USEEFFECT, products : ", state);
-  //     setProducts(state.products);
-  //   }
-  // }, [state]);
 
   //GESTION DU DISPLAY
   useEffect(() => {
@@ -60,10 +42,6 @@ const FilterSide: FC<IProps> = ({ open }) => {
     setIsOpen(true);
   }, [open]);
 
-  //DECLENCHE LE SUBMIT QUAND ON CHANGE UN INPUT
-  // useEffect(() => {
-  //   submitRef.current?.click();
-  // }, [params]);
 
   //CLOSE DIALOG SI CLICK OUTSIDE SIDER
   const onCloserHandler = (
@@ -77,7 +55,6 @@ const FilterSide: FC<IProps> = ({ open }) => {
 
   //RESET DE TOUS LES FILTRES, ON NE GARDE QUE LE KEYWORD
   const onResetHandler = () => {
-    // console.log("RESET PARAMS");
     const { keyword } = params;
     updateParams({
       keyword,
@@ -93,7 +70,6 @@ const FilterSide: FC<IProps> = ({ open }) => {
       onClick={onCloserHandler}
     >
       <div
-        // action={action}
         ref={dial}
         className="bg-white fixed min-h-screen  min-w-96 max-w-full right-0 top-0 p-4 flex flex-col gap-4 text-left"
       >
@@ -138,9 +114,6 @@ const FilterSide: FC<IProps> = ({ open }) => {
             <Button className="button_main" onClick={() => setIsOpen(false)} >Rechercher</Button>
           </div>
         </div>
-        {/* <button ref={submitRef} hidden type="submit">
-          SUBMIT
-        </button> */}
       </div>
     </dialog>
   );

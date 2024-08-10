@@ -1,7 +1,6 @@
 import { Input, Spinner } from "@nextui-org/react";
 import { Dispatch, FC, useEffect, useRef, useState } from "react";
 import SellButton from "../sell-button/SellButton";
-import { ProductSelect } from "@/drizzle/schema";
 import { Search } from "lucide-react";
 import ResultContainer from "./ResultContainer";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -23,7 +22,6 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
   const searchParams = useSearchParams();
   const ref = useRef<HTMLDivElement>(null);
   
-  useEffect(() => { console.log('SEARCHINPUT MOUNTED') },[])
 
   //SI L'USER CHANGE DE PAGE OU QUE LES SEARCH PARAMS CHANGENT, ON CACHE LE RESULT
   useEffect(() => {
@@ -55,7 +53,6 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
 
       //SI VALUE EST VIDE, ON NE REQUEST PAS
       if (now - lastTyping.current! >= 200 && value.length !== 0) {
-        console.log("ON LANCE LA RECHERCHE");
         setLoading(true);
         const response = await fetch('/api/fetch/search/' + value, {
           method: 'POST',
@@ -63,7 +60,6 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
         })
         if (response.ok) {
           const p: SearchResultType[] = await response.json();
-          console.log('RESULTAT : ', p);
           setSearchResult(p);
           setOpenResult(true);
           setLoading(false);
@@ -78,11 +74,9 @@ const SearchInput: FC<IProps> = ({isSearchFocus, setIsSearchFocus}) => {
       | React.FocusEvent<HTMLInputElement, Element>
       | React.FocusEvent<Element, Element>
   ) => {
-    console.log('ONBLUR EVENT ', event);
 
     //SI C'EST DANS RESULT, C'EST QUE L'USER A CLIQUE SUR UN LIEN, ON LAISSE LE RESULT AFFICHE
     if ((ref.current && !ref.current.contains(event.relatedTarget)) || !value.length) {
-      console.log('ON RENTRE DANS LE IF')
       setOpenResult(false);
       setIsSearchFocus(false)
     }

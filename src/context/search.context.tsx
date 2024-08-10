@@ -1,11 +1,9 @@
 "use client";
-import { CategoryEnum, CategorySelect, LocationInsert, SearchInsert } from "@/drizzle/schema";
-import { CategoriesType, ProductForList } from "@/interfaces/IProducts";
+import {  CategorySelect, LocationInsert, SearchInsert } from "@/drizzle/schema";
+import {  ProductForList } from "@/interfaces/IProducts";
 import { searchWithFiltersACTION } from "@/lib/actions/product.action";
-import { generateFullSearchInsert, paramsToQuery } from "@/lib/helpers/search.helper";
+import {  paramsToQuery } from "@/lib/helpers/search.helper";
 import { getLocationByIdOnDB } from "@/lib/requests/location.request";
-import { ConsoleLogWriter, SQL, sql } from "drizzle-orm";
-import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
 import {
   Dispatch,
   ReactNode,
@@ -14,7 +12,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useFormState } from "react-dom";
 
 interface IContextType {
   displaySide: boolean;
@@ -67,44 +64,7 @@ export const SearchContextProvider = ({ children }: Props) => {
   const [products, setProducts] = useState<ProductForList[]>([]);
   const [list, setList] = useState<LocationInsert[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<LocationInsert>();
-  const router = useRouter();
-  const pathName = usePathname()
-  const sp = useSearchParams();
-  const p = useParams();
 
-  //
-  // const updateFromSearchLocation = (
-  //   loc: LocationInsert | undefined,
-  //   newParams: ISearchParams
-  // ): void => {
-  //   setSelectedAddress(loc);
-  //   setParams(newParams);
-  // };
-
-  // useEffect(() => {
-  //   console.log('PARAMS DANS LE USEEFFECT : ', params);
-  // }, [params]);
-
-  // //ON UPDATE PARAMS QUAND L'USER CHOISIT UNE LOCALISATION
-  // useEffect(() => {
-  //   // console.log("YSEEFFECT SELECTEADRESS DANS CONTEXT : ", selectedAddress);
-  //   //AVANT DE METTRE A JOUR, ON VERIFIE SI SELECTADDRESS !== UNDEFINED OU SI IL Y AVAIT UNE ADRESSE MAUS L'USER L'A SUPPRIME
-  //   if (selectedAddress || params.lat) {
-  //     //console.log('ON RENTRE DANS LE IF : ', params, selectedAddress);
-  //     const lat = selectedAddress?.coordonates?.lat|| undefined;
-  //     const lng = selectedAddress?.coordonates?.lng || undefined;
-  //     const newParams: ISearchParams = { ...params, lat, lng, locationId: selectedAddress?.id };
-  //     setParams(newParams);
-  //   }
-  // }, [selectedAddress]);
-
-  // //ON UPDATE l'URL AVEC LES PARAMS
-  // useEffect(() => {
-  //   const query = paramsToQuery(params);
-  //   const USP = new URLSearchParams(query);
-  //   window.history.replaceState(null, '',`/search-result/?${USP}`);
-
-  // }, [params]);
 
   const resetState = async (newParams: ISearchParams) => {
    
@@ -119,7 +79,6 @@ export const SearchContextProvider = ({ children }: Props) => {
   }
 
  
-
   const getProds = async (params: ISearchParams) => {
 
     //ON FETCH LES PRODUCTS AVEC LES NOUVEAUX PARAMS
@@ -135,7 +94,6 @@ export const SearchContextProvider = ({ children }: Props) => {
 
   const updateParams = async (newParams: ISearchParams): Promise<void> => {
 
-    // console.log('NEW PARAMS DANS UPDATEPARAMS : ', newParams);
     //ON MET A JOUR LES PARAMS
     setParams(newParams);
 
@@ -156,9 +114,6 @@ export const SearchContextProvider = ({ children }: Props) => {
 
   };
 
-  useEffect(() => {
-    // console.log('PARAMS DANS LE USEEFFECT : ', params);
-  },[params]);
 
   const updateLocation = (loc: LocationInsert | undefined): void => {
 
@@ -175,34 +130,6 @@ export const SearchContextProvider = ({ children }: Props) => {
     //ON RECUPERE LES PRODUITS AVEC LES NOUVEAUX PARAMS
     getProds(newParams);
   }
-
-
-  // //FETCH PRODUCTS QUAND PARAMS CHANGE
-  // useEffect(() => {
-  //   // console.log("USEFFEECT CREATESEARCHFIULTER DANS CONTETX");
-  //   const getProds = async () => {
-  //     const st = await searchWithFiltersACTION(
-  //       params,
-  //       { success: false, error: null, products },
-  //       new FormData()
-  //     );
-  //     setProducts(st.products);
-  //   };
-  //   getProds();
-  // }, [params]);
-
-  // //SI LOCATION.ID DANS PARAMS, ON RECUPERE LA LOCATION DANS LA DB
-  // useEffect(() => {
-  //   if (params.locationId) {
-  //     console.log("USEFFEECT LOCATIONID DANS CONTETX");
-  //     const getLoc = async () => {
-  //       const loc = await getLocationByIdOnDB(params.locationId!);
-  //       setSelectedAddress(loc);
-  //     };
-  //     getLoc();
-  //   }
-  // }, [params.locationId]);
-
 
   //NOMBRE DE FILTRES ACTIFS
   //////////  CEST DEGUEU, A IMPROVE /////////////

@@ -1,12 +1,11 @@
 "use client";
-import React, { FC, useEffect, useRef, useState } from "react";
-import AddressInput from "../inputs/AddressInput";
+import React, {  useEffect, useState } from "react";
 import { Button } from "@nextui-org/react";
 import { ChevronRight, SlidersHorizontal } from "lucide-react";
 import FilterSide from "./FilterSide";
 import { useSearchContext } from "@/context/search.context";
 import AddressSearchInput from "./AddressSearchInput";
-import { getPriceText, paramsToQuery } from "@/lib/helpers/search.helper";
+import { getPriceText } from "@/lib/helpers/search.helper";
 
 
 const FilterHeader = () => {

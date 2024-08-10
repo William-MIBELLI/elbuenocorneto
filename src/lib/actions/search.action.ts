@@ -16,8 +16,7 @@ import {
   updateSearchOnDB,
 } from "../requests/search.request";
 import { revalidatePath } from "next/cache";
-import { rest } from "lodash";
-import { compareSearchs, generateFullSearchInsert, queryToParams } from "../helpers/search.helper";
+import {  generateFullSearchInsert } from "../helpers/search.helper";
 
 export const createSearchACTION = async (
   data: { params: ISearchParams; location: LocationInsert | undefined },
@@ -32,7 +31,6 @@ export const createSearchACTION = async (
     const { params, location } = data;
     const session = await auth();
 
-    console.log('DATA DANS CREATE SEARCH ACTION : ', data);
     //ON CHECK SI L'UTILISATEUR EST CONNECTE
     if (!session || !session.user || !session.user.id) {
       throw new Error("User not connected");
@@ -139,7 +137,6 @@ export const updateSearchACTION = async (
 
     const { search, location } = data;
 
-    console.log('DATA DANS UPDATE SEARCH ACTION : ', data);
 
     //ON CHECK SI LA RECHERCHE EXISTE
     const existingSearch = await getSearchs("id", search.id);
@@ -161,7 +158,6 @@ export const updateSearchACTION = async (
 
     //SI ON A UNE NOUVELLE LOCATION
     if (location?.coordonates) {
-      //console.log('OLCDSEACRH : ', oldSearch);
       //ON CHECK SI IL Y EN A UNE ANCIENNE
       if (OldLocation?.coordonates) {
         //ON LES DESTRUCTURE POUR ENLEVER L'ID
@@ -171,10 +167,8 @@ export const updateSearchACTION = async (
         //ON LES COMPARE
         const isSameLoc = newLng === oldLng && newLat === oldLat;
 
-        console.log('IS SAME LOC : ', isSameLoc, newLng, oldLng, newLat, oldLat);
         //SI LES LOCATIONS SONT DIFFERENTES
         if (!isSameLoc) {
-          // console.log('ON RENTRE DANS LE IF DE LOCATIONS DIFFERENTES');
           //ON MET A JOUR L'ANCIENNE LOCATION AVEC LES PROPRIETES DE LA NOUVELLE
           const updatedLoc = await updateLocationOnDB(
             {...location, id: oldSearch.locationId!},
@@ -214,10 +208,6 @@ export const updateSearchACTION = async (
 
     const fullNewSearch = generateFullSearchInsert(newParams);
 
-    // const np = queryToParams(newParams);
-    
-    console.log('NEW PARAMS DANS UPDATE SEARCH ACTION : ', newParams, fullNewSearch);
-
     //ON UPDATE LA RECHERCHE
     const updatedSearch = await updateSearchOnDB(
       fullNewSearch,
@@ -228,8 +218,6 @@ export const updateSearchACTION = async (
     if (!updatedSearch) {
       throw new Error("Search not updated");
     }
-
-    // console.log('UPDATED SEARCH DANS ACTION  : ', updatedSearch);
 
     //ON RETURN SUCCESS
     return {
@@ -243,6 +231,3 @@ export const updateSearchACTION = async (
   }
 };
 
-export const revalidatePathAfterSuccess = async (path: string) => {
-  revalidatePath(path);
-}

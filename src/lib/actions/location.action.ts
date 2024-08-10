@@ -73,7 +73,7 @@ export const fetchAddressReverse = async ( location: GeolocationCoordinates) => 
   try {
     const { latitude, longitude } = location;
     console.log('LOCATION : ', location);
-    const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${longitude}&lat=${latitude}`);
+    const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${longitude}&lat=${latitude.toFixed(2)}`);
     if (res.status !== 200) {
       throw new Error('fetching fail with status : ' + res.status);
     }

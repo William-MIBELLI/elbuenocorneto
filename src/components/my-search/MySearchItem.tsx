@@ -1,6 +1,5 @@
 "use client";
-import { SearchSelect } from "@/drizzle/schema";
-import { ISearchItem } from "@/lib/requests/search.request";
+import {  ISearchItem } from "@/lib/requests/search.request";
 import { Button } from "@nextui-org/react";
 import { Layers3, Pen, Trash } from "lucide-react";
 import React, { FC, useEffect } from "react";
@@ -21,6 +20,8 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
     searchParams;
   const priceToDisplay = getPriceText(searchParams);
   const router = useRouter();
+
+
 
   //ON REDIRIGE VERS LA PAGE DE RECHERCHE AVEC LES PARAMS
   const onRedirectClick = (isUpdate: boolean) => {
@@ -57,7 +58,7 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
       {/* LEFT SIDE */}
       <div className=" w-2/3 flex flex-col items-start gap-2">
         {/* CATEGORIE */}
-        <div className="flex gap-1 text-xs items-center bg-gray-200 rounded-lg w-fit px-2 py-0.5 text-gray-900">
+        <div className="flex gap-1 text-xs items-center bg-blue-200 rounded-lg w-fit px-2 py-0.5 text-blue-900">
           {categorySelectedType ? (
             <>
               <IconCategorySelector size={13} category={categorySelectedType} />
@@ -73,15 +74,11 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
 
         {/* TITLE AND COUNT*/}
         <div className="flex items-center gap-3">
-          <h3 className="text-xl font-semibold">{keyword}</h3>
-
-          <div className="bg-main rounded-xl text-white font-semibold px-2">
-            9+
-          </div>
+          <h3 className="text-2xl font-semibold">{keyword}</h3>
         </div>
 
         {/* PRICE */}
-        <p className="text-sm text-black font-semibold">{priceToDisplay}</p>
+        <p className="text-sm text-green-400 font-semibold">{priceToDisplay}</p>
 
         {/* LOCATION */}
         <div>
@@ -96,7 +93,7 @@ const MySearchItem: FC<IProps> = ({ item, deleteOnState }) => {
         </div>
 
         {/* DATE */}
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 italic">
           Crée le {new Date(item.search.createdAt!).toLocaleDateString()}
         </p>
       </div>

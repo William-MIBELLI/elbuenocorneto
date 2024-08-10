@@ -1,7 +1,6 @@
 import { QueryParams } from "@/app/(regular)/search-result/page";
 import { ISearchParams, SortType } from "@/context/search.context";
 import { CategoryEnum, SearchInsert } from "@/drizzle/schema";
-import { user } from "@nextui-org/theme";
 
 export const queryToParams = (
   query: QueryParams,
@@ -61,7 +60,6 @@ export const paramsToQuery = (
         return item[1] !== undefined;
       })
   );
-  //console.log("MAPPED DANS LA FUNCTION : ", mapped, params);
   return mapped;
 };
 
@@ -85,7 +83,7 @@ export const getPriceText = (
 
 export const compareSearchs = (
   current: SearchInsert | ISearchParams,
-  target: ISearchParams
+  t: ISearchParams
 ): boolean => {
   //ON CREE UN TABLEAU AVEC LES KEYS A IGNORER
   const ignore: Partial<keyof SearchInsert>[] = [
@@ -96,8 +94,8 @@ export const compareSearchs = (
     "page",
   ];
 
-  //console.log('CURRENT : ', current);
-  //console.log('target : ', target);
+  //ON CREE UNE SEARCH AVEC TOUS LES PARAMS, MEME UNDEFINED
+  const target = generateFullSearchInsert(t as SearchInsert);
 
   //ON LOOP SUR CHAQUE KEY DE LA SEARCH
   for (const key in current) {
@@ -105,31 +103,43 @@ export const compareSearchs = (
     if (
       current[key as keyof ISearchParams] !== target[key as keyof ISearchParams]
     ) {
+      //ON CHECK SI LA KEY N'EST PAS DANS LES KEYS A IGNORER
+      if (ignore.includes(key as keyof SearchInsert)) {
+        console.log('KEY IGNORED : ', key);
+        continue;
+      }
+      //ET SI LA VALUE N'EST PAS UNDEFINED OU NULL
       if (
-        (!ignore.includes(key as keyof SearchInsert) &&
-          current[key as keyof ISearchParams] !== undefined) ||
-        null
-      ) {
-        // //console.log('DIFFERENT VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
+        (current[key as keyof ISearchParams] !== undefined &&
+          current[key as keyof ISearchParams] !== null) ||
+          (target[key as keyof ISearchParams] !== undefined &&
+            target[key as keyof ISearchParams] !== null)
+          ) {
+        console.log("KEY : ", key, "CURRENT : ", current[key as keyof ISearchParams], "TARGET : ", target[key as keyof ISearchParams]);
+        console.log("RETURN FALSE");
         return false;
       }
-      // //console.log('DIFFERENT VALUE IGNORED : ',key , current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
     }
-    // //console.log('SAME VALUE : ', key, current[key as keyof ISearchParams], target[key as keyof ISearchParams]);
   }
-  console.log("SAME : ", current, target);
   return true;
 };
 
 export const generateFullSearchInsert = (
   params: SearchInsert
 ): SearchInsert => {
+  //ON CONVERTIT LES PARAMS EN QUERY
   const query = paramsToQuery(params);
+
+  //ON SE SERT DE LA QUERY POUR GENERER UNE SEARCH AVEC TOUS LES PARAMS, MEME UNDEFINED
   const fullParams = queryToParams(query as QueryParams, true);
-  const mappedFullParams = Object.fromEntries(Object.entries(fullParams).map(
-    ([key, value]) => {
+
+  //ON MAP LES UNDEFINED EN NULL
+  const mappedFullParams = Object.fromEntries(
+    Object.entries(fullParams).map(([key, value]) => {
       return value === undefined ? [key, null] : [key, value];
-    }
-  ));
-  return { ...params, ...mappedFullParams, createdAt: new Date(Date.now())};
+    })
+  );
+
+  //ON RETURN LES PARAMS AVEC LA DATE DE CREATION
+  return { ...params, ...mappedFullParams, createdAt: new Date(Date.now()) };
 };

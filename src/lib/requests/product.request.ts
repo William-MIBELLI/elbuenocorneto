@@ -566,8 +566,8 @@ export const searchOnDb = async (
       .limit(3);
 
     return result;
-  } catch (error) {
-    console.log("ERROR SEARCHING ON DB : ", error);
+  } catch (error: any) {
+    console.log("ERROR SEARCHING ON DB : ", error?.message);
     return [];
   }
 };

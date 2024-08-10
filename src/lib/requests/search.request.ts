@@ -1,5 +1,4 @@
 'use server'
-import { check } from "drizzle-orm/mysql-core";
 import { getDb } from "@/drizzle/db";
 import {
   locations,
@@ -9,8 +8,6 @@ import {
   searchTable,
 } from "@/drizzle/schema";
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { ISearchParams } from "@/context/search.context";
 import { compareSearchs } from "../helpers/search.helper";
 
@@ -22,8 +19,6 @@ export const createSearchOnDB = async (search: SearchInsert) => {
       .values(search)
       .returning()
       .then((r) => r[0]);
-    // revalidatePath("/my-search", "page");
-    console.log("SEARCH CREATED REQUEST APRES REVALIDATE PATH: ", res);
     return res;
   } catch (error: any) {
     console.log("ERROR CREATING SEARCH : ", error?.message);
@@ -45,7 +40,7 @@ export const getSearchs = async <T extends Partial<SearchTableKeys>>(
     const db = getDb();
     const res = await db
       .select()
-      .from(searchTable)
+        .from(searchTable)
       .leftJoin(locations, eq(searchTable.locationId, locations.id))
       .where(eq(searchTable[col], value))
       .then((r) => r);
@@ -69,18 +64,17 @@ export const checkSearchExist = async (searchToSave: SearchInsert | ISearchParam
       .then((r) => r);
 
     //ON FILTRE LES RECHERCHES QUI ONT LES MEMES PARAMS
-    // const mapped = res.filter((current) => {
-    //   return compareSearchs(current, searchToSave);
-    // });
     for(const r of res) {
       const isSame = compareSearchs(r, searchToSave);
+
+      //SI ON TROUVE UNE RECHERCHE IDENTIQUE, ON RENVOIE TRUE
       if (isSame) {
-        // console.log('!!!!!!!!!!!!!  SAME IS TRUE  !!!!!!!!!!!!!!!', r, searchToSave);
         return true;
       };
     }
-
+    //SINON ON RENVOIE FALSE
     return false;
+
   } catch (error) {
     console.log("ERROR CHECKING SEARCH EXIST : ", error);
     return false;
@@ -106,7 +100,6 @@ export const deleteSearchOnDB = async (
 
 export const updateSearchOnDB = async (updatedSearch: SearchInsert, id: string) => {
   try {
-    // console.log('DATA DANS UPDATE SEARCH : ', updatedSearch, id);
     const db = getDb();
     const res = await db
       .update(searchTable)
@@ -120,3 +113,4 @@ export const updateSearchOnDB = async (updatedSearch: SearchInsert, id: string) 
     return null;
   }
 }
+

@@ -1,5 +1,5 @@
 import { useSearchContext } from "@/context/search.context";
-import { createSearchACTION, revalidatePathAfterSuccess, updateSearchACTION } from "@/lib/actions/search.action";
+import { createSearchACTION, updateSearchACTION } from "@/lib/actions/search.action";
 import {
   Divider,
   Checkbox,
@@ -15,7 +15,6 @@ import {
   ArrowDownNarrowWide,
   ListTodo,
 } from "lucide-react";
-import { revalidatePath } from "next/cache";
 import React, { FC, useEffect } from "react";
 import { useFormState } from "react-dom";
 
@@ -50,16 +49,10 @@ const MainSelect: FC<IProps> = ({}) => {
       : createSearchACTION.bind(null, { params, location: selectedAddress }),
     { success: false, error: "", newParams: undefined }
   );
-  // const revalidate = async (path: string) => {
-  //   'use server';
-  //   //revalidatePath(path);
-  // }
 
   //ON RESET LE CACHE DE LA PAGE MY-SEARCH
   useEffect(() => {
-    //console.log("STATE DANS LE USEFFECT: ", state);
     if (state.success && state.newParams) {
-      // console.log('ON MET A JOUR LES PARAMS DEPUIS LE STATE : ',params, state.newParams);
       updateParams(state.newParams);
     }
   }, [state]);

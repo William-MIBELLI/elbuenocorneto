@@ -4,9 +4,7 @@ import FilterHeader from "./FilterHeader";
 import ProductList from "../product-list/ProductList";
 import { ProductForList } from "@/interfaces/IProducts";
 import { ISearchParams, useSearchContext } from "@/context/search.context";
-import { Button, Pagination } from "@nextui-org/react";
-import { usePathname, useRouter } from "next/navigation";
-import { paramsToQuery } from "@/lib/helpers/search.helper";
+import { usePathname } from "next/navigation";
 
 interface IProps {
   paramsURL: ISearchParams;
@@ -14,28 +12,16 @@ interface IProps {
 }
 
 const Body: FC<IProps> = ({ result, paramsURL }) => {
-  const { products, setProducts, updateParams, params, resetState } =
+  const { products, resetState } =
     useSearchContext();
-  const { keyword, titleOnly, page } = paramsURL;
-  const [count, setCount] = useState<number>(0);
-  const router = useRouter();
+  const { keyword } = paramsURL;
   const actualPath = usePathname();
 
-  //AU MONTAGE, ON STOCKE LES PRODUCST DANS LE CONTEXT,
-  //ET ON PASSERA A PRODUCTLIST LES PRODUCTS DU CONTEXT
-  //POUR FACILITER LE REFRESH
+  //AU MONTAGE, ON PASSE LES PARAMS DE L'URL AU CONTEXT
   useEffect(() => {
     resetState(paramsURL);
   }, []);
 
-  //ON RESRESH LE NOMBRE D'ANNONCE QUAND IL Y A EU UNE NOUVELLE REQUEST
-  // ET QUE LE RESULTAT A CHANGE
-  // useEffect(() => {
-  //   if (products && products[0]?.count && products[0].count.total !== count) {
-  //     return setCount(products[0].count.total);
-  //   }
-  //   setCount(0);
-  // }, [products]);
 
   return (
     <div className="w-full" key={actualPath}>
