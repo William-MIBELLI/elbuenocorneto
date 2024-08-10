@@ -714,10 +714,7 @@ export const getProductsList = async (
         )/1000 < ${params.radius}`
             )
             .as("sq")
-        : db
-            .select({ id: products.id })
-            .from(products)
-            .as("sq");
+        : db.select({ id: products.id }).from(products).as("sq");
 
     //LA SUBQUERY POUR RECUPERER LE COUNT TOTAL DE PRODUCT CORRESPONDANT A LA RECHERCHE
     const sqWith = db.$with("count").as(
@@ -776,3 +773,43 @@ export function withLocation<T extends PgSelect>(qb: T, params: ISearchParams) {
   );
 }
 
+export const getProductForConversation = async (productId: string) => {
+  try {
+    const db = getDb();
+
+    const prod =  await
+      db.query.products.findFirst({
+        where: eq(products.id, productId),
+        with: {
+          seller: {
+            columns: {
+              password: false,
+            },
+            with: {
+              products: {
+                columns: {
+                  id: true,
+                }
+              }
+            }
+          },
+          pdl: {
+            with: {
+              delivery: true,
+            },
+          },
+          location: true,
+          attributes: {
+            with: {
+              attribute: true,
+            }
+          }
+        },
+      })
+ 
+    return prod;
+  } catch (error: any) {
+    console.log("ERROR GETTING PRODUCT FOR CONVERSATION : ", error?.message);
+    return null;
+  }
+};

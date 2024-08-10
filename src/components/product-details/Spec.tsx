@@ -10,7 +10,7 @@ interface IProps {
 }
 const Spec: FC<IProps> = ({ label, content, name }) => {
   return (
-    <div className='flex gap-2 justify-start items-start '>
+    <div className='flex gap-2 justify-start items-center '>
       <div className='bg-gray-300 rounded-full p-1.5'>
         <SpecIconDisplayer name={name} />
       </div>

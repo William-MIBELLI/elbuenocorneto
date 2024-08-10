@@ -79,6 +79,10 @@ input[type='number'] {
     @apply flex flex-col gap-2
   }
 
+  .description_subtitle {
+    @apply font-semibold mt-4 mb-3
+  }
+
 
 }
 

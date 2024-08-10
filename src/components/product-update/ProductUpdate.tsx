@@ -109,6 +109,7 @@ const ProductUpdate: FC<IProps> = ({ data }) => {
 
   //AU SUBMIT ON STOCKE LES NOUVELLES VALEURS DANS PREVIOUS POUR DISABLE OU PAS LE SUBMITBUTTON
   useEffect(() => {
+    console.log("LAST RESULT : ", lastResult);
     if (lastResult?.status === "success") {
       setPreviousProd({
         title: fields.title.value!,
