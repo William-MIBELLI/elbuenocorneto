@@ -10,13 +10,15 @@ interface IProps {
   disable?: boolean;
   success?: boolean;
   successMessage?: string;
+  secondary?: boolean;
 }
 const SubmitButton: FC<IProps> = ({
   text = "Enregistrer les modifications",
   fullWidth = false,
   disable = false,
   success = false,
-  successMessage = "Votre adresse a été enregistrée avec succés."
+  successMessage = "Votre adresse a été enregistrée avec succés.",
+  secondary = false
 }) => {
   const status = useFormStatus();
 
@@ -25,7 +27,7 @@ const SubmitButton: FC<IProps> = ({
       <Button
         fullWidth={fullWidth}
         isDisabled={status.pending || disable}
-        className="button_main"
+        className={`${!secondary ? 'button_main' : 'bg-blue-900 text-white'}`}
         type="submit"
       >
         {text}

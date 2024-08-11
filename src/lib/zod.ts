@@ -170,4 +170,10 @@ export const createDynamicSchemaForAttrs = (attributes: AttributeSelect[]) => {
 };
 
 
-export const updateProductSchema = productSchema.pick({ title: true, price: true, description: true})
+export const updateProductSchema = productSchema.pick({ title: true, price: true, description: true })
+
+export const createConversationSchema = z.object({
+  message: z.string().min(3).max(2500),
+  sellerId: z.string(),
+  productId: z.string(),
+})

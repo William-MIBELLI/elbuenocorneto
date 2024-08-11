@@ -1,9 +1,10 @@
 import { auth } from "@/auth";
 import AuthRequired from "@/components/auth-required/AuthRequired";
+import ReplyInput from "@/components/conversation/ReplyInput";
 import Specs from "@/components/product-details/Specs";
 import { getProductForConversation } from "@/lib/requests/product.request";
 import { Button, Divider, Textarea } from "@nextui-org/react";
-import { MegaphoneOff } from "lucide-react";
+import { MegaphoneOff, Reply } from "lucide-react";
 import Image from "next/image";
 import React, { FC } from "react";
 
@@ -27,7 +28,7 @@ const page: FC<IProps> = async ({ params: { product_id } }) => {
     return <div>Impossible de récupérer les informations nécessaires</div>;
   }
 
-  const { seller, } = data;
+  const { seller } = data;
 
   return (
     <div className="grid  w-full grid-cols-2 gap-4">
@@ -68,45 +69,29 @@ const page: FC<IProps> = async ({ params: { product_id } }) => {
           </div>
 
           {/* MESSAGE INPUT */}
-          <div className="my-4 flex flex-col w-full gap-3 items-center">
-            <Textarea
-              label="Votre message"
-              labelPlacement="outside"
-              variant="bordered"
-              minRows={15}
-              defaultValue={`Bonjour ${seller.name}, votre annonce m'intéresse! Est-elle toujours disponible ?`}
-            />
-            <Button className="bg-blue-900 text-white ">
-              Envoyer votre message
-            </Button>
-          </div>
+          <ReplyInput
+            name={seller.name}
+            productId={data.id}
+            sellerId={data.userId}
+          />
 
           {/* DISCLAIMER */}
           <div className="text-xs text-gray-400">
-            Me renseigner sur les finalités du traitement de mes données personnelles. 
-            Les destinataires, le responsable de traitement, les dirées de conservation, les coordonnées
-            du PDO et mes droits.
+            Me renseigner sur les finalités du traitement de mes données
+            personnelles. Les destinataires, le responsable de traitement, les
+            dirées de conservation, les coordonnées du PDO et mes droits.
           </div>
         </div>
-
       </div>
 
-      
       {/* RIGHT SIDE */}
       <div className="min-h-full rounded-lg shadow-small flex flex-col gap-6 text-left p-5">
-
-        <h3 className="text-xl font-bold">
-          Résumé de l'annonce
-        </h3>
+        <h3 className="text-xl font-bold">Résumé de l'annonce</h3>
 
         {/* HEADER */}
         <section className="mb-4">
-          <h4 className="font-semibold">
-            {data.title}
-          </h4>
-          <p className="text-green-400 font-semibold">
-            {data.price} €
-          </p>
+          <h4 className="font-semibold">{data.title}</h4>
+          <p className="text-green-400 font-semibold">{data.price} €</p>
           <p className="text-xs text-gray-400">
             Mise en ligne le {data.createdAt?.toLocaleDateString()}
           </p>
@@ -114,17 +99,13 @@ const page: FC<IProps> = async ({ params: { product_id } }) => {
 
         {/* DESCRIPTION */}
         <section className="mb-4">
-          <h4 className="description_subtitle">
-            Description
-          </h4>
-          <p className="text-sm">
-            {data.description}
-          </p>
+          <h4 className="description_subtitle">Description</h4>
+          <p className="text-sm">{data.description}</p>
         </section>
 
         {/* ATTRIBUTES */}
         <section className="mb-4">
-          <Specs attributes={data.attributes}/>
+          <Specs attributes={data.attributes} />
         </section>
 
         {/* LOCATION */}

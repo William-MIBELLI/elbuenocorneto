@@ -401,3 +401,30 @@ export const searchTable = pgTable("search", {
 
 export type SearchInsert = typeof searchTable.$inferInsert;
 export type SearchSelect = typeof searchTable.$inferSelect;
+
+export const conversationTable = pgTable("conversation", {
+  id: text("id").primaryKey().notNull(),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  sellerId: text("seller_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  buyerId: text("buyer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ConversationInsert = typeof conversationTable.$inferInsert;
+export type ConversationSelect = typeof conversationTable.$inferSelect;
+
+export const messageTable = pgTable("message", {
+  id: text("id").primaryKey().notNull(),
+  conversationId: text("conversation_id")
+    .notNull()
+    .references(() => conversationTable.id, { onDelete: "cascade" }),
+  senderId: text("sender_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  isRead: boolean("is_read").default(false),
+});
+
+export type MessageInsert = typeof messageTable.$inferInsert;
+export type MessageSelect = typeof messageTable.$inferSelect;
