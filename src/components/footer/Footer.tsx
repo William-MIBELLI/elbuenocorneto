@@ -14,7 +14,7 @@ const Footer = () => {
         La base de donnée a été seed de facon aleatoire{" "}
         <span className="text-xs text-gray-900">(mais oui, ici on aime les chats 👀)</span>
       </p>
-      <p className="my-3 font-semibold">En ce moment : CRUD MES RECHERCHES</p>
+      <p className="my-3 font-semibold"><span className="underline">En ce moment </span>: MESSAGES ENTRE UTILISATEURS</p>
       <div className="flex gap-3">
       <Button as={Link} className="flex items-center gap-2  font-semibold" href={'https://docs.google.com/document/d/1f0AP0OxrqNv6i6y_QQPNJTK3b83Dc1xWhq8B2vqRmeg/edit?usp=sharing'} target="_blank">
         Le devlog

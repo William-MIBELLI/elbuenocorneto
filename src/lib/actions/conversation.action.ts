@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react';
 "use server";
 
 import { parseWithZod } from "@conform-to/zod";
@@ -32,38 +33,46 @@ export const startConversationACTION = async (prevState: { error: string | undef
 
     const { message: content, productId, sellerId } = submission.value;
 
-    //ON CHECKE SI UNE CONVERSATION EXISTE DEJA
-    const exisitingConv = await checkIfExistingConversation(productId, sellerId, session.user.id);
-    
-    if (exisitingConv.length > 0) {
-      throw new Error('Vous avez déjà une conversation en cours avec ce vendeur concernant cette annonce.');
-    }
-
-    //ON CREE D'ABORD LA CONVERSATION
-    const conv: ConversationInsert = {
-      id: uuidv4(),
-      productId,
-      sellerId,
-      buyerId: session.user.id,
-    }
-
-    const conversation = await createConversationOnDb(conv);
-
-    //SI PAS DE CONVERSATION ON RETOURNE UNE ERREUR
-    if (!conversation) {
-      throw new Error('Impossible de créer la conversation');
-    }
-
-    //ON CREE ENSUITE LE MESSAGE
+    //ON CREE LE MESSAGEINSERT SANS LE CONVERSATION ID
     const message: MessageInsert = {
       id: uuidv4(),
-      conversationId: conversation.id,
+      conversationId: '',
       content,
       senderId: session.user.id,
     }
 
+    //ON CHECK SI UNE CONVERSATION EXISTE DEJA
+    const exisitingConv = await checkIfExistingConversation(productId, sellerId, session.user.id);
+    
+    //SI PAS DE CONVERSATION TROUVEE, ON LA CREE
+    if (!exisitingConv) {
+
+      const conv: ConversationInsert = {
+        id: uuidv4(),
+        productId,
+        sellerId,
+        buyerId: session.user.id,
+      }
+  
+      const conversation = await createConversationOnDb(conv);
+
+      //SI LA CREDATION RETURN NULL, ON THROW UNE ERREUR
+      if (!conversation) {
+        throw new Error('Impossible de créer la conversation');
+      }
+
+      //ON SET LE CONVERSATION ID DANS LE MESSAGE
+      message.conversationId = conversation.id;
+    } else {
+
+      //SI UNE CONVERSATION EXISTE, ON SET LE CONVERSATION ID DANS LE MESSAGE
+      message.conversationId = exisitingConv.id;
+    }
+
+    //ON CREE LE MESSAGE DANS LA DB
     const mess = await createMessageOnDb(message);
 
+    console.log('MESSAGE ', mess);
     if (!mess) {
       throw new Error('Impossible d\'envoyer le message');
     }

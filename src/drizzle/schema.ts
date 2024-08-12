@@ -114,6 +114,8 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     references: [locations.id],
   }),
   favorites: many(favoritesTable),
+  conversations: many(conversationTable),
+  messages: many(messageTable),
 }));
 
 export type SelectUser = typeof users.$inferSelect;
@@ -167,6 +169,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   attributes: many(productAttributeJONC),
   favorites: many(favoritesTable),
+  conversations: many(conversationTable),
 }));
 
 export type ProductInsert = typeof products.$inferInsert;
@@ -404,11 +407,36 @@ export type SearchSelect = typeof searchTable.$inferSelect;
 
 export const conversationTable = pgTable("conversation", {
   id: text("id").primaryKey().notNull(),
-  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
-  sellerId: text("seller_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  buyerId: text("buyer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: text("product_id")
+    .notNull()
+    .references(() => products.id, { onDelete: "cascade" }),
+  sellerId: text("seller_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  buyerId: text("buyer_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const conversationRelations = relations(
+  conversationTable,
+  ({ one, many }) => ({
+    messages: many(messageTable), 
+    product: one(products, {
+      fields: [conversationTable.productId],
+      references: [products.id],
+    }),
+    seller: one(users, {
+      fields: [conversationTable.sellerId],
+      references: [users.id],
+    }),
+    buyer: one(users, {
+      fields: [conversationTable.buyerId],
+      references: [users.id],
+    }),
+  })
+);
 
 export type ConversationInsert = typeof conversationTable.$inferInsert;
 export type ConversationSelect = typeof conversationTable.$inferSelect;
@@ -425,6 +453,17 @@ export const messageTable = pgTable("message", {
   createdAt: timestamp("created_at").defaultNow(),
   isRead: boolean("is_read").default(false),
 });
+
+export const messageRelations = relations(messageTable, ({ one }) => ({
+  conversation: one(conversationTable, {
+    fields: [messageTable.conversationId],
+    references: [conversationTable.id],
+  }),
+  sender: one(users, {
+    fields: [messageTable.senderId],
+    references: [users.id],
+  }),
+}));
 
 export type MessageInsert = typeof messageTable.$inferInsert;
 export type MessageSelect = typeof messageTable.$inferSelect;

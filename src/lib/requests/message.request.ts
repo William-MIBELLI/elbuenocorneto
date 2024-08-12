@@ -1,7 +1,8 @@
 'use server';
 
 import { getDb } from "@/drizzle/db";
-import { MessageInsert, messageTable } from "@/drizzle/schema";
+import { conversationTable, MessageInsert, messageTable } from "@/drizzle/schema";
+import { eq, or } from "drizzle-orm";
 
 export const createMessageOnDb = async (message: MessageInsert) => {
   try {
@@ -10,7 +11,8 @@ export const createMessageOnDb = async (message: MessageInsert) => {
       .insert(messageTable)
       .values(message)
       .returning().then((res) => res[0]);
-
+    
+    
     return msg;
   } catch (error: any) {
     console.log("ERROR CREATE MESSAGE ON DB ", error?.message);
