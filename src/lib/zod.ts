@@ -177,3 +177,9 @@ export const createConversationSchema = z.object({
   sellerId: z.string(),
   productId: z.string(),
 })
+
+export const createMessageSchema = z.object({
+  content: z.string().min(3).max(2500),
+  conversationId: z.string(),
+  senderId: z.string(),
+})
