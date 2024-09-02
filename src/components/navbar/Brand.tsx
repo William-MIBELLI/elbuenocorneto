@@ -16,7 +16,7 @@ const Brand = () => {
         src={hat}
         height={25}
         width={25}
-        className="absolute right-[-15px] top-[-5px] animate-bounce "
+        className="absolute right-[-15px] top-[-5px]"
       />
     </NavbarBrand>
   );

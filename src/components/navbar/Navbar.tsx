@@ -24,6 +24,8 @@ import Brand from "./Brand";
 import { ProductSelect } from "@/drizzle/schema";
 import SearchInput from "../search/SearchInput";
 import { pusherClient } from "@/lib/pusher/client";
+import { getUnreadMessagesByUserId } from "@/lib/requests/message.request";
+import { useNotificationContext } from "@/context/notification.context";
 
 
 export const navItems = [
@@ -53,7 +55,7 @@ const Navbar: FC<IProps> = ({ userId }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const { data, status } = useSession();
   const [user, setUser] = useState(data?.user);
-  const [newMessage, setNewMessage] = useState<number>(0);
+  const {newMessage, setNewMessage} = useNotificationContext();
  
 
   useEffect(() => {
@@ -83,6 +85,24 @@ const Navbar: FC<IProps> = ({ userId }) => {
   // }, []);
   
   useEffect(() => { console.log('NEWMESSAGE : ', newMessage) }, [newMessage]);
+
+  // //ON FETCH LE NOMBRE DE MESSAGES NON LUS
+  // useEffect(() => {
+
+  //   if (!user?.id) {
+  //     return;
+  //   }
+  //   console.log('USEEFFECT COUNT NAVBAR');
+  //   const getUnreadMsgCount = async () => {
+  //     const res = await getUnreadMessagesByUserId(user?.id || '')
+  //     console.log('RES DANS NAVBAR : ', res);
+  //     if (res) {
+  //       setNewMessage(res[0].count)
+  //     }
+  //   }
+  //   getUnreadMsgCount();
+
+  // },[user?.id])
 
   return (
     <Suspense fallback={<Spinner/>}>

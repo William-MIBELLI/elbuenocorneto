@@ -15,6 +15,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import MessageItem from "./MessageItem";
 import { MessageSelect } from "@/drizzle/schema";
 import { pusherClient } from "@/lib/pusher/client";
+import { useNotificationContext } from "@/context/notification.context";
 
 interface IProps {
   convoId: string;
@@ -27,7 +28,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
 
   if (!session.data?.user?.id) return null;
 
-  const [messages, setMessages] = useState<MessageSelect[]>([]);
+  const { messages, addNewMessage, setMessages } = useNotificationContext();
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [value, setValue] = useState<string>();
@@ -49,16 +50,6 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   });
-
-  //AJOUTER LE DERNIER MESSAGE AUX AUTRES
-  const addNewMessage = (newMsg: MessageSelect) => {
-    console.log('MESSAGES : ', messages);
-    const newMessages: MessageSelect[] = [...messages, newMsg];
-    setMessages((prev) => [...prev, newMsg]);
-  }
-  useEffect(() => {
-    console.log('CHANGEMENT DANS MESSAGES : ', messages);
-  }, [messages]);
 
   //AU MONTAGE, ON FETCH LES MESSAGES DE LA CONVERSATION
   useEffect(() => {
@@ -86,22 +77,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
     }
   }, [messages]);
 
-  //RECEPTION DES NOUVEAUX MESSAGES VIA PUSHER
-  useEffect(() => {
-    if (!userId) {
-      return;
-    }
-    // console.log('USEEFFECT CONVERSATION CONTENT : ', userId);
-    pusherClient.subscribe(userId);
-    pusherClient.bind('new_message', (msg: MessageSelect) => {
-      console.log('NEWMESSAGE DANS COVNERSATION CONTENT VIA PUSHER : ', msg, messages);
-      addNewMessage(msg);
-    })
-    return () => {
-      console.log('ON UNSUBSRIBE');
-      pusherClient.unbind();
-    }
-  },[userId])
+
 
   return (
     <div className="flex flex-col justify-between max-h-full h-full  p-1">
@@ -110,7 +86,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
         {!loading && messages && messages.length > 0 ? (
           messages.map((msg, index) => (
             <div key={msg.id} ref={index === messages.length - 1 ? lastMessageRef : null}>
-              <MessageItem msg={msg} />
+              <MessageItem msg={msg} userId={userId} />
             </div>
           ))
         ) : loading ? (

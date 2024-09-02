@@ -1,18 +1,34 @@
+import { useNotificationContext } from "@/context/notification.context";
 import { MessageSelect } from "@/drizzle/schema";
+import { updateIsReadByMsgId } from "@/lib/requests/message.request";
 import { useSession } from "next-auth/react";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 
 interface IProps {
   msg: MessageSelect;
+  userId: string;
 }
 
-const MessageItem: FC<IProps> = ({ msg }) => {
+const MessageItem: FC<IProps> = ({ msg , userId}) => {
 
-  const session = useSession();
-
-  if (!session.data?.user?.id) return null;
+  const isSender = msg.senderId === userId;
+  const { setNewMessage, newMessage } = useNotificationContext();
   
-  const isSender = msg.senderId === session.data.user.id;
+  //MISE A JOUR DE ISREAD
+  useEffect(() => {
+    //SI ISREAD EST DEJA TRUE OU QUR L'USER EST LE SENDER, ON FAST RETURN
+    if (msg.isRead || isSender){
+      return;
+    }
+    const udpateIsread = async () => {
+      const r = await updateIsReadByMsgId(msg.id);
+      console.log('MESSAGE UPDATED : ', r?.id)
+      if (r) {
+        setNewMessage((previous) => previous - 1);
+      }
+    }
+    udpateIsread();
+  },[msg])
 
   return (
     <div key={msg.id} className={`flex flex-col ${isSender ? 'items-end' : 'items-start'}`}>
@@ -26,7 +42,7 @@ const MessageItem: FC<IProps> = ({ msg }) => {
         <p className="text-sm">{msg.content}</p>
       </div>
       <p className="text-[0.6rem]">
-        12:12{/* {msg?.createdAt?.getHours()}:{msg.createdAt?.getMinutes().toString().padStart(2, '0')} */}
+        {msg?.createdAt?.getHours()}:{msg.createdAt?.getMinutes().toString().padStart(2, '0')}
       </p>
     </div>
   );

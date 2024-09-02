@@ -6,41 +6,69 @@ import {
 import {
   Button,
   Divider,
-  Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
-import React, { FC, useEffect, useState } from "react";
-import ControlledInput from "../inputs/ControlledInput";
+import React, { FC, Suspense, useEffect, useState } from "react";
 import {
   ArrowLeft,
   CircleX,
   EllipsisVertical,
-  SendHorizonal,
+  MessageCircleWarning,
 } from "lucide-react";
 import Image from "next/image";
 import ConversationContent from "./ConversationContent";
 import { deleteConversationACTION } from "@/lib/actions/conversation.action";
+import { useNotificationContext } from "@/context/notification.context";
 
 interface IProps {
   fetchedConvo: ConversationListType;
   userId: string;
 }
 
-
-
 const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
-  const session = useSession();
-  const [selectedConvo, setSelectedConvo] =
-    useState<ConversationListItemType>();
-  const [conversations, setConversations] = useState<ConversationListItemType[]>(fetchedConvo);
+  const { selectedConvo, setSelectedConvo, conversations, setConversations } =
+    useNotificationContext();
+
+  //AU MONTAGE, ON PASSE LES CONVOS AU CONTEXT
+  useEffect(() => {
+    setConversations(fetchedConvo);
+  }, [fetchedConvo]);
 
   //CLICK SUR UNE CONVERSATION
-  const onConvoClick = (convoId: string) => {
+  const onConvoClick = async (convoId: string) => {
     const convo = conversations.find((convo) => convo.id === convoId);
+
+    if (convo?.id === selectedConvo?.id) {
+      return;
+    }
     setSelectedConvo(convo);
+
+    if (convo?.messages[0].isRead) {
+      return;
+    }
+
+    //ON CHANGE LE ISREAD DU DERNIER MESSAGE DE LA CONVERSATION
+    const newConvos = conversations.map((c) => {
+      //SI C'EST LA CONVO SUR LAQUELLE VIENT DE CLIQUER L'USER
+      if (c.id === convo?.id && !c.messages[0].isRead) {
+        //ON SPREAD LE MESSAGE ET ON PASSE ISREAD A TRUE
+        const newM = { ...c.messages[0], isRead: true };
+
+        //ON SPREAD LA CONVO ET ON LUI PASSE LE MESSAGE MIS A JOUR
+        const newC: ConversationListItemType = { ...c, messages: [newM] };
+
+        return newC;
+      }
+
+      //SINON ON RETURN LA CONVO TELLE QUELLE
+      return c;
+    });
+
+    //ON UPDATE ENSUITE LE STATE DANS LE CONTEXT
+    setConversations(newConvos);
   };
 
   //SUPPRIMER LA CONVERSATION
@@ -51,7 +79,7 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
     // ET ON SUPPRIME LA CONVERSATION DE LA LISTE
     if (deleted) {
       setSelectedConvo(undefined);
-      const newConversations = conversations.filter(c => {
+      const newConversations = conversations.filter((c) => {
         return c.id !== convo.id;
       });
       setConversations(newConversations);
@@ -72,20 +100,29 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
                     : "hover:bg-gray-100"
                 }`}
               >
-                <h4 className="font-semibold text-md mb-2 text-ellipsis">
-                  {convo.product.title}
-                </h4>
+                <div className="flex justify-between items-center">
+                  <h4 className="font-semibold text-md mb-2 text-ellipsis">
+                    {convo.product.title}
+                  </h4>
+                  {convo.messages[0].senderId !== userId &&
+                    !convo.messages[0].isRead && (
+                      <MessageCircleWarning
+                        className="text-main animate-bounce"
+                        size={22}
+                      />
+                    )}
+                </div>
                 <p className="text-sm text-gray-400">
                   Avec{" "}
-                  {convo.seller.id === session.data?.user?.id
+                  {convo.seller.id === userId
                     ? convo.buyer.name
                     : convo.seller.name}
                 </p>
                 <p className="text-xs italic">
                   Dernier message le{" "}
-                  {convo?.messages[
-                    convo.messages.length - 1
-                  ]?.createdAt?.toLocaleDateString()}
+                  {typeof convo?.messages[0]?.createdAt === "string"
+                    ? convo?.messages[0]?.createdAt
+                    : convo?.messages[0]?.createdAt?.toLocaleDateString()}
                 </p>
               </div>
               <Divider />

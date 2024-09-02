@@ -18,7 +18,7 @@ const NavItem: FC<IProps> = ({ Icon, text, target, notification }) => {
     >
       <Icon size={18} />
       <p className="text-xs">{text}</p>
-      {notification && (
+      {(notification && notification > 0) && (
         <div className="absolute animate-bounce rounded-full flex justify-center items-center  -top-2 h-3 w-3 -right-2  text-xs bg-main text-white">
         </div>
       )}

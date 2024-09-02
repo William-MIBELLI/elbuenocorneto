@@ -8,7 +8,7 @@ import {
   MessageSelect,
   messageTable,
 } from "@/drizzle/schema";
-import { and, eq, or } from "drizzle-orm";
+import { and, asc, desc, eq, or } from "drizzle-orm";
 
 export const createConversationOnDb = async (
   conversation: ConversationInsert
@@ -64,7 +64,10 @@ export const getUserConversations = async (userId: string) => {
         eq(conversationTable.sellerId, userId)
       ),
       with: {
-        messages: true,
+        messages: {
+          orderBy: [desc(messageTable.createdAt)],
+          limit: 1
+        },
         product: {
           with: {
             images: true,
