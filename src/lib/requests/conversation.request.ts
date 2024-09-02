@@ -1,7 +1,13 @@
 "use server";
 
 import { getDb } from "@/drizzle/db";
-import { ConversationInsert, ConversationSelect, conversationTable, MessageSelect, messageTable } from "@/drizzle/schema";
+import {
+  ConversationInsert,
+  ConversationSelect,
+  conversationTable,
+  MessageSelect,
+  messageTable,
+} from "@/drizzle/schema";
 import { and, eq, or } from "drizzle-orm";
 
 export const createConversationOnDb = async (
@@ -38,7 +44,8 @@ export const checkIfExistingConversation = async (
           eq(conversationTable.sellerId, sellerId),
           eq(conversationTable.buyerId, buyerId)
         )
-      ).then((res) => res[0]);
+      )
+      .then((res) => res[0]);
 
     return conv;
   } catch (error: any) {
@@ -50,7 +57,7 @@ export const checkIfExistingConversation = async (
 export const getUserConversations = async (userId: string) => {
   try {
     const db = getDb();
-    
+
     const convos = await db.query.conversationTable.findMany({
       where: or(
         eq(conversationTable.buyerId, userId),
@@ -61,22 +68,24 @@ export const getUserConversations = async (userId: string) => {
         product: {
           with: {
             images: true,
-            location: true
-          }
+            location: true,
+          },
         },
         buyer: true,
         seller: true,
-      }
-    })
+      },
+    });
 
     return convos;
   } catch (error: any) {
     console.log("ERROR GET USER CONVERSATIONS ", error?.message);
     return [];
   }
-}
+};
 
-export const getConversationMessages = async (convoId: string): Promise<MessageSelect[]> => {
+export const getConversationMessages = async (
+  convoId: string
+): Promise<MessageSelect[]> => {
   try {
     const db = getDb();
     const messages = await db.query.messageTable.findMany({
@@ -88,7 +97,7 @@ export const getConversationMessages = async (convoId: string): Promise<MessageS
     console.log("ERROR GET CONVERSATION MESSAGES ", error?.message);
     return [];
   }
-}
+};
 
 export const deleteConversationOnDB = async (convoId: string) => {
   try {
@@ -96,16 +105,33 @@ export const deleteConversationOnDB = async (convoId: string) => {
     const deleted = await db
       .delete(conversationTable)
       .where(eq(conversationTable.id, convoId))
-      .returning().then((res) => res[0]);
+      .returning()
+      .then((res) => res[0]);
 
     return deleted;
   } catch (error: any) {
     console.log("ERROR DELETE CONVERSATION ON DB ", error?.message);
     return null;
   }
-} 
+};
 
+export const getConversationById = async (convoId: string) => {
+  try {
+    const db = getDb();
+    const convo = await db
+      .select()
+      .from(conversationTable)
+      .where(eq(conversationTable.id, convoId))
+      .then((r) => r[0]);
+    return convo;
+  } catch (error: any) {
+    console.log("ERROR GET CONVERSATION REQUEST : ", error?.message);
+    return null;
+  }
+};
 
-export type ConversationListType = Awaited<ReturnType<typeof getUserConversations>>;
+export type ConversationListType = Awaited<
+  ReturnType<typeof getUserConversations>
+>;
 
 export type ConversationListItemType = ConversationListType[number];

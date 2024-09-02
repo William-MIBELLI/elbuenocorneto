@@ -26,7 +26,7 @@ const MessageItem: FC<IProps> = ({ msg }) => {
         <p className="text-sm">{msg.content}</p>
       </div>
       <p className="text-[0.6rem]">
-        {msg.createdAt?.getHours()}:{msg.createdAt?.getMinutes()}
+        12:12{/* {msg?.createdAt?.getHours()}:{msg.createdAt?.getMinutes().toString().padStart(2, '0')} */}
       </p>
     </div>
   );

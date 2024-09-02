@@ -2,7 +2,7 @@
 import { auth } from '@/auth';
 import AuthRequired from '@/components/auth-required/AuthRequired';
 import ConversationList from '@/components/conversation/ConversationList';
-import { getUserConversations } from '@/lib/requests/conversation.request';
+import { ConversationListType, getUserConversations } from '@/lib/requests/conversation.request';
 import { Divider } from '@nextui-org/react';
 import React from 'react'
 
@@ -14,10 +14,10 @@ const page = async () => {
     return <AuthRequired />
   }
 
-  const conversations = await getUserConversations(session.user.id);
+  const conversations: ConversationListType = await getUserConversations(session.user.id);
 
   return (
-    <ConversationList conversations={conversations} />
+    <ConversationList fetchedConvo={conversations} userId={session.user.id} />
   )
 }
 

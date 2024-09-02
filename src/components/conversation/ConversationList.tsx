@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ControlledInput from "../inputs/ControlledInput";
 import {
   ArrowLeft,
@@ -26,9 +26,12 @@ import { deleteConversationACTION } from "@/lib/actions/conversation.action";
 
 interface IProps {
   fetchedConvo: ConversationListType;
+  userId: string;
 }
 
-const ConversationList: FC<IProps> = ({ fetchedConvo }) => {
+
+
+const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
   const session = useSession();
   const [selectedConvo, setSelectedConvo] =
     useState<ConversationListItemType>();
@@ -40,7 +43,7 @@ const ConversationList: FC<IProps> = ({ fetchedConvo }) => {
     setSelectedConvo(convo);
   };
 
-  //SUPPRIMER LA COVNERSATION
+  //SUPPRIMER LA CONVERSATION
   const onDeleteConvo = async (convo: ConversationListItemType) => {
     const deleted = await deleteConversationACTION(convo);
 
@@ -56,7 +59,7 @@ const ConversationList: FC<IProps> = ({ fetchedConvo }) => {
   };
 
   return (
-    <div className="grid grid-cols-9  h-[80vh] w-full border-1 rounded-lg">
+    <div className="grid grid-cols-9 h-[80vh] w-full border-1 rounded-lg">
       {/* CONVERSATIONS LIST */}
       <div className="col-span-2  flex flex-col">
         {conversations &&
@@ -91,9 +94,9 @@ const ConversationList: FC<IProps> = ({ fetchedConvo }) => {
       </div>
 
       {/* SELECTED CONVERSATION CONTENT */}
-      <div className="col-span-5 p-3 border-x-1 flex flex-col gap-2 relative">
+      <div className="col-span-5  border-x-1 flex flex-col gap-2 relative overflow-y-auto">
         {selectedConvo ? (
-          <ConversationContent convoId={selectedConvo.id} />
+          <ConversationContent convoId={selectedConvo.id} userId={userId} />
         ) : (
           <div className="flex justify-center items-center h-full w-full">
             <div className="flex items-center gap-2">
