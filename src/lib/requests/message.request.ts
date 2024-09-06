@@ -6,7 +6,7 @@ import {
   MessageInsert,
   messageTable,
 } from "@/drizzle/schema";
-import { and, count, eq, ne, or } from "drizzle-orm";
+import { and, count, eq, isNotNull, ne, or } from "drizzle-orm";
 
 export const createMessageOnDb = async (message: MessageInsert) => {
   try {
@@ -52,11 +52,12 @@ export const getUnreadMessagesByUserId = async (userId: string) => {
 
     //ON COUNT LE NOMBRE DE MESSAGES QUI ONT ISREAD === FALSE
     const req = await db
-      .select({ count: count() })
+      .select({ id: sq.message.id})
       .from(sq)
       .where(and(
         eq(sq.message.isRead, false),
-        ne(sq.message.senderId, userId)
+        ne(sq.message.senderId, userId),
+        isNotNull(sq.message.id)
       ));
 
     return req;

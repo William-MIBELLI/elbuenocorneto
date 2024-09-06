@@ -24,7 +24,7 @@ const MessageItem: FC<IProps> = ({ msg , userId}) => {
       const r = await updateIsReadByMsgId(msg.id);
       console.log('MESSAGE UPDATED : ', r?.id)
       if (r) {
-        setNewMessage((previous) => previous - 1);
+        setNewMessage((previous) => previous.filter(item => item !== msg.id));
       }
     }
     udpateIsread();

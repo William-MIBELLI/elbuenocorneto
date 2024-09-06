@@ -23,8 +23,8 @@ interface INotifContext {
   setSelectedConvo: Dispatch<ConversationListItemType | undefined>;
   messages: MessageSelect[];
   setMessages: Dispatch<MessageSelect[]>;
-  newMessage: number;
-  setNewMessage: Dispatch<React.SetStateAction<number>>;
+  newMessage: string[];
+  setNewMessage: Dispatch<React.SetStateAction<string[]>>;
   addNewMessage: (msg: MessageSelect) => void;
 }
 
@@ -44,7 +44,7 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
   const [selectedConvo, setSelectedConvo] =
     useState<ConversationListItemType>();
   const [messages, setMessages] = useState<MessageSelect[]>([]);
-  const [newMessage, setNewMessage] = useState<number>(18);
+  const [newMessage, setNewMessage] = useState<string[]>([]);
 
   const selectedConvoRef = useRef(selectedConvo);
   const conversationsRef = useRef(conversations);
@@ -64,19 +64,20 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     }
   }, [session.data?.user?.id]);
 
-  //ON FETCH LE NOMBRE DE MESSAGES NON LUS
+  //ON FETCH L'ID DE MESSAGES NON LUS
   useEffect(() => {
     if (!userId) {
       return;
     }
 
-    const getUnreadMsgCount = async (userId: string) => {
+    const getUnreadMsg = async (userId: string) => {
       const res = await getUnreadMessagesByUserId(userId);
       if (res) {
-        setNewMessage(res[0].count);
+        const mappedRes = res.filter(item => item.id !== null).map(item => item.id as string) || [];
+        setNewMessage(mappedRes);
       }
     };
-    getUnreadMsgCount(userId);
+    getUnreadMsg(userId);
   }, [userId]);
 
   const handleIncomingMessage = (msg: MessageSelect) => {
@@ -85,13 +86,13 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     if (pathnameRef.current !== "/messages") {
       console.log("PATHNAME DIFFERENT, ON SETNEWMESSAGE : ",pathnameRef.current);
       //SI IL N'Y EST PAS, ON AJOUTE 1 A NEWMESSAGE
-      return setNewMessage((previous) => previous + 1);
+      return setNewMessage((previous) => [...previous, msg.id]);
     }
 
     //SINON, ON CHECK LA SELECTEDCONVO
     if (selectedConvoRef.current?.id === msg.conversationId) {
       console.log("CONVOID IDENTIQUE, ON AJOUTE LE MESSAGE");
-      //SI LA SELECTEDCONVO.ID === NEXMESSAGE.CONVOID, ALORS ON L'AJOUTE AU MESSAGE
+      //SI LA SELECTEDCONVO.ID === NEWMESSAGE.CONVOID, ALORS ON L'AJOUTE AU MESSAGE
       return addNewMessage(msg);
     }
 

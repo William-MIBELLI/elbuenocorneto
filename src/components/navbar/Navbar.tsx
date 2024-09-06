@@ -27,7 +27,6 @@ import { pusherClient } from "@/lib/pusher/client";
 import { getUnreadMessagesByUserId } from "@/lib/requests/message.request";
 import { useNotificationContext } from "@/context/notification.context";
 
-
 export const navItems = [
   {
     Icon: Bell,
@@ -55,8 +54,7 @@ const Navbar: FC<IProps> = ({ userId }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const { data, status } = useSession();
   const [user, setUser] = useState(data?.user);
-  const {newMessage, setNewMessage} = useNotificationContext();
- 
+  const { newMessage, setNewMessage } = useNotificationContext();
 
   useEffect(() => {
     setUser(data?.user);
@@ -68,7 +66,7 @@ const Navbar: FC<IProps> = ({ userId }) => {
   //   if (!userId) {
   //     return
   //   }
-   
+
   //   console.log('ON RENTRE DANS LE USEEFFECT, userid: ', userId)
 
   //   //ON SUBSCRIBE AVEC SUR SON ID
@@ -83,8 +81,10 @@ const Navbar: FC<IProps> = ({ userId }) => {
   //   //ON UNSUBSRIBE A LA FERMETURE
   //   return () => {pusherClient.unsubscribe(userId || '') }
   // }, []);
-  
-  useEffect(() => { console.log('NEWMESSAGE : ', newMessage) }, [newMessage]);
+
+  useEffect(() => {
+    console.log("NEWMESSAGE : ", newMessage);
+  }, [newMessage]);
 
   // //ON FETCH LE NOMBRE DE MESSAGES NON LUS
   // useEffect(() => {
@@ -105,7 +105,7 @@ const Navbar: FC<IProps> = ({ userId }) => {
   // },[user?.id])
 
   return (
-    <Suspense fallback={<Spinner/>}>
+    <Suspense fallback={<Spinner />}>
       <Nv
         maxWidth="lg"
         position={!isSearchFocus ? "static" : undefined}
@@ -142,7 +142,11 @@ const Navbar: FC<IProps> = ({ userId }) => {
               Icon={item.Icon}
               target={item.target}
               text={item.text}
-              notification={ (item.text === "Messages" && newMessage !== 0) ? newMessage : undefined}
+              notification={
+                item.text === "Messages" && newMessage.length !== 0
+                  ? newMessage.length
+                  : undefined
+              }
             />
           ))}
         </NavbarContent>
