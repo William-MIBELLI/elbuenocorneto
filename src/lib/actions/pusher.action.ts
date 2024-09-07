@@ -1,8 +1,10 @@
 "use server";
 
-import { getConversationById } from "../requests/conversation.request";
+import { ConversationListType, getConversationById, getUserConversations } from "../requests/conversation.request";
 import { getPusherServer } from "../pusher/server";
-import { MessageSelect } from "@/drizzle/schema";
+import { ConversationSelect, conversationTable, MessageSelect } from "@/drizzle/schema";
+import { auth } from "@/auth";
+import { sql } from "drizzle-orm";
 
 export const sendMessageNotification = async (message: MessageSelect) => {
   const { conversationId: convoId, senderId } = message;
@@ -27,6 +29,22 @@ export const sendMessageNotification = async (message: MessageSelect) => {
 
   } catch (error: any) {
     console.log('ERROR SEND MESSAGE NOTIF ACTION : ', error?.message);
+    return null;
+  }
+}
+
+export const creationConversationNotification = async (userIdToNotif: string, convoId: string) => {
+
+  try {
+    const pusherServer = getPusherServer();
+    const convo: ConversationListType = await getUserConversations(sql`${conversationTable.id} = ${convoId}`);
+    if (!convo) {
+      throw new Error('NO USER CONVO MATCHED WITH THIS CONDITION');
+    }
+    pusherServer.trigger(userIdToNotif, 'create_conversation', convo[0]);
+    
+  } catch (error: any) {
+    console.log('ERROR CREATION CONVERSATION NOTIFICATION : ', error?.message);
     return null;
   }
 }

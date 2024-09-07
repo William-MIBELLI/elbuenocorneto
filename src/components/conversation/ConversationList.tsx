@@ -29,13 +29,20 @@ interface IProps {
 }
 
 const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
-  const { selectedConvo, setSelectedConvo, conversations, setConversations } =
+  const { selectedConvo, setSelectedConvo, conversations, setConversations, deleteConversationFromState } =
     useNotificationContext();
 
   //AU MONTAGE, ON PASSE LES CONVOS AU CONTEXT
   useEffect(() => {
     setConversations(fetchedConvo);
   }, [fetchedConvo]);
+
+  //RESET LE SELECTEDCONVO
+  useEffect(() => {
+    // setSelectedConvo(undefined);
+    console.log('MONTAGE CONVERSATION LSIT : ');
+    conversations.forEach(convo => console.log(`title : ${convo.product.title}, isRead : ${convo.messages[0].isRead}`))
+  },[])
 
   //CLICK SUR UNE CONVERSATION
   const onConvoClick = async (convoId: string) => {
@@ -77,13 +84,9 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
 
     //SI LA SUPPRESSION EST REUSSIE, ON PASSE SELECTEDCONVO A UNDEFINED
     // ET ON SUPPRIME LA CONVERSATION DE LA LISTE
-    if (deleted) {
-      setSelectedConvo(undefined);
-      const newConversations = conversations.filter((c) => {
-        return c.id !== convo.id;
-      });
-      setConversations(newConversations);
-    }
+    // if (deleted) {
+    //   deleteConversationFromState(convo.id)
+    // }
   };
 
   return (
@@ -104,8 +107,8 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
                   <h4 className="font-semibold text-md mb-2 text-ellipsis">
                     {convo.product.title}
                   </h4>
-                  {convo.messages[0].senderId !== userId &&
-                    !convo.messages[0].isRead && (
+                  {(convo.messages[0].senderId !== userId &&
+                    !convo.messages[0].isRead) && (
                       <MessageCircleWarning
                         className="text-main animate-bounce"
                         size={22}

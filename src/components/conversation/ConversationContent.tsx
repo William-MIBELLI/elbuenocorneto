@@ -33,6 +33,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [value, setValue] = useState<string>();
   const messagesArea = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [lastResult, action] = useFormState(createMessageACTION, {
     error: undefined,
@@ -47,8 +48,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
       // console.log("ONVALIDATE : ", res);
       return res;
     },
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
+    shouldValidate: "onSubmit",
   });
 
   //AU MONTAGE, ON FETCH LES MESSAGES DE LA CONVERSATION
@@ -68,6 +68,12 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
       setValue("");
       addNewMessage(lastResult.newMsg)
     }
+    //ON REMET LE FOCUS SUR L'INPUT EN AJOUTANT UN TIMEOUT (POUR TRICHER UN PEU ... 🥲)
+    const to = setTimeout(() => {
+        inputRef?.current?.focus();
+
+    }, 100)
+    return () => clearTimeout(to)
   }, [lastResult]);
 
   //ON SCROLL VERS LE DERNIER MESSAGE
@@ -121,9 +127,11 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
         <div className="flex flex-col items-center w-full ">
           <div className="flex w-full gap-2">
             <Input
+              ref={inputRef}
               variant="bordered"
               name={fields.content.name}
               key={fields.content.key}
+              id={fields.content.id}
               placeholder="Ecrivez votre message."
               value={value}
               onValueChange={setValue}

@@ -8,7 +8,7 @@ import {
   MessageSelect,
   messageTable,
 } from "@/drizzle/schema";
-import { and, asc, desc, eq, or } from "drizzle-orm";
+import { and, asc, desc, eq, or, SQL, sql } from "drizzle-orm";
 
 export const createConversationOnDb = async (
   conversation: ConversationInsert
@@ -54,15 +54,11 @@ export const checkIfExistingConversation = async (
   }
 };
 
-export const getUserConversations = async (userId: string) => {
+export const getUserConversations = async (condition: SQL<unknown>) => {
   try {
     const db = getDb();
-
     const convos = await db.query.conversationTable.findMany({
-      where: or(
-        eq(conversationTable.buyerId, userId),
-        eq(conversationTable.sellerId, userId)
-      ),
+      where: condition,
       with: {
         messages: {
           orderBy: [desc(messageTable.createdAt)],
@@ -93,6 +89,7 @@ export const getConversationMessages = async (
     const db = getDb();
     const messages = await db.query.messageTable.findMany({
       where: eq(messageTable.conversationId, convoId),
+      orderBy: [asc(messageTable.createdAt)]
     });
 
     return messages;

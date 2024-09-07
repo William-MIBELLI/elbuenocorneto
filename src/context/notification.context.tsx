@@ -2,10 +2,10 @@
 
 import { MessageSelect } from "@/drizzle/schema";
 import { pusherClient } from "@/lib/pusher/client";
-import { ConversationListItemType } from "@/lib/requests/conversation.request";
+import { ConversationListItemType, ConversationListType } from "@/lib/requests/conversation.request";
 import { getUnreadMessagesByUserId } from "@/lib/requests/message.request";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter} from "next/navigation";
 import {
   createContext,
   Dispatch,
@@ -26,6 +26,7 @@ interface INotifContext {
   newMessage: string[];
   setNewMessage: Dispatch<React.SetStateAction<string[]>>;
   addNewMessage: (msg: MessageSelect) => void;
+  deleteConversationFromState: (convoID: string) => void;
 }
 
 const NotificationContext = createContext<INotifContext>({} as INotifContext);
@@ -36,6 +37,7 @@ interface IProps {
 export const NotificationProvider: FC<IProps> = ({ children }) => {
   const session = useSession();
   const pathname = usePathname();
+  const router = useRouter();
 
   const [userId, setUserId] = useState<string>();
   const [conversations, setConversations] = useState<
@@ -49,13 +51,15 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
   const selectedConvoRef = useRef(selectedConvo);
   const conversationsRef = useRef(conversations);
   const pathnameRef = useRef(pathname);
+  const messagesRef = useRef(messages);
 
   //ON MET A JOUR LES REFS A CHAQUE RENDU
   useEffect(() => {
     selectedConvoRef.current = selectedConvo;
     conversationsRef.current = conversations;
     pathnameRef.current = pathname;
-  }, [selectedConvo, conversations, pathname]);
+    messagesRef.current = messages;
+  }, [selectedConvo, conversations, pathname, messages]);
 
   //ON RECUPERE L'ID DE USER DANS UN STATE POUR L'UTILISER PLUS FACILEMENT
   useEffect(() => {
@@ -73,7 +77,10 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     const getUnreadMsg = async (userId: string) => {
       const res = await getUnreadMessagesByUserId(userId);
       if (res) {
-        const mappedRes = res.filter(item => item.id !== null).map(item => item.id as string) || [];
+        const mappedRes =
+          res
+            .filter((item) => item.id !== null)
+            .map((item) => item.id as string) || [];
         setNewMessage(mappedRes);
       }
     };
@@ -81,56 +88,58 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
   }, [userId]);
 
   const handleIncomingMessage = (msg: MessageSelect) => {
-    console.log("HANDLE INCOMING MESSAGE");
-    //ON CHECK SI LUSER EST DANS LA PAGE /MESSAGE
-    if (pathnameRef.current !== "/messages") {
-      console.log("PATHNAME DIFFERENT, ON SETNEWMESSAGE : ",pathnameRef.current);
-      //SI IL N'Y EST PAS, ON AJOUTE 1 A NEWMESSAGE
-      return setNewMessage((previous) => [...previous, msg.id]);
-    }
 
-    //SINON, ON CHECK LA SELECTEDCONVO
-    if (selectedConvoRef.current?.id === msg.conversationId) {
-      console.log("CONVOID IDENTIQUE, ON AJOUTE LE MESSAGE");
+    //ON CHECK SI L'USER EST SUR LA PAGE DES CONVO ET QUE LA SELECTEDCONVO CORRESPOND AU MESSAGE ENTRANT
+    if (selectedConvoRef.current?.id === msg.conversationId && pathnameRef.current === '/messages') {
       //SI LA SELECTEDCONVO.ID === NEWMESSAGE.CONVOID, ALORS ON L'AJOUTE AU MESSAGE
       return addNewMessage(msg);
     }
 
-    //SINON ON UPDATE LE DERNIER MESSAGE DE LA CONVO DANS CONVERSATIONS,
-    //CA PERMETTRA DE DISPLAY L'ICONE DE NOTIF ET DE METTRE A JOUR L'HEURE DU DERNIER MESSAGE
-    if (conversationsRef.current.length > 0) {
-      const newConvos = conversationsRef.current.map((convo) => {
-        if (convo.id === msg.conversationId) {
-          const newC = { ...convo, messages: [msg] };
-          return newC;
-        }
-        return convo;
-      });
-      console.log(
-        "CONVERSATION DIFFERENTE, ON UPDATE CONVERSATIONS",
-        newConvos
-      );
-      return setConversations((prev) => newConvos);
-    }
-    console.log(
-      "AUCUNE CONDITION FAVORABLE : ",
-      pathnameRef.current,
-      selectedConvoRef.current?.id,
-      conversationsRef.current?.length
-    );
+    //SINON ON AJOUTE L'ID DU MESSAGE A NEWMESSAGES POUR LA NAVBAR
+    setNewMessage((previous) => [...previous, msg.id]);
+
+    //ET ON UPDATE LE DERNIER MESSAGE DE LA CONVERSATION A LAQQUELLE LE MESSAGE APPARTIENT
+    const newConvos = conversationsRef.current.map((convo) => {
+      if (convo.id === msg.conversationId) {
+        const newC = { ...convo, messages: [msg] };
+        return newC;
+      }
+      return convo;
+    });
+    console.log('NEW CONVOS : ', newConvos);
+    setConversations(newConvos);
   };
 
-  //RECEPTION DES NOUVEAUX MESSAGES VIA PUSHER
+  ///////////////////////////////
+  //  GESTION DES NOTIFICATION //
+  ///////////////////////////////
   useEffect(() => {
     if (!userId) {
       return;
     }
     pusherClient.subscribe(userId);
+
+    //INCOMING MESSAGE
     pusherClient.bind("new_message", (msg: MessageSelect) => {
       console.log("ON RENTRE DANS LE BIND NEW_MESSAGE");
-      const mappedMsg: MessageSelect = {...msg, createdAt: new Date(msg.createdAt!)} 
+      const mappedMsg: MessageSelect = {
+        ...msg,
+        createdAt: new Date(msg.createdAt!),
+      };
       handleIncomingMessage(mappedMsg);
     });
+
+    //DELETED CONVERSATION
+    pusherClient.bind('delete_conversation', (convoId: string) => {
+      console.log('DELETE CONVERSATION PUSHER : ', convoId);
+      deleteConversationFromState(convoId);
+    })
+
+    //CREATION CONVERSATION
+    pusherClient.bind('create_conversation', (convo: ConversationListItemType) => {
+      setConversations([...conversationsRef.current, {...convo, createdAt: new Date(convo.createdAt!)}]);
+      setNewMessage(previous => [...previous, convo.messages[0].id]);
+    })
     return () => {
       console.log("ON UNSUBSRIBE");
       pusherClient.unbind();
@@ -139,8 +148,17 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
 
   //AJOUTER LE DERNIER MESSAGE AUX AUTRES
   const addNewMessage = (newMsg: MessageSelect) => {
-    setMessages((prev) => [...prev, newMsg]);
+    setMessages([...messagesRef.current, newMsg]);
   };
+
+  //SUPPRESSION D'UNE CONVERSATION
+  const deleteConversationFromState = (convoId: string) => {
+    const filteredConvo = conversationsRef.current.filter(convo => convo.id !== convoId);
+    setConversations(filteredConvo);
+    if (selectedConvoRef.current?.id === convoId) {
+      setSelectedConvo(undefined);
+    }
+  }
 
   const value = {
     conversations,
@@ -152,6 +170,7 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     newMessage,
     setNewMessage,
     addNewMessage,
+    deleteConversationFromState,
   };
 
   return (

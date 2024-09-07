@@ -6,7 +6,7 @@ import {
   MessageInsert,
   messageTable,
 } from "@/drizzle/schema";
-import { and, count, eq, isNotNull, ne, or } from "drizzle-orm";
+import { and, count, eq, getTableColumns, isNotNull, ne, or } from "drizzle-orm";
 
 export const createMessageOnDb = async (message: MessageInsert) => {
   try {
@@ -36,7 +36,9 @@ export const getUnreadMessagesByUserId = async (userId: string) => {
 
     //LA SUBREQUEST POUR RECUPERER TOUS LES MESSAGES DE TOUTES LES CONVERSATION DE L'UTILISATEUR
     const sq = db
-      .select()
+      .select({
+        convoId: conversationTable.id
+      })
       .from(conversationTable)
       .where(
         or(
@@ -44,20 +46,19 @@ export const getUnreadMessagesByUserId = async (userId: string) => {
           eq(conversationTable.sellerId, userId)
         )
       )
-      .leftJoin(
-        messageTable,
-        eq(messageTable.conversationId, conversationTable.id)
-      )
       .as("sq");
 
     //ON COUNT LE NOMBRE DE MESSAGES QUI ONT ISREAD === FALSE
     const req = await db
-      .select({ id: sq.message.id})
+      .select({ id: messageTable.id})
       .from(sq)
+      .leftJoin(
+        messageTable,
+        eq(messageTable.conversationId, sq.convoId)
+      )
       .where(and(
-        eq(sq.message.isRead, false),
-        ne(sq.message.senderId, userId),
-        isNotNull(sq.message.id)
+        eq(messageTable.isRead, false),
+        ne(messageTable.senderId, userId)
       ));
 
     return req;
