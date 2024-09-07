@@ -276,8 +276,8 @@ export const createProdAttrsOnDB = async (prodAttrs: ProdAttrInsert[]) => {
       console.log("0 ROW INSERTED PRODATTR : ", prodAttrs);
     }
     return true;
-  } catch (error) {
-    console.log("ERROR CREATING PRODATTR REQUEST : ", error);
+  } catch (error: any) {
+    console.log("ERROR CREATING PRODATTR REQUEST : ", error?.message);
     return null;
   }
 };

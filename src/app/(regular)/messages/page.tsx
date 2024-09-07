@@ -1,4 +1,4 @@
-'use server';
+
 import { auth } from '@/auth';
 import AuthRequired from '@/components/auth-required/AuthRequired';
 import ConversationList from '@/components/conversation/ConversationList';
@@ -8,8 +8,8 @@ import { Divider } from '@nextui-org/react';
 import { sql } from 'drizzle-orm';
 import React from 'react'
 
+export const dynamic = 'force-dynamic';
 const page = async () => {
-
   const session = await auth();
 
   if (!session || !session.user || !session.user.id) {

@@ -35,7 +35,7 @@ import {
   udpateProductOnDB,
   updateProdAttrOnDb,
 } from "../requests/product.request";
-import { createLocationOnDB } from "../requests/location.request";
+import { createLocationOnDB, deleteLocationOnDB } from "../requests/location.request";
 import {
   deleteImagesOnDB,
   deleteMultipleImagesOnCloud,
@@ -135,18 +135,24 @@ export const createProductACTION = async (
 
     if (!newP) throw new Error("Impossible de sauvegarder votre annonce.");
 
-    //ON CREE LES PRODUCTSATTRIBUTS DANS LA DB
-    const newA = await createProdAttrsOnDB(mappedAttributes);
-
-    if (!newA)
-      throw new Error(
-        "Impossible de sauvegarder les caractéristiques de l'annonce."
-      );
+    //ON CREE LES PRODUCTSATTRIBUTS DANS LA DB SI IL Y EN A
+    if (mappedAttributes.length > 0) {
+      console.log('MAPPED ATTRIBUTES ! ', mappedAttributes);
+      const newA = await createProdAttrsOnDB(mappedAttributes);
+  
+      if (!newA)
+        throw new Error(
+          "Impossible de sauvegarder les caractéristiques de l'annonce."
+        );
+    }
 
     //ON UPLOAD LES PHOTO SUR LE CLOUD ET ON RECUP LES URLS
     const pictures = data.files.getAll("file") as File[];
 
+    //SI L'USER A FOURNI DES PHOTOS
     if (pictures.length) {
+
+      //ON LES UPLOAD DANS FIREBASE
       const images = await uploadMultipleImagesOnCloud(
         pictures,
         data.product.id
@@ -183,8 +189,11 @@ export const createProductACTION = async (
     return { ...initialState, success: true };
   } catch (error: any) {
     //SI ERREUR AVEC LA CREATION, ON SUPPRIME TOUT CE QUI A PU ETRE CREE POUR EVITER LES CONFLITS LORS DU RESUBMIT
-    console.log("ERROR CREATE PRODUCT ACTION", error);
-    await deleteProductOnDB(data.product.id);
+    console.log("ERROR CREATE PRODUCT ACTION", error?.message);
+    //await deleteProductOnDB(data.product.id);
+
+    //PLUTOT QUE DELETE LE PRODUCT, ON DELETE LA LOCATION QUI EST EN DELETE CASCADE AVEC LE PRODUCT
+    await deleteLocationOnDB(data.location.id);
     return {
       ...initialState,
       success: false,

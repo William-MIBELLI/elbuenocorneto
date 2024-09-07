@@ -137,7 +137,8 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
 
     //CREATION CONVERSATION
     pusherClient.bind('create_conversation', (convo: ConversationListItemType) => {
-      setConversations([...conversationsRef.current, {...convo, createdAt: new Date(convo.createdAt!)}]);
+      const mappedMsg: MessageSelect = {...convo.messages[0], createdAt: new Date(convo.messages[0].createdAt as Date) }
+      setConversations([...conversationsRef.current, { ...convo, messages: [mappedMsg] }]);
       setNewMessage(previous => [...previous, convo.messages[0].id]);
     })
     return () => {
