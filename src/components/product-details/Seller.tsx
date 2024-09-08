@@ -36,7 +36,7 @@ const Seller: FC<IProps> = async ({ userId, productId }) => {
       </Link>
       <Divider />
       <div className='flex flex-col gap-2 my-3'>
-        <Button isDisabled fullWidth className='bg-orange-500 text-white '>
+        <Button as={Link} href={`/buy/${productId}`}  fullWidth className='bg-orange-500 text-white '>
           Réserver
         </Button>
         <Button as={Link} href={`/conversation/${productId}`} fullWidth className='bg-blue-900 text-white '>

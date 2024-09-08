@@ -19,7 +19,7 @@ const Footer = () => {
         </span>
       </p>
       <p className="my-3 font-semibold">
-        <span className="underline">En ce moment </span>: NOTIFICATION VIA PUSHER 
+        <span className="underline">En ce moment </span>: RESERVATION / PAIEMENT 😓 
       </p>
       <div className="flex gap-3">
         <Button
