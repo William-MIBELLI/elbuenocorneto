@@ -8,6 +8,7 @@ interface IProps extends InputProps {
   type?: 'text' | 'password' | 'email' | 'search' | 'number';
   defaultValue?: string;
   errors?: string[];
+  colSpan?: number;
 }
 
 
@@ -18,10 +19,11 @@ const UncontrolledInput: FC<IProps> = ({
   required = true,
   defaultValue = undefined,
   errors,
+  colSpan,
   ...rest
 }) => {
   return (
-    <div className="flex flex-col items-start">
+    <div className={`flex flex-col items-start ${colSpan ? `col-span-${colSpan}` : null }`} >
       <label htmlFor={name}>{`${label} ${required ? '*' : ''}`}</label>
       <Input
         type={type}
@@ -29,7 +31,7 @@ const UncontrolledInput: FC<IProps> = ({
         name={name}
         defaultValue={defaultValue}
         classNames={{
-          inputWrapper: "border bg-transparent",
+          inputWrapper: `border bg-transparent`,
         }}
         {...rest}
       />

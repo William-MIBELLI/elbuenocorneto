@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import AuthRequired from '@/components/auth-required/AuthRequired';
 import Step1 from '@/components/buy/Step1';
+import { BuyProductProvider } from '@/context/buyProduct.context';
 import { getProductDetails } from '@/lib/requests/product.request';
 import React, { FC } from 'react'
 
@@ -30,12 +31,14 @@ const page: FC<IProps> = async ({ params: { productId } }) => {
   }  
 
   return (
-    <div className='w-full'>
-      <h1>
-        {`PRODUCT ID : ${productId}`}
-      </h1>
-      <Step1 product={product} />
-    </div>
+    <BuyProductProvider>
+      <div className='w-full'>
+        <h1>
+          {`PRODUCT ID : ${productId}`}
+        </h1>
+        <Step1 product={product} />
+      </div>
+    </BuyProductProvider>
   )
 }
 
