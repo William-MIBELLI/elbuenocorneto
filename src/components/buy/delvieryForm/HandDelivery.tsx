@@ -30,7 +30,7 @@ const HandDelivery = () => {
               3
             </div>
             <p>
-              Pensez à prendre votre téléphone portable pour déclancher le
+              Pensez à prendre votre téléphone portable pour déclencher le
               paiement depuis votre messagerie{" "}
               <span className="text-main font-semibold">elbuenocorneto</span>{" "}
               pendant le rendez-vous

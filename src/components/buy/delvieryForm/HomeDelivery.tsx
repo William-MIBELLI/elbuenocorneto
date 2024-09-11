@@ -22,12 +22,15 @@ const HomeDelivery = () => {
           colSpan={1}
         />
         <UncontrolledInput name="street" label="Rue" colSpan={3} />
+        <div className="col-span-4">
+
         <UncontrolledInput
           name="addressLine"
           label="Complément d'adresse"
           required={false}
-          colSpan={4}
+          
         />
+        </div>
         <UncontrolledInput
           name="postCode"
           type="number"

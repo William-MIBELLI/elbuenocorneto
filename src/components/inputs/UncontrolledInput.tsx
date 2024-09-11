@@ -8,7 +8,7 @@ interface IProps extends InputProps {
   type?: 'text' | 'password' | 'email' | 'search' | 'number';
   defaultValue?: string;
   errors?: string[];
-  colSpan?: number;
+  colSpan?: number | string;
 }
 
 

@@ -1,35 +1,79 @@
-'use client';
-import { DeliverySelect, deliveriesEnum } from "@/drizzle/schema";
-import { createContext, Dispatch, FC, SetStateAction, useContext, useState } from "react";
+"use client";
+import { deliveriesEnum } from "@/drizzle/schema";
+import { Details } from "@/interfaces/IProducts";
+import {
+  createContext,
+  FC,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-export type Delivery =  typeof deliveriesEnum.enumValues[number] | 'hand_delivery'
+export type Delivery =
+  | (typeof deliveriesEnum.enumValues)[number]
+  | "hand_delivery";
 
-interface IBuyProductContext {
-  selectedDeliveryMethod: Delivery;
-  setSelectedDeliveryMethod: Dispatch<SetStateAction<Delivery>>
-}
+const useBuyProductContextValue = () => {
 
-const BuyProductContext = createContext<IBuyProductContext>({} as IBuyProductContext);
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<Delivery>("hand_delivery");
+  const [totalPrice, setTotalPrice] = useState<number>();
+  const [protectionCost, setProtectionCost] = useState<number>();
+  const [product, setProduct] = useState<Details>();
 
+//CALCUL DU COUT DE LA PROTECTION
+  useEffect(() => {
+    if (product) {
+      setProtectionCost(Math.floor(product.price * 0.025))
+    }
+  }, [product])
+  
+  //CALCUL DU TOTAL
+  useEffect(() => {
+    let total = 0;
+    if (product) {
+      total += product.price
+    }
+    if (protectionCost) {
+      total+= protectionCost
+    }
+    if (selectedDeliveryMethod && selectedDeliveryMethod !== 'hand_delivery') {
+      const del = product?.pdl.find(item => item.delivery.type === selectedDeliveryMethod);
+      if (del) {
+        total += parseFloat(del.delivery.price)
+      }
+    }
+    setTotalPrice(total);
+  },[product, protectionCost, selectedDeliveryMethod])
+
+  return {
+    selectedDeliveryMethod,
+    setSelectedDeliveryMethod,
+    totalPrice,
+    setTotalPrice,
+    protectionCost,
+    setProtectionCost,
+    product,
+    setProduct,
+  };
+};
+
+const BuyProductContext = createContext<
+  ReturnType<typeof useBuyProductContextValue>
+>({} as ReturnType<typeof useBuyProductContextValue>);
 
 interface IProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export const BuyProductProvider: FC<IProps> = ({ children }) => {
 
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<Delivery>('hand_delivery');
-
-  const value = {
-    selectedDeliveryMethod,
-    setSelectedDeliveryMethod
-  }
+  const value = useBuyProductContextValue();
 
   return (
     <BuyProductContext.Provider value={value}>
       {children}
     </BuyProductContext.Provider>
-  )
-}
+  );
+};
 
 export const useBuyProductContext = () => useContext(BuyProductContext);

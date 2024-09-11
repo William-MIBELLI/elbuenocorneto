@@ -4,7 +4,7 @@ import { Details } from "@/interfaces/IProducts";
 import { Divider, Radio, RadioGroup } from "@nextui-org/react";
 import { Check, MapPin } from "lucide-react";
 import Image from "next/image";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import LeftSide from "./LeftSide";
 
 interface IProps {
@@ -13,7 +13,11 @@ interface IProps {
 
 const Step1: FC<IProps> = ({ product }) => {
 
-  const { selectedDeliveryMethod, setSelectedDeliveryMethod } = useBuyProductContext();
+  const { selectedDeliveryMethod, setSelectedDeliveryMethod, setProduct, totalPrice, protectionCost } = useBuyProductContext();
+
+  useEffect(() => {
+    setProduct(product);
+  },[product])
 
   return (
     <div className=" w-full">
@@ -113,7 +117,7 @@ const Step1: FC<IProps> = ({ product }) => {
                   Protection Elbuenocorneto
                 </p>
                 <p className="text-red-400">
-                  8€
+                  {protectionCost}€
                 </p>
               </div>
               <div className="flex justify-between items-start gap-2 text-left">
@@ -138,7 +142,7 @@ const Step1: FC<IProps> = ({ product }) => {
           {/* FOOTER */}
           <div className="flex justify-between font-semibold">
             <p>Total</p>
-            <p className="text-lg text-red-400">{product.price}€</p>
+            <p className="text-lg text-red-400">{totalPrice}€</p>
           </div>
         </div>
       </div>
