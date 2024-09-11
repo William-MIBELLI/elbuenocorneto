@@ -15,10 +15,11 @@ export type Delivery =
 
 const useBuyProductContextValue = () => {
 
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<Delivery>("hand_delivery");
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<Delivery>("mondialrelay");
   const [totalPrice, setTotalPrice] = useState<number>();
   const [protectionCost, setProtectionCost] = useState<number>();
   const [product, setProduct] = useState<Details>();
+  const [step, setStep] = useState<'delivery' | 'payment'>('payment');
 
 //CALCUL DU COUT DE LA PROTECTION
   useEffect(() => {
@@ -54,6 +55,8 @@ const useBuyProductContextValue = () => {
     setProtectionCost,
     product,
     setProduct,
+    step,
+    setStep
   };
 };
 

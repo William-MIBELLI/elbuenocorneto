@@ -2,7 +2,7 @@ import React from "react";
 
 const HandDelivery = () => {
   return (
-      <div className="col-span-2 shadow-small rounded-lg text-left p-6 flex flex-col gap-3 my-4">
+      <form noValidate className="col-span-2 shadow-small rounded-lg text-left p-6 flex flex-col gap-3 my-4 relative z-30 bg-white">
         <h3 className="font-semibold text-lg">
           Remise de l'achat en main propre
         </h3>
@@ -36,8 +36,9 @@ const HandDelivery = () => {
               pendant le rendez-vous
             </p>
           </div>
-        </div>
       </div>
+      <button type="submit" hidden ></button>
+      </form>
   );
 };
 

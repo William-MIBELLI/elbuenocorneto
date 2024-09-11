@@ -6,7 +6,7 @@ import React from "react";
 
 const HomeDelivery = () => {
   return (
-    <div className="w-full rounded-lg shadow-small p-5 flex flex-col gap-2 text-left my-4">
+    <div className="w-full rounded-lg shadow-small p-5 flex flex-col gap-2 text-left my-4 relative z-30 bg-white">
       <h2 className="font-semibold text-lg">Adresse de livraison</h2>
       <p className="text-gray-400 font-thin">
         transmise au vendeur pour l'envoi du colis

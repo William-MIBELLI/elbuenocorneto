@@ -22,7 +22,7 @@ const LeftSide = () => {
   };
   return <div className="flex flex-col">
     {renderContent()}
-    <p className="text-left text-xs text-gray-400 font-light">
+    <p className="text-left text-xs text-gray-400 font-light z-30">
         Vous ne serez créditez que lorsque le vendeur aura confirmé la disponibilité de la commande
       </p>
   </div>;

@@ -1,8 +1,9 @@
 import { auth } from "@/auth";
 import AuthRequired from "@/components/auth-required/AuthRequired";
-import Step1 from "@/components/buy/Step1";
+import StepDisplayer from "@/components/buy/StepDisplayer";
 import { BuyProductProvider } from "@/context/buyProduct.context";
 import { getProductDetails } from "@/lib/requests/product.request";
+import Image from "next/image";
 import React, { FC } from "react";
 
 interface IProps {
@@ -27,7 +28,15 @@ const page: FC<IProps> = async ({ params: { productId } }) => {
 
   return (
     <div className="w-full">
-      <Step1 product={product} />
+      {/* <Step1 product={product} /> */}
+      <StepDisplayer product={product} />
+      <Image
+        className="fixed bottom-0 right-0 z-10"
+        src="/buy_product_bg.svg"
+        alt="bg"
+        width={800}
+        height={800}
+      />
     </div>
   );
 };

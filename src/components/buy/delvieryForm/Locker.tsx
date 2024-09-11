@@ -5,7 +5,7 @@ import React, { useState } from "react";
 const Locker = () => {
   const [phoneValue, setPhoneValue] = useState("");
   return (
-    <div className="flex flex-col gap-3 my-4 w-full">
+    <div className="flex flex-col gap-3 my-4 w-full z-30 bg-white">
       {/* SEARCH LOCKER PART */}
       <div className="flex flex-col gap-3 p-5 shadow-small w-full rounded-lg text-left">
         <h2 className="font-semibold text-lg">
