@@ -50,8 +50,7 @@ export const fetchAddressFromAPI = async (keyword: string, city: boolean = false
     );
 
     if (res.status !== 200) {
-      console.log('RES : ', res)
-      throw new Error();
+      throw new Error('Error fetching address from API, status : '+ res.status);
     }
     const data: IResponse = await res.json();
     const mappedResponse: IMappedResponse[] = data.features.map((item) => {
@@ -63,8 +62,8 @@ export const fetchAddressFromAPI = async (keyword: string, city: boolean = false
     const locationList = mapLocationForStorage(mappedResponse);
 
     return locationList;
-  } catch (error) {
-    console.log("ERROR FETCHING FROM API ADDRESS : ", error);
+  } catch (error: any) {
+    console.log("ERROR FETCHING FROM API ADDRESS : ", error?.message);
     return [];
   }
 };

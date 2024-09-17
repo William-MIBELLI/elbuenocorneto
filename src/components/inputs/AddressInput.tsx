@@ -5,12 +5,13 @@ import AddressList from '../adress-list/AddressList';
 import { Input } from '@nextui-org/react';
 
 interface IProps {
-  onClickHandler: (item: LocationInsert) => void
+  onClickHandler: (item: LocationInsert) => void;
+  previousKeyword?: string;
   required?: boolean;
 }
-const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
+const AddressInput: FC<IProps> = ({ onClickHandler, previousKeyword = '', required = true }) => {
 
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState(previousKeyword);
   const [list, setList] = useState<LocationInsert[]>([]);
   const lastTimeTyping = useRef<number>();
 
@@ -41,7 +42,10 @@ const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
   };
 
   //ONCLICK SUR IN ITEM DE LA LIST
-  const testClickHandler = (item: LocationInsert) => {
+  const localClickHandler = (item: LocationInsert) => {
+    if (item?.label) {
+      setKeyword(item.label)
+    }
     setList([]);
     onClickHandler(item);
   }
@@ -62,13 +66,13 @@ const AddressInput: FC<IProps> = ({ onClickHandler, required = true }) => {
           />
         </div>
         {list.length ? (
-          <AddressList list={list} onClickHandler={onClickHandler} />
-        ) : (
+          <AddressList list={list} onClickHandler={localClickHandler} />
+        ) :  keyword.length === 0 ?(
           <p className="text-xs my-3">
             Commencez a renseigner votre adresse et selectionnez la ensuite dans
             la liste.
           </p>
-        )}
+        ) : null}
       </div>
   )
 }

@@ -10,6 +10,7 @@ export const login = async (
   intialState: { error: string },
   formData: FormData
 ) => {
+  console.log('CALLBACK : ', callbackUrl);
   const parsedCredentials = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),

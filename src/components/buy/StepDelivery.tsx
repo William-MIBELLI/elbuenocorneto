@@ -19,10 +19,10 @@ const Step1 = () => {
   } = useBuyProductContext();
 
   return (
-    <div className=" w-full">
+    <div className=" w-full mb-24">
       {/* HEADER */}
       {/* CONTAINER */}
-      <div className=" w-full grid grid-cols-3 gap-3">
+      <div className=" w-full grid grid-cols-3 gap-3 relative">
         {/* LEFTSIDE */}
         <div className=" col-span-2">
           <div className="flex flex-col text-left text-2xl font-semibold">
@@ -32,7 +32,10 @@ const Step1 = () => {
           <LeftSide />
         </div>
 
+        <div className="relative z-30">
+
         <DeliveryRightSide/>
+        </div>
       </div>
     </div>
   );

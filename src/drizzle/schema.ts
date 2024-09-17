@@ -467,3 +467,24 @@ export const messageRelations = relations(messageTable, ({ one }) => ({
 
 export type MessageInsert = typeof messageTable.$inferInsert;
 export type MessageSelect = typeof messageTable.$inferSelect;
+
+export const transactionTable = pgTable('transaction', {
+  id: text('id').notNull().primaryKey(),
+  productId: text('product_id').notNull().references(() => products.id),
+  costProtection: numericCasted('cost_protection').notNull(),
+  deliveryMethod: deliveriesEnum('delivery_method'),
+  userId: text('user_id').notNull().references(() => users.id),
+  firstname: text('firstname'),
+  lastname: text('lastname'),
+  houseNumber: numericCasted('house_number'),
+  streetName: text('street_name'),
+  addressLine: text('address_line'),
+  postCode: numericCasted('post_code'),
+  city: text('city'),
+  country: text('country').default('France'),
+  phoneNumber: numericCasted('phone_number')
+})
+
+export type TransactionInsert = typeof transactionTable.$inferInsert;
+export type TransactionSelect = typeof transactionTable.$inferSelect;
+  

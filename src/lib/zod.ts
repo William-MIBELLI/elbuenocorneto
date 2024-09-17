@@ -7,11 +7,13 @@ import {
   AttributeSelect,
   LocationInsert,
   StateEnum,
+  TransactionInsert,
   deliveriesEnum,
 } from "./../drizzle/schema";
 import { DeliveryType, DeliveryTypeList } from "./../interfaces/IDelivery";
 import { GENDER } from "@/interfaces/IUser";
 import { z } from "zod";
+import { IPickerShop } from "@/interfaces/ILocation";
 
 export const loginSchema = z.object({
   email: z.string().email(),
@@ -71,32 +73,29 @@ export const informationsSchema = z
   })
   .partial();
 
+export const productSchema = z.object({
+  userId: z.string().uuid("This user_id is not valid."),
+  title: z
+    .string()
+    .min(4, "Le titre doit avoir au moins 4 caractères.")
+    .max(100, "Le titre doit avoir au maximum 100 caractères."),
+  price: z.number(),
+  description: z
+    .string()
+    .min(10, "La description doit avoir au moins 10 caractères.")
+    .max(2500, "Maximum 2500 caractères."),
+  categoryType: z
+    .string()
+    .refine(
+      (value) => categoriesTypeList.includes(value as CategoriesType),
+      "Cette catégorie n'est aps disponible"
+    ),
+  locationId: z.string().uuid(),
+  state: z
+    .string({ message: "L'état est requis" })
+    .refine((val) => StateEnum.enumValues.find((item) => item === val)),
+});
 
-
-export const productSchema = z
-  .object({
-    userId: z.string().uuid("This user_id is not valid."),
-    title: z
-      .string()
-      .min(4, "Le titre doit avoir au moins 4 caractères.")
-      .max(100, "Le titre doit avoir au maximum 100 caractères."),
-    price: z.number(),
-    description: z
-      .string()
-      .min(10, "La description doit avoir au moins 10 caractères.")
-      .max(2500, "Maximum 2500 caractères."),
-    categoryType: z
-      .string()
-      .refine(
-        (value) => categoriesTypeList.includes(value as CategoriesType),
-        "Cette catégorie n'est aps disponible"
-      ),
-    locationId: z.string().uuid(),
-    state: z
-      .string({ message: "L'état est requis" })
-      .refine((val) => StateEnum.enumValues.find((item) => item === val)),
-  });
-  
 export type ProductSchemaType = z.infer<typeof productSchema>;
 
 export const locationSchema = z.object({
@@ -169,17 +168,99 @@ export const createDynamicSchemaForAttrs = (attributes: AttributeSelect[]) => {
   return mappedVers;
 };
 
-
-export const updateProductSchema = productSchema.pick({ title: true, price: true, description: true })
+export const updateProductSchema = productSchema.pick({
+  title: true,
+  price: true,
+  description: true,
+});
 
 export const createConversationSchema = z.object({
   message: z.string().min(3).max(2500),
   sellerId: z.string(),
   productId: z.string(),
-})
+});
 
 export const createMessageSchema = z.object({
   content: z.string().min(3).max(2500),
   conversationId: z.string(),
   senderId: z.string(),
-})
+});
+
+export const baseDeliverySchema = z.object({
+  productId: z.string().uuid("ProductId is not a UUID"),
+  userId: z.string().uuid("userId is not a UUID"),
+  costProtection: z.number(),
+}) satisfies z.ZodType<Omit<TransactionInsert, "id">>;
+
+export const PickerDeliverySchema = baseDeliverySchema.extend({
+  firstname: z.string().min(3).max(25),
+  lastname: z.string().min(3).max(25),
+});
+
+export const homeDeliverySchema = baseDeliverySchema.extend({
+  firstname: z.string().min(3).max(25),
+  lastname: z.string().min(3).max(25),
+  houseNumber: z.number(),
+  streetName: z.string().min(3).max(100),
+  addressLine: z.string().optional(),
+  postCode: z.number().refine((val) => val.toString().length === 5, {
+    message: "Le code postal doit comporter 5 caractères",
+  }),
+  city: z.string().min(3).max(100),
+  phoneNumber: z
+    .number()
+    .refine(
+      (val) => {
+        const str = val.toString();
+        return (
+          (str.length === 10 && str[0] === "0") ||
+          (str.length === 9 && str[0] !== "0")
+        );
+      },
+      {
+        message:
+          "Le numéro de téléphone doit comporter 9 chiffres, ou 10 chiffres commençant par 0",
+      }
+    )
+    .optional(),
+  country: z.string().default("France"),
+}) satisfies z.ZodType<Omit<TransactionInsert, "id">>;
+
+export type HomdeDeliverySchemaType = z.infer<typeof homeDeliverySchema>;
+
+export const mergePickerAndFormData = (
+  picker: IPickerShop | undefined,
+  fd: FormData
+) => {
+  
+  const mergedFD = new FormData();
+
+  // Copier les entrées existantes du FormData original
+  for (const [key, value] of fd.entries()) {
+    mergedFD.append(key, value);
+  }
+
+  //SI PAS DE PICKER, ON RETURN DIRECT LE FORMDATA
+  if (!picker) {
+    return mergedFD;
+  }
+  
+  //ON SPREAD PICKER
+  const { street, house_number, name, postal_code, city, phone, country } = picker;
+
+  //ON MERGE LE NOUVEL OBJET AVEC LE PICKER
+  const pickerData: Record<string, number | string> = {
+    streetName: street,
+    houseNumber: +house_number,
+    addressLine: name,
+    postCode: +postal_code,
+    city,
+    country,
+  };
+
+  Object.keys(pickerData).forEach(key => {
+    mergedFD.append(key, pickerData[key].toString())
+  })
+
+  return mergedFD;
+};

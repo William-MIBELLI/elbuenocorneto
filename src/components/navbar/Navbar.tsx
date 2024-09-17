@@ -60,49 +60,11 @@ const Navbar: FC<IProps> = ({ userId }) => {
     setUser(data?.user);
   }, [data]);
 
-  // //NOTIF POUR LES NOUVEAUX MESSAGES RECUS
-  // useEffect(() => {
-  //   //SI L'YSER N'EST PAS CONNECTE ON FAST RETURN
-  //   if (!userId) {
-  //     return
-  //   }
-
-  //   console.log('ON RENTRE DANS LE USEEFFECT, userid: ', userId)
-
-  //   //ON SUBSCRIBE AVEC SUR SON ID
-  //   pusherClient.subscribe(userId);
-
-  //   //ON BIND SUR new_message
-  //   pusherClient.bind('new_message', (msg: any) => {
-  //     console.log('ON RECOIT UN NOUVEAU MESSAGE : ', msg);
-  //     setNewMessage((previous) => previous + 1);
-  //   })
-
-  //   //ON UNSUBSRIBE A LA FERMETURE
-  //   return () => {pusherClient.unsubscribe(userId || '') }
-  // }, []);
 
   useEffect(() => {
     console.log("NEWMESSAGE : ", newMessage);
   }, [newMessage]);
 
-  // //ON FETCH LE NOMBRE DE MESSAGES NON LUS
-  // useEffect(() => {
-
-  //   if (!user?.id) {
-  //     return;
-  //   }
-  //   console.log('USEEFFECT COUNT NAVBAR');
-  //   const getUnreadMsgCount = async () => {
-  //     const res = await getUnreadMessagesByUserId(user?.id || '')
-  //     console.log('RES DANS NAVBAR : ', res);
-  //     if (res) {
-  //       setNewMessage(res[0].count)
-  //     }
-  //   }
-  //   getUnreadMsgCount();
-
-  // },[user?.id])
 
   return (
     <Suspense fallback={<Spinner />}>

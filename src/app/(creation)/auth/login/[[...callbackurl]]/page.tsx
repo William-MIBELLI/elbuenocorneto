@@ -17,7 +17,7 @@ const Login: FC<IProps> = async ({ params: { callbackurl = '/' } }) => {
   const session = await auth();
   
 
-  //SI LUISER EST DEJA IDENTIFIE
+  //SI L'USER EST DEJA IDENTIFIE
   if (session && session.user) {
     return (
       <div className="flex flex-col gap-4 p-8">
@@ -26,7 +26,7 @@ const Login: FC<IProps> = async ({ params: { callbackurl = '/' } }) => {
           'use server';
           await signOut({ redirectTo: '/'})
         }}>
-        <Button className="button_danger" type="submit">Sé déconnecter ?</Button>
+        <Button className="button_danger" type="submit">Se déconnecter ?</Button>
         </form>
       </div>
     )

@@ -24,7 +24,8 @@ const LocationPart = () => {
     }
   }, [location])
   
-  //SUBMIT HANDLER SI L'USER EST REVENU SUR LA PAGE ET QU'UNE LOCATION EST DEJA STOCKEE, DU COUP LE BOUTON SUIVANT EST CLICKABLE
+  //SUBMIT HANDLER SI L'USER EST REVENU SUR LA PAGE ET QU'UNE LOCATION EST DEJA STOCKEE,
+  //DU COUP LE BOUTON SUIVANT EST CLICKABLE
   const onSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (location) {

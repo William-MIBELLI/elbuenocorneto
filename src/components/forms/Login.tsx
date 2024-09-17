@@ -14,11 +14,13 @@ interface IProps {
 
 const LoginForm: FC<IProps> = ({ callbackUrl = ['/'] }) => {
 
-  const [state, formAction] = useFormState(login.bind(null, callbackUrl.join('/')), { error: "" });
+  //IMPOSSIBLE DE JOIN AVEC UN SLASH,
+  //DU COUP PTIT TWERK JOIN - SPLIT - JOIN 🤕
+  const callback = callbackUrl.join('.');
+  const [state, formAction] = useFormState(login.bind(null, callback.split(',').join('/')), { error: "" });
   const path = usePathname()
 
-  console.log('PATH : ',  callbackUrl);
-
+  console.log('callBackURL : ',  callbackUrl, callback.split(',').join('/'));
 
   return (
     <form action={formAction}>

@@ -19,7 +19,7 @@ const DeliveryRightSide = () => {
   }
 
   return (
-    <div className=" col-span-1 p-3 shadow-small rounded-lg z-30 bg-white">
+    <div className=" col-span-1 p-3 shadow-small rounded-lg sticky top-28 z-30 bg-white">
       {/* HEADER */}
       <div className="flex gap-2">
         <Image

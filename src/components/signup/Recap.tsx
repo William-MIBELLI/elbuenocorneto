@@ -14,11 +14,11 @@ const Recap: FC<IProps> = () => {
   const { address, email, name, phone } = userValue;
   const [picFD, setPicFD] = useState<FormData>();
 
+  //EN FAIT JUST SPLIT BY SIGNUP ET PRENDRE path[1]
   const path = usePathname().split("/");
-  console.log("PATH DANS RECAP : ", path);
 
   // PROBABLEMENT LERREUR DE REDIRECTION AU SIGNUP EST LA
-  const callbackurl = path[3] ? `/${path[3]}` : "/";
+  const callbackurl = path[3] ? `/${path.slice(3).join('/')}` : "/";
 
   //ON STOCKE l'IMAGE DE L'USER DANS UN FORMDATA POUR LE PASSER AU SERVER-ACTION
   useEffect(() => {

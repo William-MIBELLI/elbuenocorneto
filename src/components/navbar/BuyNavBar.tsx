@@ -1,10 +1,11 @@
 'use client'
 import { Button, Divider, Navbar, NavbarContent } from "@nextui-org/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { FC } from "react";
 import Brand from "./Brand";
 import { MoveLeft, ShieldCheck, Tally1 } from "lucide-react";
 import Link from "next/link";
+import { useBuyProductContext } from "@/context/buyProduct.context";
 
 interface IProps {
   productId: string;
@@ -12,8 +13,23 @@ interface IProps {
 
 const BuyNavBar: FC<IProps> = ({ productId }) => {
 
-  return <Navbar maxWidth="lg" isBordered className="mb-9">
-    <Button as={Link} href={`/product/${productId}`} isIconOnly variant="light" >
+  const { step, setStep } = useBuyProductContext();
+  const router = useRouter();
+
+  //GERER LE CLICK DE RETOUR
+  const onBackClickHandler = () => {
+
+    //SI L'USER EST SUR LA PAGE DE PAIEMENT ON LE RAMENE AUX OPTIONS DE LIVRAISONS
+    if (step === 'payment') {
+      return setStep('delivery');
+    }
+
+    //SINON ON LE RAMENE SUR LA PAGE DU PRODUIT
+    router.back();
+  }
+
+  return <Navbar maxWidth="lg" isBordered className=" mb-9">
+    <Button onClick={onBackClickHandler} isIconOnly variant="light" >
       <MoveLeft />
     </Button>
     
@@ -23,7 +39,7 @@ const BuyNavBar: FC<IProps> = ({ productId }) => {
       <Divider orientation="vertical" className="h-6 w-0.5 mx-2"/>
         <ShieldCheck />
         <p>
-          Etape 1/2
+          Etape {step === "delivery" ? 1 : 2}/2
         </p>
       </div>
     </NavbarContent>

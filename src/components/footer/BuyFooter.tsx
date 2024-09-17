@@ -5,7 +5,14 @@ import React from 'react'
 
 const BuyFooter = () => {
 
-  const { totalPrice, setStep } = useBuyProductContext();
+  const { totalPrice, setStep, step, submitDeliveryRef } = useBuyProductContext();
+
+  const onClickHandler = () => {
+    // if (step === 'delivery') {
+    //   return setStep('payment')
+    // }
+    submitDeliveryRef?.current?.click();
+  }
 
   return (
     <div className='h-16 border-t-1  w-full fixed bottom-0 z-30'>
@@ -19,8 +26,10 @@ const BuyFooter = () => {
           </p>
         </NavbarContent>
         <NavbarContent justify='end'>
-          <Button className='button_main' onClick={(e) => setStep('payment')}>
-            Etape 2/2: payer
+          <Button className='button_main' onClick={onClickHandler}>
+            {
+              step === "delivery" ? 'Etape 2/2: payer' : 'Payer'
+            }
           </Button>
         </NavbarContent>
       </Navbar>
