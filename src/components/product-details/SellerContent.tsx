@@ -16,6 +16,7 @@ const SellerContent: FC<IProps> = async ({ user }) => {
       <div className="flex justify-between items-start">
         <UserHeader userData={user} />
         <Button
+          isDisabled
           variant="bordered"
           className="border-blue-900 border-1 text-blue-900 font-semibold"
         >

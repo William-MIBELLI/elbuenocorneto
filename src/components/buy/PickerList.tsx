@@ -9,7 +9,14 @@ interface IProps {
 }
 
 const PickerList: FC<IProps> = ({ servicePoints }) => {
-  const { pickers, setSelectedPicker, selectedPicker } = useBuyProductContext();
+  const {
+    pickers,
+    setSelectedPicker,
+    selectedPicker,
+    displayPickersList,
+    setDisplayPickersList,
+    personalInfoRef,
+  } = useBuyProductContext();
 
   const onChangeHandler = (value: string) => {
     if (!pickers) {
@@ -17,28 +24,59 @@ const PickerList: FC<IProps> = ({ servicePoints }) => {
     }
     const picker = pickers.find((item) => item.id === +value);
     setSelectedPicker(picker);
+    setDisplayPickersList(false);
+    if (personalInfoRef) {
+      personalInfoRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
   };
 
   return (
-    <RadioGroup
-      className="max-h-80 overflow-y-auto overflow-x-hidden my-4"
-      value={selectedPicker?.id.toString()}
-      onValueChange={onChangeHandler}
-    >
-      {servicePoints.map((service) => (
-        <Radio
-          key={service.id}
-          value={service.id.toString()}
-          classNames={{
-            base: ["min-w-full flex items-start justify-start p-3"],
-            labelWrapper: ["w-full"],
-            label: [" min-w-full p-0 -mt-1"],
-          }}
+    <div className="max-h-80 h-auto overflow-y-auto overflow-x-hidden mt-4 transition-all">
+      <RadioGroup
+        className=""
+        value={selectedPicker?.id.toString()}
+        onValueChange={onChangeHandler}
+      >
+        {displayPickersList ? (
+          servicePoints.map((service) => (
+            <Radio
+              key={service.id}
+              value={service.id.toString()}
+              classNames={{
+                base: ["min-w-full flex items-start justify-start p-3"],
+                labelWrapper: ["w-full"],
+                label: [" min-w-full p-0 -mt-1"],
+              }}
+            >
+              <PickerListItem picker={service} />
+            </Radio>
+          ))
+        ) : selectedPicker ? (
+          <Radio
+            key={selectedPicker.id}
+            value={selectedPicker.id.toString()}
+            classNames={{
+              base: ["min-w-full flex items-start justify-start  box-border"],
+              labelWrapper: ["w-full"],
+              label: [" min-w-full p-0 -mt-1"],
+            }}
+          >
+            <PickerListItem picker={selectedPicker} />
+          </Radio>
+        ) : null}
+      </RadioGroup>
+      {selectedPicker && !displayPickersList && (
+        <p
+          className=" mt-4 text-center cursor-pointer text-xs font-semibold"
+          onClick={() => setDisplayPickersList(true)}
         >
-          <PickerListItem picker={service} />
-        </Radio>
-      ))}
-    </RadioGroup>
+          voir plus
+        </p>
+      )}
+    </div>
   );
 };
 

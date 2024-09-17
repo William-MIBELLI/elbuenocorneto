@@ -31,7 +31,7 @@ const Locker: FC<IProps> = ({ userId, productId }) => {
     selectedPicker,
     transaction,
     setTransaction,
-    setStep, location
+    setStep, location, personalInfoRef
   } = useBuyProductContext();
 
   const [lastResult, action] = useFormState(lockerDeliveryACTION.bind(null ,selectedPicker), undefined);
@@ -105,7 +105,7 @@ const Locker: FC<IProps> = ({ userId, productId }) => {
       </div>
 
       {/* INFORMATIONS PERSONELLES PART */}
-      <div className="flex flex-col gap-5 p-5 shadow-small w-full bg-white rounded-lg text-left">
+      <div ref={personalInfoRef} className="flex flex-col gap-5 p-5 shadow-small w-full bg-white rounded-lg text-left">
         <div>
           <h2 className="text-lg font-semibold">2. Informations personelles</h2>
           <p className="text-gray-400 font-thin">

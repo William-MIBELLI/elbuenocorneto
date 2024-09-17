@@ -14,7 +14,7 @@ const PickerListItem: FC<IProps> = ({ picker }) => {
 
   const mappedAddress = `${picker.house_number} ${picker.street}, ${picker.postal_code} ${picker.city}`
   return (
-    <div className="w-full  flex flex-col cursor-pointer">
+    <div className="w-fullflex flex-col cursor-pointer box-border">
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
         <p className="font-semibold">{picker.name}</p>

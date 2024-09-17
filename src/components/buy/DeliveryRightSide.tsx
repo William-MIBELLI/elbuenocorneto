@@ -42,7 +42,7 @@ const DeliveryRightSide = () => {
         {/* SELECTION DES LA METHODE DE LIVRAISON */}
         <RadioGroup
           classNames={{
-            wrapper: ["gap-3"],
+            wrapper: ["gap-3 min-w-full"],
           }}
           onValueChange={(value) =>
             setSelectedDeliveryMethod(value as Delivery)
@@ -76,9 +76,9 @@ const DeliveryRightSide = () => {
               value={item.delivery.type}
               key={item.deliveryId}
               classNames={{
-                base: ["min-w-full flex items-start justify-start"],
-                labelWrapper: ["w-full text-left p-0"],
-                label: ["p-0 -mt-1"],
+                base: ["min-w-full w-full flex items-start justify-start"],
+                labelWrapper: ["w-full text-left p-0 "],
+                label: ["p-0 -mt-1 min-w-full"],
               }}
             >
               <div className="flex w-full justify-between font-semibold">

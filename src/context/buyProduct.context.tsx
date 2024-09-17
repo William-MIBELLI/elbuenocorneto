@@ -32,8 +32,10 @@ const useBuyProductContextValue = () => {
   const [pickers, setPickers] = useState<IPickerShop[]>();
   const [selectedPicker, setSelectedPicker] = useState<IPickerShop>();
   const [loadingPickers, setLoadingPickers] = useState<boolean>(false);
+  const [displayPickersList, setDisplayPickersList] = useState<boolean>(true);
 
   const submitDeliveryRef = useRef<HTMLButtonElement>(null);
+  const personalInfoRef = useRef<HTMLDivElement>(null);
 
   //FETCH LA LISTE DES PICKERS
   const getSc = async () => {
@@ -44,6 +46,7 @@ const useBuyProductContextValue = () => {
     );
     setPickers(services);
     setLoadingPickers(false);
+    setDisplayPickersList(true);
   };
 
 
@@ -113,7 +116,10 @@ const useBuyProductContextValue = () => {
     selectedPicker,
     setSelectedPicker,
     loadingPickers,
-    setLoadingPickers
+    setLoadingPickers,
+    displayPickersList,
+    setDisplayPickersList,
+    personalInfoRef
   };
 };
 

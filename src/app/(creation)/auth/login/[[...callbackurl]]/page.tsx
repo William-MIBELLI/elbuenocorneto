@@ -21,12 +21,16 @@ const Login: FC<IProps> = async ({ params: { callbackurl = '/' } }) => {
   if (session && session.user) {
     return (
       <div className="flex flex-col gap-4 p-8">
+        <h1 className="text-2xl font-semibold">Connexion</h1>
         <h3 className="flex gap-2">Vous êtes déjà identifié en tant que <p className="font-semibold italic">{session.user.name}</p>.</h3>
         <form action={async () => {
           'use server';
           await signOut({ redirectTo: '/'})
         }}>
-        <Button className="button_danger" type="submit">Se déconnecter ?</Button>
+          <div className="flex gap-3">
+            <Button as={Link} href="/" className="button_main" type="button">Rester connecté</Button>
+            <Button className="button_secondary" type="submit">Se déconnecter</Button>
+          </div>
         </form>
       </div>
     )

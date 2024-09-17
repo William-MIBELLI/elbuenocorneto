@@ -39,10 +39,10 @@ const page: FC<IProps> = async ({ params: { id } }) => {
                 {name}
               </h2>
             <div className='flex justify-center items-center gap-3'>
-              <Button className='bg-orange-500 text-white'>
+              <Button isDisabled className='bg-orange-500 text-white'>
                 Suivre
               </Button>
-              <Button isIconOnly variant='bordered'>
+              <Button isDisabled isIconOnly variant='bordered'>
                 <Ellipsis />
               </Button>
             </div>
