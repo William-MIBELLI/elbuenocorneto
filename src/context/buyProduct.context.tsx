@@ -27,7 +27,7 @@ const useBuyProductContextValue = () => {
   const [protectionCost, setProtectionCost] = useState<number>();
   const [product, setProduct] = useState<Details>();
   const [transaction, setTransaction] = useState<TransactionInsert>();
-  const [step, setStep] = useState<"delivery" | "payment">("delivery");
+  const [step, setStep] = useState<"delivery" | "payment" | 'success'>("delivery");
   const [location, setLocation] = useState<LocationInsert>();
   const [pickers, setPickers] = useState<IPickerShop[]>();
   const [selectedPicker, setSelectedPicker] = useState<IPickerShop>();

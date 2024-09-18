@@ -34,7 +34,7 @@ const PickerList: FC<IProps> = ({ servicePoints }) => {
   };
 
   return (
-    <div className="max-h-80 h-auto overflow-y-auto overflow-x-hidden mt-4 transition-all">
+    <div className="max-h-80 pickers_list h-auto overflow-y-auto overflow-x-hidden mt-4 transition-all">
       <RadioGroup
         className=""
         value={selectedPicker?.id.toString()}

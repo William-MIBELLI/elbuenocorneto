@@ -29,7 +29,8 @@ const cardsToDisplay: ICardDashboard[] = [
     title: ' Transaction',
     content: 'Suivre mes achats et mes ventes',
     iconUrl: 'transactions.png',
-    target: '/mes-transactions'
+    target: '/mes-transactions',
+    available: true
   },
   {
     title: 'Réservation de vacances',

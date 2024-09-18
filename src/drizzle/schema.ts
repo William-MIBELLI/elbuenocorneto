@@ -84,6 +84,10 @@ export const SortEnum = pgEnum("sort_enum", [
   "price_desc",
 ]);
 
+export const TransactionStatusEnum = pgEnum('transaction_status_enum', [
+  'CREATED', 'ACCEPTED', 'DECLINED', 'CANCELED', 'DONE', 'REFUNDED'
+])
+
 export type attrNameType = (typeof AttributeNameEnum.enumValues)[number];
 
 export const users = pgTable("user", {
@@ -482,7 +486,10 @@ export const transactionTable = pgTable('transaction', {
   postCode: numericCasted('post_code'),
   city: text('city'),
   country: text('country').default('France'),
-  phoneNumber: numericCasted('phone_number')
+  phoneNumber: numericCasted('phone_number'),
+  paymentIntentId: text('payment_intent_id'),
+  status: TransactionStatusEnum('status').default('CREATED'),
+  createdAt: timestamp('created_at').defaultNow()
 })
 
 export type TransactionInsert = typeof transactionTable.$inferInsert;

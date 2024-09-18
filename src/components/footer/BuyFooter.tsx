@@ -8,10 +8,12 @@ const BuyFooter = () => {
   const { totalPrice, setStep, step, submitDeliveryRef } = useBuyProductContext();
 
   const onClickHandler = () => {
-    // if (step === 'delivery') {
-    //   return setStep('payment')
-    // }
     submitDeliveryRef?.current?.click();
+  }
+
+  
+  if (step === 'success') {
+    return;
   }
 
   return (

@@ -116,4 +116,26 @@ input[type='number'] {
   }
 
  
+ 
+}
+
+/* width */
+.pickers_list::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.pickers_list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+.pickers_list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+.pickers_list::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

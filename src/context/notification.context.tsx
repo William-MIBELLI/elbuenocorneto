@@ -113,39 +113,39 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
   ///////////////////////////////
   //  GESTION DES NOTIFICATION //
   ///////////////////////////////
-  // useEffect(() => {
-  //   if (!userId) {
-  //     return;
-  //   }
-  //   pusherClient.subscribe(userId);
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    pusherClient.subscribe(userId);
 
-  //   //INCOMING MESSAGE
-  //   pusherClient.bind("new_message", (msg: MessageSelect) => {
-  //     console.log("ON RENTRE DANS LE BIND NEW_MESSAGE");
-  //     const mappedMsg: MessageSelect = {
-  //       ...msg,
-  //       createdAt: new Date(msg.createdAt!),
-  //     };
-  //     handleIncomingMessage(mappedMsg);
-  //   });
+    //INCOMING MESSAGE
+    pusherClient.bind("new_message", (msg: MessageSelect) => {
+      console.log("ON RENTRE DANS LE BIND NEW_MESSAGE");
+      const mappedMsg: MessageSelect = {
+        ...msg,
+        createdAt: new Date(msg.createdAt!),
+      };
+      handleIncomingMessage(mappedMsg);
+    });
 
-  //   //DELETED CONVERSATION
-  //   pusherClient.bind('delete_conversation', (convoId: string) => {
-  //     console.log('DELETE CONVERSATION PUSHER : ', convoId);
-  //     deleteConversationFromState(convoId);
-  //   })
+    //DELETED CONVERSATION
+    pusherClient.bind('delete_conversation', (convoId: string) => {
+      console.log('DELETE CONVERSATION PUSHER : ', convoId);
+      deleteConversationFromState(convoId);
+    })
 
-  //   //CREATION CONVERSATION
-  //   pusherClient.bind('create_conversation', (convo: ConversationListItemType) => {
-  //     const mappedMsg: MessageSelect = {...convo.messages[0], createdAt: new Date(convo.messages[0].createdAt as Date) }
-  //     setConversations([...conversationsRef.current, { ...convo, messages: [mappedMsg] }]);
-  //     setNewMessage(previous => [...previous, convo.messages[0].id]);
-  //   })
-  //   return () => {
-  //     console.log("ON UNSUBSRIBE");
-  //     pusherClient.unbind();
-  //   };
-  // }, [userId]);
+    //CREATION CONVERSATION
+    pusherClient.bind('create_conversation', (convo: ConversationListItemType) => {
+      const mappedMsg: MessageSelect = {...convo.messages[0], createdAt: new Date(convo.messages[0].createdAt as Date) }
+      setConversations([...conversationsRef.current, { ...convo, messages: [mappedMsg] }]);
+      setNewMessage(previous => [...previous, convo.messages[0].id]);
+    })
+    return () => {
+      console.log("ON UNSUBSRIBE");
+      pusherClient.unbind();
+    };
+  }, [userId]);
 
   //AJOUTER LE DERNIER MESSAGE AUX AUTRES
   const addNewMessage = (newMsg: MessageSelect) => {
