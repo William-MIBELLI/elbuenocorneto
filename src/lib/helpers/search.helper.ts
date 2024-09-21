@@ -9,10 +9,10 @@ export const queryToParams = (
   const params = {
     ...query,
     titleOnly: query.titleOnly === "true",
-    min: query.min ? +query.min ?? undefined : undefined,
-    max: query.max ? +query.max ?? undefined : undefined,
+    min: query.min ? +query.min || undefined : undefined,
+    max: query.max ? +query.max || undefined : undefined,
     keyword: query.keyword ? query.keyword.toString() : "",
-    radius: query.radius ? +query.radius ?? undefined : undefined,
+    radius: query.radius ? +query.radius || undefined : undefined,
     delivery: query.delivery === "true",
     sort: query.sort ? (query.sort as SortType) : undefined,
     categorySelectedType: query.categorySelectedType
@@ -21,8 +21,8 @@ export const queryToParams = (
     categorySelectedLabel: query.categorySelectedLabel?.toString() ?? undefined,
     donation: query.donation === "true",
     page: query.page ? +query.page : 1,
-    lat: query.lat ? +query.lat ?? undefined : undefined,
-    lng: query.lng ? +query.lng ?? undefined : undefined,
+    lat: query.lat ? +query.lat || undefined : undefined,
+    lng: query.lng ? +query.lng || undefined : undefined,
     id: query.id?.toString() ?? undefined,
     locationId: query.locationId?.toString() ?? undefined,
     createdAt: query.createdAt

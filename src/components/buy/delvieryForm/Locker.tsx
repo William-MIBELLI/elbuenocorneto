@@ -1,9 +1,6 @@
 import AddressInput from "@/components/inputs/AddressInput";
-import PhoneInput from "@/components/inputs/PhoneInput";
-import { LocationInsert, TransactionInsert } from "@/drizzle/schema";
-import { IPickerShop } from "@/interfaces/ILocation";
-import { getServicePoints } from "@/lib/requests/sendCloud.request";
-import { Divider, Input, Spinner } from "@nextui-org/react";
+import { TransactionInsert } from "@/drizzle/schema";
+import { Divider, Spinner } from "@nextui-org/react";
 import React, { FC, useEffect, useState } from "react";
 import PickerList from "../PickerList";
 import { useBuyProductContext } from "@/context/buyProduct.context";
@@ -11,36 +8,35 @@ import { useFormState } from "react-dom";
 import { lockerDeliveryACTION } from "@/lib/actions/transaction.action";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { homeDeliverySchema, mergePickerAndFormData, PickerDeliverySchema } from "@/lib/zod";
+import { baseDeliverySchemaType, homeDeliverySchema, mergeDataAndFormData, mergePickerAndFormData } from "@/lib/zod";
 import UncontrolledInput from "@/components/inputs/UncontrolledInput";
 import { Smartphone } from "lucide-react";
 
 interface IProps {
-  userId: string;
-  productId: string;
+  data: baseDeliverySchemaType
 }
 
-const Locker: FC<IProps> = ({ userId, productId }) => {
+const Locker: FC<IProps> = ({ data }) => {
   const [phoneValue, setPhoneValue] = useState("");
   const {
     pickers,
     setLocation,
     loadingPickers,
     submitDeliveryRef,
-    protectionCost,
     selectedPicker,
     transaction,
     setTransaction,
-    setStep, location, personalInfoRef
+    setStep, location, personalInfoRef, selectedDeliveryMethod
   } = useBuyProductContext();
 
-  const [lastResult, action] = useFormState(lockerDeliveryACTION.bind(null ,selectedPicker), undefined);
+  const [lastResult, action] = useFormState(lockerDeliveryACTION.bind(null ,{selectedPicker, baseData: data}), undefined);
 
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      const merged = mergePickerAndFormData(selectedPicker, formData)
-      const res = parseWithZod(merged, { schema: homeDeliverySchema });
+      const mergedPicker = mergePickerAndFormData(selectedPicker, formData);
+      const mergedFinal = mergeDataAndFormData(data, mergedPicker);
+      const res = parseWithZod(mergedFinal, { schema: homeDeliverySchema });
       console.log('RES DANS VALIDATE : ', res);
       return res;
     },
@@ -63,20 +59,6 @@ const Locker: FC<IProps> = ({ userId, productId }) => {
       noValidate
       className="flex flex-col gap-3 my-4 w-full z-30 "
     >
-      {/* HIDDEN INPUTS */}
-      <input hidden type="text" defaultValue={userId} name={fields.userId.name} />
-      <input
-        hidden
-        type="text"
-        defaultValue={productId}
-        name={fields.productId.name}
-      />
-      <input
-        hidden
-        type="number"
-        defaultValue={protectionCost}
-        name={fields.costProtection.name}
-      />
 
       {/* SEARCH LOCKER PART */}
       <div className="flex flex-col gap-3 p-5 shadow-small w-full bg-white rounded-lg text-left">

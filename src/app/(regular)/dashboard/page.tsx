@@ -26,7 +26,7 @@ const cardsToDisplay: ICardDashboard[] = [
     available: true
   },
   {
-    title: ' Transaction',
+    title: 'Transaction',
     content: 'Suivre mes achats et mes ventes',
     iconUrl: 'transactions.png',
     target: '/mes-transactions',

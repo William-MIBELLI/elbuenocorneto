@@ -15,7 +15,7 @@ import {
   decimal,
   customType,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const genderEnum = pgEnum("gender", ["0", "1", "2"]);
 export const attributeTypeEnum = pgEnum("attribute_type_enum", [
@@ -84,9 +84,14 @@ export const SortEnum = pgEnum("sort_enum", [
   "price_desc",
 ]);
 
-export const TransactionStatusEnum = pgEnum('transaction_status_enum', [
-  'CREATED', 'ACCEPTED', 'DECLINED', 'CANCELED', 'DONE', 'REFUNDED'
-])
+export const TransactionStatusEnum = pgEnum("transaction_status_enum", [
+  "CREATED",
+  "ACCEPTED",
+  "DECLINED",
+  "CANCELED",
+  "DONE",
+  "REFUNDED",
+]);
 
 export type attrNameType = (typeof AttributeNameEnum.enumValues)[number];
 
@@ -153,6 +158,7 @@ export const products = pgTable("product", {
     .references(() => categoryTable.type),
   description: text("description").notNull(),
   state: StateEnum("state").notNull(),
+  isReserved: boolean("is_reserved").default(false),
   // deliveryAvailable: boolean('delivery_available').default(true)
 });
 
@@ -199,7 +205,7 @@ export type InsertImage = typeof images.$inferInsert;
 
 export const deliveries = pgTable("deliveries", {
   id: text("id").primaryKey(),
-  type: deliveriesEnum("type").notNull(),
+  type: deliveriesEnum("type").unique().notNull(),
   label: text("label").notNull(),
   description: text("description").notNull(),
   price: numeric("price").notNull(),
@@ -426,7 +432,7 @@ export const conversationTable = pgTable("conversation", {
 export const conversationRelations = relations(
   conversationTable,
   ({ one, many }) => ({
-    messages: many(messageTable), 
+    messages: many(messageTable),
     product: one(products, {
       fields: [conversationTable.productId],
       references: [products.id],
@@ -472,26 +478,56 @@ export const messageRelations = relations(messageTable, ({ one }) => ({
 export type MessageInsert = typeof messageTable.$inferInsert;
 export type MessageSelect = typeof messageTable.$inferSelect;
 
-export const transactionTable = pgTable('transaction', {
-  id: text('id').notNull().primaryKey(),
-  productId: text('product_id').notNull().references(() => products.id),
-  costProtection: numericCasted('cost_protection').notNull(),
-  deliveryMethod: deliveriesEnum('delivery_method'),
-  userId: text('user_id').notNull().references(() => users.id),
-  firstname: text('firstname'),
-  lastname: text('lastname'),
-  houseNumber: numericCasted('house_number'),
-  streetName: text('street_name'),
-  addressLine: text('address_line'),
-  postCode: numericCasted('post_code'),
-  city: text('city'),
-  country: text('country').default('France'),
-  phoneNumber: numericCasted('phone_number'),
-  paymentIntentId: text('payment_intent_id'),
-  status: TransactionStatusEnum('status').default('CREATED'),
-  createdAt: timestamp('created_at').defaultNow()
-})
+export const transactionTable = pgTable("transaction", {
+  id: text("id").notNull().primaryKey(),
+  productId: text("product_id")
+    .notNull()
+    .references(() => products.id),
+  productTitle: text("product_title")
+    .notNull(),
+  sellerId: text("seller_id")
+    .notNull()
+    .references(() => users.id),
+  totalPrice: numericCasted("total_price").notNull(),
+  costProtection: numericCasted("cost_protection").notNull(),
+  deliveryMethod: deliveriesEnum("delivery_method").references(
+    () => deliveries.type
+  ),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  firstname: text("firstname"),
+  lastname: text("lastname"),
+  houseNumber: numericCasted("house_number"),
+  streetName: text("street_name"),
+  addressLine: text("address_line"),
+  postCode: numericCasted("post_code"),
+  city: text("city"),
+  country: text("country").default("France"),
+  phoneNumber: numericCasted("phone_number"),
+  paymentIntentId: text("payment_intent_id"),
+  status: TransactionStatusEnum("status").default("CREATED"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const transactionRelations = relations(transactionTable, ({ one }) => ({
+  product: one(products, {
+    fields: [transactionTable.productId],
+    references: [products.id],
+  }),
+  user: one(users, {
+    fields: [transactionTable.userId],
+    references: [users.id],
+  }),
+  seller: one(users, {
+    fields: [transactionTable.sellerId],
+    references: [users.id],
+  }),
+  delivery: one(deliveries, {
+    fields: [transactionTable.deliveryMethod],
+    references: [deliveries.type],
+  }),
+}));
 
 export type TransactionInsert = typeof transactionTable.$inferInsert;
 export type TransactionSelect = typeof transactionTable.$inferSelect;
-  

@@ -1,15 +1,17 @@
 "use client";
 import { useBuyProductContext } from "@/context/buyProduct.context";
 import { TransactionInsert } from "@/drizzle/schema";
+import { reserveProductACTION } from "@/lib/actions/product.action";
 import { createTransactionACTION } from "@/lib/actions/transaction.action";
-import { Button } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 import {
-  CardElement,
   PaymentElement,
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { redirect, RedirectType, useRouter } from "next/navigation";
+import { AnyARecord } from "dns";
+import { revalidatePath } from "next/cache";
+import { useRouter } from "next/navigation";
 import React, { FC, useState } from "react";
 // import '../../../envConfig'
 
@@ -21,9 +23,20 @@ interface IProps {
 const StripeForm: FC<IProps> = ({ clientSecret, dpmLink }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const { transaction, setStep, submitDeliveryRef } = useBuyProductContext();
+  const {
+    transaction,
+    setStep,
+    submitDeliveryRef,
+    product,
+    setLoading,
+    setTransaction,
+  } = useBuyProductContext();
   const [message, setMessage] = useState<string>();
   const router = useRouter();
+
+  if (!product || !transaction) {
+    return <Spinner />;
+  }
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,45 +47,77 @@ const StripeForm: FC<IProps> = ({ clientSecret, dpmLink }) => {
     if (!stripe || !elements) {
       return;
     }
-    const t = await elements.submit();
+    setLoading(true);
+    try {
+      //ON SUBMIT LES ELEMENTS
+      const t = await elements.submit();
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: "http://localhost:3000/buy/success",
-      },
-      clientSecret,
-      redirect: "if_required",
-    });
+      //ON UPDATE LE PRODUCT EN PASSANT ISRESERVED A TRUE pour
+      //EVITER QUE 2 USERS PUISSENT L'ACHETER EN MEME TEMPS
+      const res = await reserveProductACTION(product.id, true);
 
-    if (
-      error &&
-      (error.type === "card_error" || error.type === "validation_error")
-    ) {
-      setMessage(error.message);
-      return;
-    } else if (error) {
-      setMessage("Une erreur s'est produite.");
-      return;
-    }
+      if (!res) {
+        setMessage("Impossible de réserver cette annonce");
+        return;
+      }
 
-    if (!paymentIntent) {
-      return;
-    }
+      //ON CALL STRIPE
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: "http://localhost:3000/buy/success",
+        },
+        clientSecret,
+        redirect: "if_required",
+      });
 
-    //SI CA S'EST BIEN PASSE AVEC STRIPE, ON INSERT LA TRANSACTION DANS LA DB
-    const trans = await createTransactionACTION(
-      transaction as TransactionInsert,
-      paymentIntent.id
-    );
+      //AVANT DE TRAITER LES ERREURS SI IL Y EN A OU SI PAS DE PAYMENT
+      //ON REPASSE LE PRODUCT A ISRESERVED === FALSE POUR QU'IL SOIT DISPONIBLE
+      if (error || !paymentIntent) {
+        await reserveProductACTION(product.id, false);
+      }
 
-    //TODO : NOTIFIER LE VENDEUR
+      //SI ON A UNE ERREUR, ON L'AFFICHE A L'USER
+      if (
+        error &&
+        (error.type === "card_error" || error.type === "validation_error")
+      ) {
+        setMessage(error.message);
+        return;
+      } else if (error) {
+        setMessage("Une erreur s'est produite.");
+        return;
+      }
 
-    //SI LA CREATION DANS LA DB EST OK, ON REDIRIGE
-    if (trans) {
-      setStep("success");
-      router.push("/buy/success");
-      // redirect('/buy/success', RedirectType.push);
+      if (!paymentIntent) {
+        return;
+      }
+
+      //SI CA S'EST BIEN PASSE AVEC STRIPE, ON INSERT LA TRANSACTION DANS LA DB
+      const trans = await createTransactionACTION(
+        transaction as TransactionInsert,
+        paymentIntent.id
+      );
+
+      //SI LA CREATION DANS LA DB EST OK, ON REDIRIGE
+      if (trans) {
+        //ON UPDATE LA TRANSACTION DANS LE CONTEXT
+        setTransaction(trans);
+
+        //ON UPDATE LE STEP
+        setStep("success");
+
+        //ON INVALIDE LE PATH DU PRODUCT
+        console.log("PATH INVALIDE");
+
+        //ON REPLACE L'URL VERS SUCCESS
+        //POUR EMPECHER L'USER DE BACK SUR LA PAGE PAYMENT
+        router.replace("/buy/success");
+      }
+    } catch (error: any) {
+      console.log("ERROR ONSUBMIT HANDLER : ", error?.message);
+    } finally {
+      setLoading(false);
     }
   };
 

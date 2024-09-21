@@ -13,16 +13,14 @@ import {
   useContext,
   useEffect,
   useRef,
-  useState,
+  useState, 
 } from "react";
 
-export type Delivery =
-  | (typeof deliveriesEnum.enumValues)[number]
-  | "hand_delivery";
+export type Delivery =(typeof deliveriesEnum.enumValues)[number];
 
 const useBuyProductContextValue = () => {
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] =
-    useState<Delivery>("hand_delivery");
+    useState<Delivery | undefined>(undefined);
   const [totalPrice, setTotalPrice] = useState<number>();
   const [protectionCost, setProtectionCost] = useState<number>();
   const [product, setProduct] = useState<Details>();
@@ -33,6 +31,7 @@ const useBuyProductContextValue = () => {
   const [selectedPicker, setSelectedPicker] = useState<IPickerShop>();
   const [loadingPickers, setLoadingPickers] = useState<boolean>(false);
   const [displayPickersList, setDisplayPickersList] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const submitDeliveryRef = useRef<HTMLButtonElement>(null);
   const personalInfoRef = useRef<HTMLDivElement>(null);
@@ -48,6 +47,14 @@ const useBuyProductContextValue = () => {
     setLoadingPickers(false);
     setDisplayPickersList(true);
   };
+
+  const updateDeliveryMethodFromRadio = (value: string) => {
+    if (value !== 'hand_delivery') {
+      setSelectedDeliveryMethod(value as Delivery);
+      return;
+    }
+    setSelectedDeliveryMethod(undefined);
+  }
 
 
   //CALCUL DU COUT DE LA PROTECTION
@@ -70,7 +77,7 @@ const useBuyProductContextValue = () => {
     if (protectionCost) {
       total += protectionCost;
     }
-    if (selectedDeliveryMethod && selectedDeliveryMethod !== "hand_delivery") {
+    if (selectedDeliveryMethod) {
       const del = product?.pdl.find(
         (item) => item.delivery.type === selectedDeliveryMethod
       );
@@ -119,7 +126,10 @@ const useBuyProductContextValue = () => {
     setLoadingPickers,
     displayPickersList,
     setDisplayPickersList,
-    personalInfoRef
+    personalInfoRef,
+    loading, 
+    setLoading,
+    updateDeliveryMethodFromRadio
   };
 };
 

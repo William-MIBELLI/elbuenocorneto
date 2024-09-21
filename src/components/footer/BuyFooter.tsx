@@ -1,11 +1,11 @@
 'use client';
 import { useBuyProductContext } from '@/context/buyProduct.context'
-import { Button, Navbar, NavbarContent } from '@nextui-org/react'
+import { Button, Navbar, NavbarContent, Spinner } from '@nextui-org/react'
 import React from 'react'
 
 const BuyFooter = () => {
 
-  const { totalPrice, setStep, step, submitDeliveryRef } = useBuyProductContext();
+  const { totalPrice, setStep, step, submitDeliveryRef, loading } = useBuyProductContext();
 
   const onClickHandler = () => {
     submitDeliveryRef?.current?.click();
@@ -28,9 +28,9 @@ const BuyFooter = () => {
           </p>
         </NavbarContent>
         <NavbarContent justify='end'>
-          <Button className='button_main' onClick={onClickHandler}>
+          <Button isDisabled={loading} className='button_main' onClick={onClickHandler}>
             {
-              step === "delivery" ? 'Etape 2/2: payer' : 'Payer'
+              loading ? <Spinner size='sm' color='white'/> : step === "delivery" ? 'Etape 2/2: payer' : 'Payer'
             }
           </Button>
         </NavbarContent>

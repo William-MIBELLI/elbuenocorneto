@@ -54,7 +54,7 @@ const Navbar: FC<IProps> = ({ userId }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const { data, status } = useSession();
   const [user, setUser] = useState(data?.user);
-  const { newMessage, setNewMessage } = useNotificationContext();
+  const { newMessage, newTransaction } = useNotificationContext();
 
   useEffect(() => {
     setUser(data?.user);
@@ -119,6 +119,7 @@ const Navbar: FC<IProps> = ({ userId }) => {
             Icon={UserRound}
             text={user?.name || "Profile"}
             target="/dashboard"
+            notification={newTransaction.length > 0 ? newTransaction.length : undefined}
           />
         ) : status === "unauthenticated" ? (
           <Button

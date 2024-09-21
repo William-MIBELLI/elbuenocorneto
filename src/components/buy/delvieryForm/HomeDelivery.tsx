@@ -3,7 +3,7 @@ import UncontrolledInput from "@/components/inputs/UncontrolledInput";
 import { useBuyProductContext } from "@/context/buyProduct.context";
 import { TransactionInsert } from "@/drizzle/schema";
 import { homeDeliveryACTION } from "@/lib/actions/transaction.action";
-import { homeDeliverySchema } from "@/lib/zod";
+import { baseDeliverySchemaType, homeDeliverySchema, mergeDataAndFormData } from "@/lib/zod";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { Divider, Input } from "@nextui-org/react";
@@ -12,19 +12,20 @@ import React, { FC, useEffect } from "react";
 import { useFormState } from "react-dom";
 
 interface IProps {
-  userId: string;
-  productId: string;
+  data: baseDeliverySchemaType
 }
 
-const HomeDelivery: FC<IProps> = ({ userId, productId}) => {
+const HomeDelivery: FC<IProps> = ({ data }) => {
 
   const { submitDeliveryRef, protectionCost, setTransaction, setStep, transaction } = useBuyProductContext();
-  const [lastResult, action] = useFormState(homeDeliveryACTION, undefined);
+  const [lastResult, action] = useFormState(homeDeliveryACTION.bind(null, data), undefined);
 
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      const sub = parseWithZod(formData, { schema: homeDeliverySchema });
+      const merged = mergeDataAndFormData(data, formData);
+      const sub = parseWithZod(merged, { schema: homeDeliverySchema });
+      console.log('SUB : ', sub);
       return sub;
     },
     shouldValidate: "onBlur",
@@ -46,9 +47,6 @@ const HomeDelivery: FC<IProps> = ({ userId, productId}) => {
     noValidate
       className="w-full rounded-lg shadow-small p-5 flex flex-col gap-2 text-left my-4 relative z-30 bg-white"
     >
-      <input type="text" hidden defaultValue={userId} name={fields.userId.name} />
-      <input type="text" hidden defaultValue={productId} name={fields.productId.name} />
-      <input type="number" hidden defaultValue={protectionCost} name={fields.costProtection.name} />
       <h2 className="font-semibold text-lg">Adresse de livraison</h2>
       <p className="text-gray-400 font-thin">
         transmise au vendeur pour l'envoi du colis

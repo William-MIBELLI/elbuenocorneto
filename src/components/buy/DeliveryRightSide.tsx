@@ -12,11 +12,14 @@ const DeliveryRightSide = () => {
     selectedDeliveryMethod,
     protectionCost,
     totalPrice,
+    updateDeliveryMethodFromRadio
   } = useBuyProductContext();
 
   if (!product) {
     return <Spinner />;
   }
+
+
 
   return (
     <div className=" col-span-1 p-3 shadow-small rounded-lg sticky top-28 z-30 bg-white">
@@ -24,7 +27,7 @@ const DeliveryRightSide = () => {
       <div className="flex gap-2">
         <Image
           alt={product.title}
-          src={product.images[0].url}
+          src={product.images[0]?.url ?? '/image_placeholder.svg'}
           width={100}
           height={100}
         />
@@ -44,13 +47,11 @@ const DeliveryRightSide = () => {
           classNames={{
             wrapper: ["gap-3 min-w-full"],
           }}
-          onValueChange={(value) =>
-            setSelectedDeliveryMethod(value as Delivery)
-          }
-          value={selectedDeliveryMethod}
+          onValueChange={updateDeliveryMethodFromRadio}
+          value={selectedDeliveryMethod === undefined ? 'hand_delivery' : selectedDeliveryMethod}
         >
           <Radio
-            value={"hand_delivery"}
+            value={'hand_delivery'}
             defaultChecked
             classNames={{
               base: ["flex items-start justify-start"],

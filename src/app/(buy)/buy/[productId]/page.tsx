@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import AuthRequired from "@/components/auth-required/AuthRequired";
 import StepDisplayer from "@/components/buy/StepDisplayer";
-import { BuyProductProvider } from "@/context/buyProduct.context";
 import { getProductDetails } from "@/lib/requests/product.request";
 import Image from "next/image";
 import React, { FC } from "react";
@@ -24,6 +23,10 @@ const page: FC<IProps> = async ({ params: { productId } }) => {
   //ON CHECK QUE LE PRODUCT EXISTE ET QU'IL N'APPARTIENT PAS A L'USER
   if (!product || product.seller.id === session.user.id) {
     return <div>Impossible d'afficher ce produit</div>;
+  }
+
+  if (product.isReserved) {
+    return <div className="mt-6 font-semibold text-2xl">Ce produit est déja en cours d'achat 🤕</div>
   }
 
   return (

@@ -14,7 +14,7 @@ const stripePromise = loadStripe(
 );
 
 const StepPayment = () => {
-  const { totalPrice, product, protectionCost, selectedDeliveryMethod } =
+  const { totalPrice, product, protectionCost, selectedDeliveryMethod, transaction } =
     useBuyProductContext();
   const [displayDetails, setDisplayDetails] = useState(false);
   const [clientSecret, setClientSecret] = useState<string>();
@@ -43,6 +43,10 @@ const StepPayment = () => {
     };
     getIntent();
   }, []);
+
+  if (transaction?.status) {
+    return <div>Cette transaction ne peut plus être modifiée.</div>
+  }
 
   return (
     <Elements stripe={stripePromise} options={options}>
@@ -123,8 +127,7 @@ const StepPayment = () => {
                     <p>Protection Elbuenocorneto</p>
                     <p>{protectionCost}€</p>
                   </div>
-                  {selectedDeliveryMethod &&
-                    selectedDeliveryMethod !== "hand_delivery" && (
+                  {selectedDeliveryMethod  && (
                       <div className="text-xs flex justify-between">
                         <p>Frais de livraison</p>
                         <p>

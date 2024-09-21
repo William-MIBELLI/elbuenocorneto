@@ -186,16 +186,19 @@ export const createMessageSchema = z.object({
   senderId: z.string(),
 });
 
+
 export const baseDeliverySchema = z.object({
   productId: z.string().uuid("ProductId is not a UUID"),
   userId: z.string().uuid("userId is not a UUID"),
   costProtection: z.number(),
+  sellerId: z.string().uuid("SellerID is not a UUID"),
+  productTitle: z.string(),
+  totalPrice: z.number().positive("Le prix ne peut pas être négatif."),
+  deliveryMethod: z.enum(deliveriesEnum.enumValues).optional()
+
 }) satisfies z.ZodType<Omit<TransactionInsert, "id">>;
 
-export const PickerDeliverySchema = baseDeliverySchema.extend({
-  firstname: z.string().min(3).max(25),
-  lastname: z.string().min(3).max(25),
-});
+export type baseDeliverySchemaType = z.infer<typeof baseDeliverySchema>;
 
 export const homeDeliverySchema = baseDeliverySchema.extend({
   firstname: z.string().min(3).max(25),
@@ -232,7 +235,6 @@ export const mergePickerAndFormData = (
   picker: IPickerShop | undefined,
   fd: FormData
 ) => {
-  
   const mergedFD = new FormData();
 
   // Copier les entrées existantes du FormData original
@@ -244,9 +246,9 @@ export const mergePickerAndFormData = (
   if (!picker) {
     return mergedFD;
   }
-  
+
   //ON SPREAD PICKER
-  const { street, house_number, name, postal_code, city, phone, country } = picker;
+  const { street, house_number, name, postal_code, city, country } = picker;
 
   //ON MERGE LE NOUVEL OBJET AVEC LE PICKER
   const pickerData: Record<string, number | string> = {
@@ -258,9 +260,27 @@ export const mergePickerAndFormData = (
     country,
   };
 
-  Object.keys(pickerData).forEach(key => {
-    mergedFD.append(key, pickerData[key].toString())
-  })
+  Object.keys(pickerData).forEach((key) => {
+    mergedFD.append(key, pickerData[key].toString());
+  });
 
   return mergedFD;
+};
+
+export const mergeDataAndFormData = (
+  data: Partial<TransactionInsert>,
+  fd: FormData
+): FormData => {
+  const newFD = new FormData();
+  const objEntries = Object.fromEntries(fd.entries());
+
+  Object.keys(objEntries).forEach((key) => {
+    return newFD.append(key, objEntries[key]);
+  });
+
+  (Object.keys(data) as Array<keyof Partial<TransactionInsert>>
+  ).forEach((key) => newFD.append(key, data[key] as string));
+
+
+  return newFD;
 };

@@ -1,26 +1,28 @@
 import { useBuyProductContext } from "@/context/buyProduct.context";
 import { TransactionInsert } from "@/drizzle/schema";
 import { handDeliveryACTION } from "@/lib/actions/transaction.action";
-import { baseDeliverySchema } from "@/lib/zod";
+import { baseDeliverySchema, baseDeliverySchemaType, mergeDataAndFormData } from "@/lib/zod";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import React, { FC, useEffect } from "react";
 import { useFormState } from "react-dom";
 
 interface IProps {
-  userId: string;
-  productId: string;
+  data: baseDeliverySchemaType
 }
 
-const HandDelivery: FC<IProps> = ({ userId, productId }) => {
-  const { submitDeliveryRef, setStep, protectionCost, setTransaction } = useBuyProductContext();
+const HandDelivery: FC<IProps> = ({ data }) => {
+  const { submitDeliveryRef, setStep, setTransaction } = useBuyProductContext();
 
-  const [lastResult, action] = useFormState(handDeliveryACTION, undefined);
+  const [lastResult, action] = useFormState(handDeliveryACTION.bind(null, data), undefined);
 
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: baseDeliverySchema });
+      const merged = mergeDataAndFormData(data, formData);
+      const sub = parseWithZod(merged, { schema: baseDeliverySchema });
+      console.log('sub :', sub);
+      return sub;
     },
   });
 
@@ -43,9 +45,6 @@ const HandDelivery: FC<IProps> = ({ userId, productId }) => {
       noValidate
       className="col-span-2 shadow-small rounded-lg text-left p-6 flex flex-col gap-3 my-4 relative z-30 bg-white"
     >
-      <input type="text" hidden defaultValue={productId} name={fields.productId.name} />
-      <input type="text" hidden defaultValue={userId} name={fields.userId.name} />
-      <input type="number" hidden defaultValue={protectionCost} name={fields.costProtection.name} />
       <h3 className="font-semibold text-lg">
         Remise de l'achat en main propre
       </h3>

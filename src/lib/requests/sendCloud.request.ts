@@ -5,7 +5,7 @@ import { LocationInsert } from "@/drizzle/schema";
 import { IPickerShop } from "@/interfaces/ILocation";
 import '../../../envConfig';
 
-export const getServicePoints = async (location: Required<LocationInsert>, deliveryMethod: Delivery) => {
+export const getServicePoints = async (location: Required<LocationInsert>, deliveryMethod: Delivery | undefined) => {
 
   const SENDCLOUD_KEY = process.env.NEXT_PUBLIC_SENDCLOUD_PUBLIC_KEY;
   const carrier = deliveryMethod === 'chronopost' || deliveryMethod === 'colissimo' ? deliveryMethod : 'mondial_relay'

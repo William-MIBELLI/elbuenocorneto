@@ -31,7 +31,7 @@ const ProductList: FC<IProps> = ({ products }) => {
   // products.forEach(p => console.log(p?.product?.id))
 
   const onChangePagination = (page: number) => {
-    const newParams = new URLSearchParams(params);
+    const newParams = new URLSearchParams(params.toString());
     newParams.set('page', page.toString());
     router.push(`${pathName}?${newParams}`);
    };

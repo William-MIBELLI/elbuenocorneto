@@ -31,7 +31,9 @@ import {
   createProductOnDB,
   createSearchCondition,
   deleteProductOnDB,
+  getProductDetails,
   getProductsList,
+  reserveProduct,
   udpateProductOnDB,
   updateProdAttrOnDb,
 } from "../requests/product.request";
@@ -481,3 +483,9 @@ export const searchWithFiltersACTION = async (
     return {...initialState, success: false};
   }
 };
+
+export const reserveProductACTION = async (productId: string, reserve: boolean) => {
+  const res = await reserveProduct(productId, reserve);
+  return res;
+}
+

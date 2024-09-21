@@ -2,7 +2,7 @@
 
 import { ConversationListType, getConversationById, getUserConversations } from "../requests/conversation.request";
 import { getPusherServer } from "../pusher/server";
-import { ConversationSelect, conversationTable, MessageSelect } from "@/drizzle/schema";
+import { ConversationSelect, conversationTable, MessageSelect, TransactionSelect } from "@/drizzle/schema";
 import { auth } from "@/auth";
 import { sql } from "drizzle-orm";
 
@@ -45,6 +45,16 @@ export const creationConversationNotification = async (userIdToNotif: string, co
     
   } catch (error: any) {
     console.log('ERROR CREATION CONVERSATION NOTIFICATION : ', error?.message);
+    return null;
+  }
+}
+
+export const sendTransactionCreationNotif = async (transaction: TransactionSelect) => {
+  try {
+    const pusher = getPusherServer();
+    pusher.trigger(transaction.sellerId, 'transaction_creation', { transactionId: transaction.id});
+  } catch (error: any) {
+    console.log('ERROR SENDING TRANSACTION CREATION NOTIF : ', error?.message);
     return null;
   }
 }

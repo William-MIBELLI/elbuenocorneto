@@ -4,6 +4,7 @@ import { MessageSelect } from "@/drizzle/schema";
 import { pusherClient } from "@/lib/pusher/client";
 import { ConversationListItemType, ConversationListType } from "@/lib/requests/conversation.request";
 import { getUnreadMessagesByUserId } from "@/lib/requests/message.request";
+import { getWaitingTransactions } from "@/lib/requests/transaction.request";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter} from "next/navigation";
 import {
@@ -27,6 +28,7 @@ interface INotifContext {
   setNewMessage: Dispatch<React.SetStateAction<string[]>>;
   addNewMessage: (msg: MessageSelect) => void;
   deleteConversationFromState: (convoID: string) => void;
+  newTransaction: string[];
 }
 
 const NotificationContext = createContext<INotifContext>({} as INotifContext);
@@ -38,6 +40,7 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
   const session = useSession();
   const pathname = usePathname();
   const router = useRouter();
+  const notif = true;
 
   const [userId, setUserId] = useState<string>();
   const [conversations, setConversations] = useState<
@@ -47,6 +50,7 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     useState<ConversationListItemType>();
   const [messages, setMessages] = useState<MessageSelect[]>([]);
   const [newMessage, setNewMessage] = useState<string[]>([]);
+  const [newTransaction, setNewTransaction] = useState<string[]>([]);
 
   const selectedConvoRef = useRef(selectedConvo);
   const conversationsRef = useRef(conversations);
@@ -70,7 +74,8 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
 
   //ON FETCH L'ID DE MESSAGES NON LUS
   useEffect(() => {
-    if (!userId) {
+
+    if (!userId ) {
       return;
     }
 
@@ -86,6 +91,21 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     };
     getUnreadMsg(userId);
   }, [userId]);
+
+  //FETCH DES TRANSACTIONS EN ATTENTE
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    const waitinTrans = async () => {
+      const res = await getWaitingTransactions(userId);
+      if (res) {
+        const mapped = res.map(item => item.id);
+        setNewTransaction(mapped)
+      }
+    }
+    waitinTrans();
+  },[userId])
 
   const handleIncomingMessage = (msg: MessageSelect) => {
 
@@ -114,7 +134,8 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
   //  GESTION DES NOTIFICATION //
   ///////////////////////////////
   useEffect(() => {
-    if (!userId) {
+    if (!userId || !notif) {
+      console.log('pas de notif');
       return;
     }
     pusherClient.subscribe(userId);
@@ -141,6 +162,13 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
       setConversations([...conversationsRef.current, { ...convo, messages: [mappedMsg] }]);
       setNewMessage(previous => [...previous, convo.messages[0].id]);
     })
+
+    //NEW TRANSACTION
+    pusherClient.bind('transaction_creation', (transactionId: string) => {
+      setNewTransaction(previous => [...previous, transactionId]);
+    })
+
+    //ON UNBSUBSCRIBE AU DEMONTAGE
     return () => {
       console.log("ON UNSUBSRIBE");
       pusherClient.unbind();
@@ -172,6 +200,7 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     setNewMessage,
     addNewMessage,
     deleteConversationFromState,
+    newTransaction
   };
 
   return (

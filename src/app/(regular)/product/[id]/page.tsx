@@ -143,7 +143,7 @@ const page: FC<IProps> = async ({ params: { id } }) => {
 
       {/* ASIDE SELLER */}
       <aside className=" w-full lg:w-1/3 lg:sticky top-10">
-        <Seller userId={data.seller.id} productId={data.id} />
+        <Seller userId={data.seller.id} productId={data.id} isReserved={data.isReserved ?? false} />
         {
           session && session?.user?.id === userId && (
             <Managament product={data} />

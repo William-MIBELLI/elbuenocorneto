@@ -777,39 +777,53 @@ export const getProductForConversation = async (productId: string) => {
   try {
     const db = getDb();
 
-    const prod =  await
-      db.query.products.findFirst({
-        where: eq(products.id, productId),
-        with: {
-          seller: {
-            columns: {
-              password: false,
-            },
-            with: {
-              products: {
-                columns: {
-                  id: true,
-                }
-              }
-            }
+    const prod = await db.query.products.findFirst({
+      where: eq(products.id, productId),
+      with: {
+        seller: {
+          columns: {
+            password: false,
           },
-          pdl: {
-            with: {
-              delivery: true,
+          with: {
+            products: {
+              columns: {
+                id: true,
+              },
             },
           },
-          location: true,
-          attributes: {
-            with: {
-              attribute: true,
-            }
-          }
         },
-      })
- 
+        pdl: {
+          with: {
+            delivery: true,
+          },
+        },
+        location: true,
+        attributes: {
+          with: {
+            attribute: true,
+          },
+        },
+      },
+    });
+
     return prod;
   } catch (error: any) {
     console.log("ERROR GETTING PRODUCT FOR CONVERSATION : ", error?.message);
     return null;
+  }
+};
+
+export const reserveProduct = async (productId: string, reserve: boolean) => {
+  try {
+    const db = getDb();
+    const res = await db
+      .update(products)
+      .set({ isReserved: reserve })
+      .where(eq(products.id, productId))
+      .returning();
+    return res;
+  } catch (error: any) {
+    console.log("ERROR RESERVE PRODUCT REQUEST : ", error?.message);
+    return false;
   }
 };

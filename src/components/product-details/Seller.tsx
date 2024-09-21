@@ -1,10 +1,8 @@
 
-import { Avatar, Button, Divider } from '@nextui-org/react'
-import { ChevronRight, Lock, LockKeyhole } from 'lucide-react'
+import { Button, Divider } from '@nextui-org/react'
+import { ChevronRight, LockKeyhole } from 'lucide-react'
 import Image from 'next/image'
 import React, { FC } from 'react'
-import Rating from '../rating/Rating'
-import { SelectUser } from '@/drizzle/schema'
 import Link from 'next/link'
 import UserHeader from '../user/UserHeader'
 import { getUserById } from '@/lib/requests/user.request'
@@ -18,8 +16,9 @@ const user = {
 interface IProps {
   userId: string;
   productId: string;
+  isReserved: boolean;
 }
-const Seller: FC<IProps> = async ({ userId, productId }) => {
+const Seller: FC<IProps> = async ({ userId, productId, isReserved }) => {
 
   const data = await getUserById(userId);
   if (!data) {
@@ -27,6 +26,7 @@ const Seller: FC<IProps> = async ({ userId, productId }) => {
       <div>Cant retrieve user 😢</div>
     )
   }
+  console.log('ISRESERVED DANS SELLER : ', isReserved, productId);
   const { id } = data.user;
   return (
     <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium bg-white'>
@@ -36,8 +36,8 @@ const Seller: FC<IProps> = async ({ userId, productId }) => {
       </Link>
       <Divider />
       <div className='flex flex-col gap-2 my-3'>
-        <Button as={Link} href={`/buy/${productId}`}  fullWidth className='bg-orange-500 text-white '>
-          Réserver
+        <Button isDisabled={isReserved} as={Link} href={`/buy/${productId}`}  fullWidth className='bg-orange-500 text-white '>
+          {isReserved ? 'Cette annoce est déja réservée 😢' : 'Réserver'}
         </Button>
         <Button as={Link} href={`/conversation/${productId}`} fullWidth className='bg-blue-900 text-white '>
           Message
