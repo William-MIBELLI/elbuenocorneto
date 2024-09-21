@@ -189,7 +189,7 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
 
             <section className="flex flex-col items-start gap-2 p-2 justify-start">
               <Image
-                src={selectedConvo.product.images[0].url}
+                src={selectedConvo.product.images[0]?.url || '/image_placeholder.svg'}
                 alt="prod_img"
                 height={150}
                 width={150}

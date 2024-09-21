@@ -136,7 +136,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
               value={value}
               onValueChange={setValue}
             />
-            <SubmitButton />
+            <SubmitButton value={value || ''} />
           </div>
           {(lastResult.error ||
             fields.content.errors ||
@@ -152,11 +152,12 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
 
 export default ConversationContent;
 
-const SubmitButton = () => {
+const SubmitButton = ({ value }: {value: string}) => {
   const status = useFormStatus();
+  console.log('VALUE DANS BUTTON : ', value)
   return (
     <Button
-      disabled={status.pending}
+      isDisabled={status.pending || value.length < 3}
       type="submit"
       isIconOnly
       className="bg-main text-white"
