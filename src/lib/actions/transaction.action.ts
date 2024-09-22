@@ -11,9 +11,11 @@ import {
 import { TransactionInsert } from "@/drizzle/schema";
 import { v4 } from "uuid";
 import { IPickerShop } from "@/interfaces/ILocation";
-import { createTransactionOnDB } from "../requests/transaction.request";
+import { updateTransactionStatusOnDb, createTransactionOnDB, getTransaction } from "../requests/transaction.request";
 import { sendTransactionCreationNotif } from "./pusher.action";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+import { reserveProduct } from "../requests/product.request";
 
 const createTransactionObject = (
   value: Omit<TransactionInsert, "id">
@@ -97,6 +99,123 @@ export const createTransactionACTION = async (transaction: TransactionInsert, pa
     return res;
   } catch (error: any) {
     console.log('ERROR CREATE TRANSACTION ACTION : ', error?.message);
+    return null;
+  }
+}
+
+export const cancelTransactionACTION = async (transactionId: string) => {
+  try {
+    //ON RECUPERE L'ID DE L'USER DANS LA SESSION
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      throw new Error('user ID missing in session');
+    }
+
+    const userId = session.user.id;
+
+    //ON RECUPERE LA TRANSACTION CORRESPONDANTE AU productId
+    const transactions = await getTransaction('id', transactionId);
+
+    if (transactions.length === 0) {
+      throw new Error('No transaction with this id');
+    }
+
+    const transaction = transactions[0];
+
+    //ON CHECK QUE L'USER EN FAIT PARTI
+    if (transaction.userId !== userId && transaction.sellerId !== userId) {
+      throw new Error('User not belong to this transaction.')
+    }
+
+    //ON CHECK QU'ELLE N'A PAS ETE VALIDEE
+    if (transaction.status !== 'CREATED') {
+      throw new Error('This transaction can not be canceled.')
+    }
+
+    //SI OUI ON PASSE LE STATUS DE LA TRANSACTION A CANCEL
+    await updateTransactionStatusOnDb(transactionId, 'CANCELED');
+
+    //ON PASSE ISRESERVED DU PRODUCT A FALSE
+    await reserveProduct(transaction.productId, false);
+
+    //ON CANCEL LE PAYMENTINTENT SUR STRIPE
+
+    //ON REVALIDE LES PATHS
+    revalidatePath(`/product/${transaction.productId}`, 'page');
+    revalidatePath('/mes-transactions', 'page');
+
+    return true;
+  } catch (error: any) {
+    console.log('ERROR CANCEL TRANSACTION ACTION : ', error?.message);
+    return null;
+  }
+}
+
+export const acceptTransactionACTION = async (transactionId: string) => {
+  try {
+    //ON RECUPERE L'ID DE L'USER
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        throw new Error('No userId on session.');
+    }
+    const userId = session.user.id;
+
+    //ON RECUPERE LA TRANSACTION
+    const transactions = await getTransaction('id', transactionId);
+
+    if (transactions.length === 0) {
+      throw new Error('No transaction found.');
+    }
+    const transaction = transactions[0];
+
+    //ON VERIFIE QUE L'USER EST BIEN LE VENDEUR
+    if (transaction.sellerId !== userId) {
+      throw new Error('user is not the seller.');
+    }
+
+    //ON VERIFIE LE STATUS DE LA TRANSACTION
+    if (transaction.status !== 'CREATED') {
+      throw new Error('This transaction can not be accepted.');
+    }
+
+    //SI C'EST OK ON PASSE STATUS A ACCEPTED
+    const updated = await updateTransactionStatusOnDb(transactionId, 'ACCEPTED');
+
+    revalidatePath('/mes-transactions', 'layout');
+  } catch (error: any) {
+    console.log('ERROR ACCEPT TRANSACTION ACTION : ', error?.message);
+    return null;
+  }
+}
+
+export const getDeliveryInfoFromTransactionACTION = async (transactionId: string) => {
+  try {
+    //ON RECUPERE L'ID DE L'USER
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        throw new Error('No userId on session.');
+    }
+    const userId = session.user.id;
+
+    //ON RECUPERE LA TRANSACTION
+    const transactions = await getTransaction('id', transactionId);
+
+    if (transactions.length === 0) {
+      throw new Error('No transaction found.');
+    }
+    const transaction = transactions[0];
+
+    //ON VERIFIE QUE L'USER EST BIEN DANS LA TRANSACTION
+    if (transaction.sellerId !== userId && transaction.userId !== userId) {
+      throw new Error('user is not the seller.');
+    }
+
+    return transaction;
+  } catch (error:any) {
+    console.log('ERROR GET DELIVERY INFO ACTION ', error?.message);
     return null;
   }
 }

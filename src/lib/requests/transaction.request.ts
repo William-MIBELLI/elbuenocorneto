@@ -5,6 +5,7 @@ import {
   images,
   products,
   TransactionInsert,
+  TransactionStatusEnum,
   transactionTable,
 } from "@/drizzle/schema";
 import { and, count, eq, or } from "drizzle-orm";
@@ -31,20 +32,6 @@ export const getUserTransactions = async (userId: string) => {
   try {
     const db = getDb();
 
-    const transactions = await db
-      .select()
-      .from(transactionTable)
-      .leftJoin(
-        products,
-        eq(transactionTable.productId, products.id)
-    )
-      .where(
-        or(
-          eq(transactionTable.userId, userId),
-          eq(products.userId, userId)
-        )
-    );
-    
     const transactionsQuery = await db.query.transactionTable.findMany({
       where: or(
         eq(transactionTable.userId, userId),
@@ -53,18 +40,18 @@ export const getUserTransactions = async (userId: string) => {
       with: {
         product: {
           with: {
-            images: true
-          }
+            images: true,
+          },
         },
         seller: {
           columns: {
             id: true,
-            name: true
-          }
+            name: true,
+          },
         },
-        delivery: true
-      }
-    })
+        delivery: true,
+      },
+    });
 
     return transactionsQuery;
   } catch (error: any) {
@@ -79,13 +66,58 @@ export type UserTransactionItem = UserTransactions[number];
 export const getWaitingTransactions = async (userId: string) => {
   try {
     const db = getDb();
-    const res = await db.select({ id: transactionTable.id }).from(transactionTable).where(and(
-      eq(transactionTable.sellerId, userId),
-      eq(transactionTable.status, 'CREATED')
-    ))
+    const res = await db
+      .select({ id: transactionTable.id })
+      .from(transactionTable)
+      .where(
+        and(
+          eq(transactionTable.sellerId, userId),
+          eq(transactionTable.status, "CREATED")
+        )
+      );
     return res;
   } catch (error: any) {
-    console.log('ERROR GET WAITING TRANSACTION REQUEST : ', error?.message);
+    console.log("ERROR GET WAITING TRANSACTION REQUEST : ", error?.message);
     return null;
   }
-}
+};
+
+type transactionKey = keyof (typeof transactionTable)["_"]["columns"];
+
+export const getTransaction = async <T extends Partial<transactionKey>>(
+  col: T,
+  value: any
+) => {
+  try {
+    const db = getDb();
+    const transaction = await db
+      .select()
+      .from(transactionTable)
+      .where(eq(transactionTable[col], value));
+    return transaction;
+  } catch (error: any) {
+    console.log("ERROR GET TRANSACTION REQUEST : ", error?.message);
+    return [];
+  }
+};
+
+type Status = typeof TransactionStatusEnum.enumValues[number]
+
+export const updateTransactionStatusOnDb = async (transactionId: string, status: Status) => {
+  try {
+    const db = getDb();
+
+    const updated = await db
+      .update(transactionTable)
+      .set({ status: status })
+      .where(eq(transactionTable.id, transactionId))
+      .returning();
+    if (updated.length === 0) {
+      throw new Error('0 raw updated');
+    }
+    return true;
+  } catch (error: any) {
+    console.log("ERROR CANCEL TRANSACTION REQUEST : ", error?.message);
+    return null;
+  }
+};
