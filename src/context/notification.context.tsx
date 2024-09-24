@@ -65,6 +65,11 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
     messagesRef.current = messages;
   }, [selectedConvo, conversations, pathname, messages]);
 
+  useEffect(() => {
+    console.log('USEEFFECT POUR SORT LES CONVERSATIONS');
+    sortConversationByLastMessageDate();
+  },[ messages, newMessage])
+
   //ON RECUPERE L'ID DE USER DANS UN STATE POUR L'UTILISER PLUS FACILEMENT
   useEffect(() => {
     if (session?.data?.user?.id) {
@@ -105,13 +110,41 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
       }
     }
     waitinTrans();
-  },[userId])
+  }, [userId])
+  
+  const sortConversationByLastMessageDate = () => {
+    const sorted = [...conversationsRef.current].sort((a, b) => {
+      // Si une conversation n'a pas de messages et l'autre en a, 
+      // celle sans messages vient en premier
+      if (a.messages.length === 0 && b.messages.length > 0) {
+        return -1;
+      }
+      if (b.messages.length === 0 && a.messages.length > 0) {
+        return 1;
+      }
+  
+      // Si les deux conversations n'ont pas de messages, 
+      // on les trie par date de création (la plus récente en premier)
+      if (a.messages.length === 0 && b.messages.length === 0) {
+        return (b.createdAt?.valueOf() || 0) - (a.createdAt?.valueOf() || 0);
+      }
+  
+      // Si les deux conversations ont des messages, 
+      // on les trie par date du dernier message (le plus récent en premier)
+      const lastMessageA = a.messages[a.messages.length - 1];
+      const lastMessageB = b.messages[b.messages.length - 1];
+      return (lastMessageB.createdAt?.valueOf() || 0) - (lastMessageA.createdAt?.valueOf() || 0);
+    });
+  
+    setConversations(sorted);
+  };
 
   const handleIncomingMessage = (msg: MessageSelect) => {
 
     //ON CHECK SI L'USER EST SUR LA PAGE DES CONVO ET QUE LA SELECTEDCONVO CORRESPOND AU MESSAGE ENTRANT
-    if (selectedConvoRef.current?.id === msg.conversationId && pathnameRef.current === '/messages') {
+    if (selectedConvoRef.current?.id === msg.conversationId && pathnameRef.current.startsWith('/messages') ) {
       //SI LA SELECTEDCONVO.ID === NEWMESSAGE.CONVOID, ALORS ON L'AJOUTE AU MESSAGE
+      console.log('ON ANRETRE DANS LE IF');
       return addNewMessage(msg);
     }
 
@@ -178,6 +211,16 @@ export const NotificationProvider: FC<IProps> = ({ children }) => {
   //AJOUTER LE DERNIER MESSAGE AUX AUTRES
   const addNewMessage = (newMsg: MessageSelect) => {
     setMessages([...messagesRef.current, newMsg]);
+
+    //ON MET A JOUR CONVERSATIONS POUR METTRE A JOUR LA DATE DU DERNIER MESSAGE
+    const updatedConvos = conversationsRef.current.map(convo => {
+      if (convo.id !== newMsg.conversationId) {
+        return convo;
+      }
+      const newC: typeof convo = { ...convo, messages: [{...newMsg, isRead: true }] };
+      return newC
+    })
+    setConversations(updatedConvos);
   };
 
   //SUPPRESSION D'UNE CONVERSATION

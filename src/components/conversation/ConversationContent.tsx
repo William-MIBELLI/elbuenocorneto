@@ -76,6 +76,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
     return () => clearTimeout(to)
   }, [lastResult]);
 
+
   //ON SCROLL VERS LE DERNIER MESSAGE
   useEffect(() => {
     if (messagesArea && lastMessageRef) {
@@ -87,7 +88,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
 
   return (
     <div className="flex flex-col justify-between max-h-full h-full  p-1">
-      <div ref={messagesArea} className="overflow-y-auto p-3">
+      <div ref={messagesArea} className="overflow-y-auto p-3 pickers_list">
         {/* LISTE DES MESSAGES DE LA COVNERSATION */}
         {!loading && messages && messages.length > 0 ? (
           messages.map((msg, index) => (
@@ -154,7 +155,6 @@ export default ConversationContent;
 
 const SubmitButton = ({ value }: {value: string}) => {
   const status = useFormStatus();
-  console.log('VALUE DANS BUTTON : ', value)
   return (
     <Button
       isDisabled={status.pending || value.length < 3}

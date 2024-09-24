@@ -26,23 +26,54 @@ import { useNotificationContext } from "@/context/notification.context";
 interface IProps {
   fetchedConvo: ConversationListType;
   userId: string;
+  convoIdOnUrl: string[];
 }
 
-const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
-  const { selectedConvo, setSelectedConvo, conversations, setConversations, deleteConversationFromState } =
-    useNotificationContext();
+const ConversationList: FC<IProps> = ({
+  fetchedConvo,
+  userId,
+  convoIdOnUrl,
+}) => {
+  const {
+    selectedConvo,
+    setSelectedConvo,
+    conversations,
+    setConversations,
+    deleteConversationFromState,
+  } = useNotificationContext();
+  const [firstMount, setFirstMount] = useState<boolean>(true);
 
   //AU MONTAGE, ON PASSE LES CONVOS AU CONTEXT
   useEffect(() => {
     setConversations(fetchedConvo);
   }, [fetchedConvo]);
+  
+  //SI UNE CONVOID EST PASSE DANS L'URL, ON LA SELECTIONNE DANS CONVOSELECTED
+  useEffect(() => {
+
+    //ON CHECK QUE CE SOIT BIEN LE MOUNT, POUR EVITER QUE LA SELECTEDCONVO CHANGE A CHAQUE FOIS 
+    //QU'ON RECOIT UN MESSAGE
+    if (!firstMount) {
+      return;
+    }
+    //ON CHECK QUE SI ON A  UNE CONVO_ID DANS L'URL 
+    if (convoIdOnUrl?.length > 0) {
+      const id = convoIdOnUrl[0];
+      onConvoClick(id);
+      setFirstMount(false);
+    }
+  },[convoIdOnUrl, conversations])
 
   //RESET LE SELECTEDCONVO
   useEffect(() => {
-    // setSelectedConvo(undefined);
-    console.log('MONTAGE CONVERSATION LSIT : ');
-    conversations.forEach(convo => console.log(`title : ${convo.product.title}, isRead : ${convo.messages[0].isRead}`))
-  },[])
+    // setSelectedConvo(undefined); 
+    console.log("MONTAGE CONVERSATION LSIT : ");
+    conversations.forEach((convo) =>
+      console.log(
+        `title : ${convo.product.title}, isRead : ${convo.messages[0].isRead}`
+      )
+    );
+  }, []);
 
   //CLICK SUR UNE CONVERSATION
   const onConvoClick = async (convoId: string) => {
@@ -53,14 +84,18 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
     }
     setSelectedConvo(convo);
 
-    if (convo?.messages[0].isRead) {
+    if (convo?.messages[0]?.isRead) {
       return;
     }
 
     //ON CHANGE LE ISREAD DU DERNIER MESSAGE DE LA CONVERSATION
     const newConvos = conversations.map((c) => {
+      //SI LA CONVO EST VIDE, ON RETURN
+      if (c?.messages.length === 0) {
+        return c;
+      }
       //SI C'EST LA CONVO SUR LAQUELLE VIENT DE CLIQUER L'USER
-      if (c.id === convo?.id && !c.messages[0].isRead) {
+      if (c.id === convo?.id && !c.messages[0]?.isRead) {
         //ON SPREAD LE MESSAGE ET ON PASSE ISREAD A TRUE
         const newM = { ...c.messages[0], isRead: true };
 
@@ -84,15 +119,15 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
 
     //SI LA SUPPRESSION EST REUSSIE, ON PASSE SELECTEDCONVO A UNDEFINED
     // ET ON SUPPRIME LA CONVERSATION DE LA LISTE
-    // if (deleted) {
-    //   deleteConversationFromState(convo.id)
-    // }
+    if (deleted) {
+      deleteConversationFromState(convo.id);
+    }
   };
 
   return (
     <div className="grid grid-cols-9 h-[80vh] w-full border-1 rounded-lg">
       {/* CONVERSATIONS LIST */}
-      <div className="col-span-2  flex flex-col">
+      <div className="col-span-2 pickers_list overflow-y-auto  flex flex-col">
         {conversations &&
           conversations.map((convo) => (
             <div key={convo.id} onClick={() => onConvoClick(convo.id)}>
@@ -107,8 +142,8 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
                   <h4 className="font-semibold text-md mb-2 text-ellipsis">
                     {convo.product.title}
                   </h4>
-                  {(convo.messages[0].senderId !== userId &&
-                    !convo.messages[0].isRead) && (
+                  {convo.messages[0]?.senderId !== userId &&
+                    !convo.messages[0]?.isRead && (
                       <MessageCircleWarning
                         className="text-main animate-bounce"
                         size={22}
@@ -121,12 +156,14 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
                     ? convo.buyer.name
                     : convo.seller.name}
                 </p>
-                <p className="text-xs italic">
-                  Dernier message le{" "}
-                  {typeof convo?.messages[0]?.createdAt === "string"
-                    ? convo?.messages[0]?.createdAt
-                    : convo?.messages[0]?.createdAt?.toLocaleDateString()}
-                </p>
+                {convo?.messages?.length > 0 && (
+                  <p className="text-xs italic">
+                    Dernier message le{" "}
+                    {typeof convo?.messages[0]?.createdAt === "string"
+                      ? convo?.messages[0]?.createdAt
+                      : convo?.messages[0]?.createdAt?.toLocaleDateString()}
+                  </p>
+                )}
               </div>
               <Divider />
             </div>
@@ -189,7 +226,10 @@ const ConversationList: FC<IProps> = ({ fetchedConvo, userId }) => {
 
             <section className="flex flex-col items-start gap-2 p-2 justify-start">
               <Image
-                src={selectedConvo.product.images[0]?.url || '/image_placeholder.svg'}
+                src={
+                  selectedConvo.product.images[0]?.url ||
+                  "/image_placeholder.svg"
+                }
                 alt="prod_img"
                 height={150}
                 width={150}

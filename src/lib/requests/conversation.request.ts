@@ -39,6 +39,9 @@ export const checkIfExistingConversation = async (
       .select()
       .from(conversationTable)
       .where(
+
+      /////////// TODO
+      /////////// REFAIRE LE WHERE POUR CHECK LES 2 POSSIBILITE DE USER
         and(
           eq(conversationTable.productId, productId),
           eq(conversationTable.sellerId, sellerId),
@@ -73,6 +76,7 @@ export const getUserConversations = async (condition: SQL<unknown>) => {
         buyer: true,
         seller: true,
       },
+      orderBy: [desc(messageTable.createdAt)]
     });
 
     return convos;

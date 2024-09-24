@@ -27,6 +27,11 @@ export const getServicePoints = async (location: Required<LocationInsert>, deliv
 
   try {
     const res = await fetch(url, options)
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(JSON.stringify(data));
+
+    }
     const data: IPickerShop[] = await res.json();
     return data;
   } catch (error: any) {

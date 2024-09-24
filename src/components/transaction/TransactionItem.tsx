@@ -89,13 +89,20 @@ const TransactionItem: FC<IProps> = ({ transaction }) => {
                 <HandHelping size={23} />
               )}
             </span>
-            <div
-              className="text-xs flex bg-gray-200 px-2 rounded-lg items-center gap-2 py-0.5 cursor-pointer w-fit ml-auto"
-              onClick={() => setDisplayDeliveryInfos((prev) => !prev)}
-            >
-              <p className="">Informations de livraison</p>
-              <ChevronDown size={15} className={`transition-all ${displayDeliveryInfos ? 'rotate-180' : ''}`} />
-            </div>
+            {transaction.status === "ACCEPTED" && (
+              <div
+                className="text-xs flex bg-gray-200 px-2 rounded-lg items-center gap-2 py-0.5 cursor-pointer w-fit ml-auto"
+                onClick={() => setDisplayDeliveryInfos((prev) => !prev)}
+              >
+                <p className="">Informations de livraison</p>
+                <ChevronDown
+                  size={15}
+                  className={`transition-all ${
+                    displayDeliveryInfos ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -119,11 +126,9 @@ const TransactionItem: FC<IProps> = ({ transaction }) => {
           )}
         </div>
       </div>
-      {
-        displayDeliveryInfos && (
-          <DeliveryInfos transactionId={transaction.id} method={transaction.deliveryMethod} />
-        )
-      }
+      {displayDeliveryInfos && transaction.status === "ACCEPTED" && (
+        <DeliveryInfos transaction={transaction}/>
+      )}
       <Divider className="my-3" />
     </div>
   );

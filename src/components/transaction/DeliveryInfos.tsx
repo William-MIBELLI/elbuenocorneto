@@ -1,83 +1,89 @@
-import { Delivery } from '@/context/buyProduct.context';
-import { TransactionSelect } from '@/drizzle/schema';
-import { getDeliveryInfoFromTransactionACTION } from '@/lib/actions/transaction.action';
-import { Button, Spinner } from '@nextui-org/react';
-import { Mail } from 'lucide-react';
-import Image from 'next/image';
-import React, { FC, useEffect, useState } from 'react'
+import { transactionConversationACTION } from "@/lib/actions/conversation.action";
+import { UserTransactionItem } from "@/lib/requests/transaction.request";
+import { Button } from "@nextui-org/react";
+import { Mail, Phone, PhoneOutgoing } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { FC, useEffect, useState } from "react";
 
 interface IProps {
-  transactionId: string;
-  method: Delivery | null;
+  transaction: UserTransactionItem;
 }
 
-const DeliveryInfos: FC<IProps> = ({ transactionId, method }) => {
+const DeliveryInfo: FC<IProps> = ({ transaction }) => {
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [deliveryInfos, setDeliveryInfos] = useState<TransactionSelect>();
+  const {
+    seller: { phone: sellerPhone },
+    user: { phone: buyerPhone },
+    sellerId,
+  } = transaction;
+  const session = useSession();
+  const [phone, setPhone] = useState<string>();
+  const router = useRouter();
 
+  //RECUPERER LE NUMERO DE TELEPHONE A DISPLAY
   useEffect(() => {
-    const fetchDeliveryInfo = async () => {
-      setLoading(true);
-      const res = await getDeliveryInfoFromTransactionACTION(transactionId);
-      if (res) {
-        console.log('DELIVERY INFO : ', res);
-        setDeliveryInfos(res);
-      }
-      setLoading(false)
+    if (!session?.data?.user?.id) {
+      return;
     }
-    if (method) {
-      fetchDeliveryInfo();
+    const ph = session.data.user.id === sellerId ? buyerPhone : sellerPhone;
+    if (ph) {
+      setPhone(ph);
     }
-  }, [transactionId])
-  
+  }, [transaction, session]);
+
+  const onGoToConversation = async () => {
+    const res = await transactionConversationACTION(transaction);
+    if (!res) {
+      console.log('RES NULL');
+    }
+    router.push(`/messages/${res}`);
+  }
+
   //PAS DE LIVRAISON, ON DISPLAY UN LIEN POUR MESSAGE L'ACHETEUR
-  if (!method) {
-    return <div className='my-6'>
-      <p className='text-sm font-semibold text-blue-800'>
-        Mettez vous d'accord avec l'acheteur afin de réaliser la transaction en personne
-      </p>
-      <div className='mt-3'>
-        <Button className='button_secondary' endContent={<Mail size={15}/>}>Envoyer un message</Button>
-        {/* {
-          deliveryInfos?.phoneNumber && (
-            <Button>Appelez</Button>
-            
-          )
-        } */}
+  if (!transaction?.deliveryMethod) {
+    return (
+      <div className="my-6">
+        <p className="text-sm font-semibold text-blue-800">
+          Mettez vous d'accord avec l'acheteur afin de réaliser la transaction
+          en personne
+        </p>
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <Button onClick={onGoToConversation} className="button_secondary" endContent={<Mail size={15} />}>
+            Envoyer un message
+          </Button>
+          {phone && (
+            <Button as={Link}
+              href={`tel:${phone}`}
+              className="button_main"
+              endContent={<PhoneOutgoing size={13} />}
+            >
+              {phone}
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+    );
   }
 
   return (
-    <div className='w-1/3 mx-auto my-6'>
-      {
-        loading ? (
-          <Spinner/>
-        ) : deliveryInfos ? (
-            <div className='text-sm text-left'>
-              <p className='font-semibold my-2 text-medium'>
-                {deliveryInfos.firstname} {deliveryInfos.lastname?.toUpperCase()}
-              </p>
-              <p>
-                {deliveryInfos.addressLine}
-              </p>
-              <p>
-              {deliveryInfos.houseNumber} {deliveryInfos.streetName}
-              </p>
-              <p>
-                {deliveryInfos.postCode} {deliveryInfos.city}
-              </p>
-              <p>
-                
-              </p>
-            </div>
-        ) : null
-      }
+    <div className="w-1/3 mx-auto my-6">
+      <div className="text-sm text-left">
+        <p className="font-semibold my-2 text-medium">
+          {transaction.firstname} {transaction.lastname?.toUpperCase()}
+        </p>
+        <p>{transaction.addressLine}</p>
+        <p>
+          {transaction.houseNumber} {transaction.streetName}
+        </p>
+        <p>
+          {transaction.postCode} {transaction.city}
+        </p>
+        <p></p>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default DeliveryInfos
-
-
+export default DeliveryInfo;

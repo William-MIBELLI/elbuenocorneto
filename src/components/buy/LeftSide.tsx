@@ -30,7 +30,6 @@ const LeftSide = () => {
       costProtection: protectionCost!,
     }
     if (selectedDeliveryMethod !== undefined) {
-      console.log('DELIVERY NOT UNDEFINED : ', selectedDeliveryMethod);
       data.deliveryMethod = selectedDeliveryMethod
     }
     switch (selectedDeliveryMethod) {

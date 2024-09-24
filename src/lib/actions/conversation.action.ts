@@ -19,6 +19,7 @@ import { revalidatePath } from "next/cache";
 import { getPusherServer } from "../pusher/server";
 import { creationConversationNotification, sendMessageNotification } from "./pusher.action";
 import { sql } from "drizzle-orm";
+import { UserTransactionItem } from "../requests/transaction.request";
 
 export const startConversationACTION = async (
   prevState: { error: string | undefined; success?: boolean },
@@ -155,10 +156,58 @@ export const deleteConversationACTION = async (
     );
 
     //ON REVALIDE LE PATH POUR /MESSAGES
-    //revalidatePath("/messages");
+    revalidatePath("/messages", 'page');
     return true;
   } catch (error: any) {
     console.log("ERROR DELETE CONVERSATION ACTION ", error?.message);
     return false;
   }
 };
+
+export const transactionConversationACTION = async (transaction: UserTransactionItem) => {
+  try {
+
+    //ON CHECK SI L'USER EST CONNECTE
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not connected.');
+    }
+
+    const { productId, sellerId, userId: buyerId} = transaction;
+    //ON CHECK SI IL Y A DEJA UNE CONVERSATION QUI EXISTE
+    const exisitingConv = await checkIfExistingConversation(productId, sellerId, buyerId);
+
+    //SI OUI, ON RETURN LE CONVERSATIONID
+    if (exisitingConv) {
+
+      //ON REVALIDE LE PATH
+      revalidatePath('/messages', 'page');
+      return exisitingConv.id
+    }
+
+    //SINON ON EN CREE UNE
+    const convo: ConversationInsert = {
+      id: uuidv4(),
+      buyerId,
+      sellerId,
+      productId
+    }
+
+    //ON L'INSERE DANS LA DB
+    const createdConvo = createConversationOnDb(convo);
+
+    if (!createdConvo) {
+      throw new Error('Conversation creation failed.');
+    }
+
+    //ON REVALIDE LE PATH DE /MESSAGE
+    revalidatePath('/messages', 'page');
+
+    //ET ON RETURN SON ID
+    return convo.id
+
+  } catch (error: any) {
+    console.log('ERROR TRANSACTION CONVERSATION ACTION : ', error?.message);
+    return null;
+  }
+}

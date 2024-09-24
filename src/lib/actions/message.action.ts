@@ -22,7 +22,6 @@ export const createMessageACTION = async (
 
     if (submission.status !== "success") {
       const err = submission.reply().error;
-      console.log("ERROR SUBMISSION ", err);
       throw new Error("Erreur de validation, merci de vérifier les champs");
     }
     //ON RECUPERE LES VALUES
@@ -55,3 +54,7 @@ export const createMessageACTION = async (
     return { error: error?.message, success: false, newMsg: undefined };
   }
 };
+
+export const sendMessageForTransaction = async () => {
+  
+}

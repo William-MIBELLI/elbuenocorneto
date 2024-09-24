@@ -8,7 +8,7 @@ import {
   TransactionStatusEnum,
   transactionTable,
 } from "@/drizzle/schema";
-import { and, count, eq, or } from "drizzle-orm";
+import { and, count, eq, getTableColumns, ne, or } from "drizzle-orm";
 
 export const createTransactionOnDB = async (transaction: TransactionInsert) => {
   try {
@@ -27,6 +27,19 @@ export const createTransactionOnDB = async (transaction: TransactionInsert) => {
     return null;
   }
 };
+
+type Keys = keyof (typeof transactionTable)["_"]["columns"];
+
+const sensitiveKeys: Keys[] = [
+  "addressLine",
+  "city",
+  "country",
+  "firstname",
+  "houseNumber",
+  "lastname",
+  "phoneNumber",
+  "phoneNumber",
+];
 
 export const getUserTransactions = async (userId: string) => {
   try {
@@ -47,13 +60,36 @@ export const getUserTransactions = async (userId: string) => {
           columns: {
             id: true,
             name: true,
+            phone: true,
           },
         },
+
         delivery: true,
+        user: {
+          columns: {
+            id: true,
+            phone: true,
+          },
+        },
       },
     });
 
-    return transactionsQuery;
+    //ON MAP LES INFO DE LA TRANSACTION SELON SON STATUS
+    //POUR PAS QUE LE VENDEUR AIT ACCES AUX INFOS DE L'ACHETEUR AVANT D'AVOIR ACCEPTE
+    const mapped = transactionsQuery.map(item => {
+      if (item.status === 'ACCEPTED') {
+        return item;
+      }
+      const mappedItem = { ...item };
+      sensitiveKeys.forEach(key => {
+        if (key in mappedItem) {
+          delete(mappedItem)[key]
+        }
+      })
+      return mappedItem
+    })
+
+    return mapped;
   } catch (error: any) {
     console.log("ERROR GET USER TRANSACTION REQUEST : ", error?.message);
     return [];
@@ -101,9 +137,12 @@ export const getTransaction = async <T extends Partial<transactionKey>>(
   }
 };
 
-type Status = typeof TransactionStatusEnum.enumValues[number]
+type Status = (typeof TransactionStatusEnum.enumValues)[number];
 
-export const updateTransactionStatusOnDb = async (transactionId: string, status: Status) => {
+export const updateTransactionStatusOnDb = async (
+  transactionId: string,
+  status: Status
+) => {
   try {
     const db = getDb();
 
@@ -113,7 +152,7 @@ export const updateTransactionStatusOnDb = async (transactionId: string, status:
       .where(eq(transactionTable.id, transactionId))
       .returning();
     if (updated.length === 0) {
-      throw new Error('0 raw updated');
+      throw new Error("0 raw updated");
     }
     return true;
   } catch (error: any) {

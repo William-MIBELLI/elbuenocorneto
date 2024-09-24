@@ -40,7 +40,7 @@ const PickerList: FC<IProps> = ({ servicePoints }) => {
         value={selectedPicker?.id.toString()}
         onValueChange={onChangeHandler}
       >
-        {displayPickersList ? (
+        {(displayPickersList && servicePoints) ? (
           servicePoints.map((service) => (
             <Radio
               key={service.id}
