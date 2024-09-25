@@ -85,6 +85,7 @@ const StripeForm: FC<IProps> = ({ clientSecret, dpmLink }) => {
         setMessage(error.message);
         return;
       } else if (error) {
+        console.log('ERROR DANS STRIPE : ', error);
         setMessage("Une erreur s'est produite.");
         return;
       }
@@ -128,7 +129,7 @@ const StripeForm: FC<IProps> = ({ clientSecret, dpmLink }) => {
         options={{ readOnly: false, layout: { type: "tabs" } }}
       />
       <button ref={submitDeliveryRef} type="submit" hidden></button>
-      {message && <p>{message}</p>}
+      {message && <p className="tetx-center text-sm text-red-500 font-semibold">{message}</p>}
     </form>
   );
 };

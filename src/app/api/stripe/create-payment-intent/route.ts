@@ -9,7 +9,8 @@ export async function POST(request: Request) {
   const paymentIntent = await stripe.paymentIntents.create({
     amount: +req.amount*100,
     currency: "eur",
-    use_stripe_sdk: true
+    use_stripe_sdk: true,
+    capture_method :'manual'
   });
 
   // console.log("PAYMENT INTENT DANS ROUTE : ", paymentIntent);

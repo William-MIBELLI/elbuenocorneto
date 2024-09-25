@@ -386,6 +386,20 @@
       "when": 1726831612731,
       "tag": "0059_fuzzy_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1727196717579,
+      "tag": "0060_cute_doctor_doom",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1727274814018,
+      "tag": "0061_overconfident_bullseye",
+      "breakpoints": true
     }
   ]
 }

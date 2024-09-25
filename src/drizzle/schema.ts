@@ -95,6 +95,21 @@ export const TransactionStatusEnum = pgEnum("transaction_status_enum", [
 
 export type attrNameType = (typeof AttributeNameEnum.enumValues)[number];
 
+export const numericCasted = customType<{
+  data: number;
+  driverData: string;
+  config: NumericConfig;
+}>({
+  dataType: (config) => {
+    if (config?.precision && config?.scale) {
+      return `numeric(${config.precision}, ${config.scale})`;
+    }
+    return "numeric";
+  },
+  fromDriver: (value: string) => Number.parseFloat(value), // note: precision loss for very large/small digits so area to refactor if needed
+  toDriver: (value: number) => value.toString(),
+});
+
 export const users = pgTable("user", {
   id: text("id").primaryKey(),
   name: varchar("name", { length: 20 }).notNull(),
@@ -114,6 +129,7 @@ export const users = pgTable("user", {
   firstname: text("firstname"),
   gender: genderEnum("gender"),
   birthday: timestamp("birthday"),
+  walletAmout: numericCasted('wallet_amount').default(0)
 });
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -373,20 +389,7 @@ type NumericConfig = {
   scale?: number;
 };
 
-export const numericCasted = customType<{
-  data: number;
-  driverData: string;
-  config: NumericConfig;
-}>({
-  dataType: (config) => {
-    if (config?.precision && config?.scale) {
-      return `numeric(${config.precision}, ${config.scale})`;
-    }
-    return "numeric";
-  },
-  fromDriver: (value: string) => Number.parseFloat(value), // note: precision loss for very large/small digits so area to refactor if needed
-  toDriver: (value: number) => value.toString(),
-});
+
 
 export const searchTable = pgTable("search", {
   id: text("id").primaryKey().notNull(),
@@ -506,7 +509,7 @@ export const transactionTable = pgTable("transaction", {
   country: text("country").default("France"),
   phoneNumber: numericCasted("phone_number"),
   paymentIntentId: text("payment_intent_id"),
-  status: TransactionStatusEnum("status").default("CREATED"),
+  status: TransactionStatusEnum("status").notNull().default("CREATED"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -531,3 +534,12 @@ export const transactionRelations = relations(transactionTable, ({ one }) => ({
 
 export type TransactionInsert = typeof transactionTable.$inferInsert;
 export type TransactionSelect = typeof transactionTable.$inferSelect;
+
+// export const WalletTable = pgTable('wallet', {
+//   id: text('id').notNull().primaryKey(),
+//   userId: text('user_id').unique().notNull().references(() => users.id),
+//   amount: numericCasted('amout').notNull().default(0)
+// })
+
+// export type WalletInsert = typeof WalletTable.$inferInsert;
+// export type WalletSelect = typeof WalletTable.$inferSelect;

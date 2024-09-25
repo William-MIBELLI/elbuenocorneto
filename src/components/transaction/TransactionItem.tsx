@@ -11,10 +11,15 @@ import BuyerInteraction from "./BuyerInteraction";
 import SellerInteraction from "./SellerInteraction";
 import { cancelTransactionACTION } from "@/lib/actions/transaction.action";
 import DeliveryInfos from "./DeliveryInfos";
+import { TransactionStatusEnum } from "@/drizzle/schema";
 
 interface IProps {
   transaction: UserTransactionItem;
 }
+
+const unEditableKeys: typeof TransactionStatusEnum.enumValues[number][] = [
+  "CANCELED","DECLINED",'DONE','REFUNDED', 
+]
 const TransactionItem: FC<IProps> = ({ transaction }) => {
   const session = useSession();
   const [displayDeliveryInfos, setDisplayDeliveryInfos] =
@@ -31,7 +36,7 @@ const TransactionItem: FC<IProps> = ({ transaction }) => {
 
   return (
     <div>
-      <div className="grid grid-cols-5 gap-3  h-20">
+      <div className="grid grid-cols-5 gap-3 h-20 ">
         {/* LEFTSIDE */}
         <div className="col-span-1 relative flex">
           <Image
@@ -47,7 +52,7 @@ const TransactionItem: FC<IProps> = ({ transaction }) => {
         </div>
 
         {/* DESCRIPTION */}
-        <div className="col-span-3  text-left flex justify-between">
+        <div className="col-span-3  text-left flex justify-between ">
           <div className="flex flex-col justify-between w-1/2">
             <div className="flex gap-4 font-semibold items-center ">
               <Link
@@ -109,23 +114,27 @@ const TransactionItem: FC<IProps> = ({ transaction }) => {
         {/* INTERACTION */}
         <div className="col-span-1 flex items-center justify-center">
           <Divider orientation="vertical" className="mx-4" />
-          {transaction.status !== "CREATED" ? (
+          {unEditableKeys.includes(transaction.status) ? (
             <p className="text-xs text-center">
               Cette transaction ne peut plus être modifiée
             </p>
           ) : transaction.userId === session.data?.user?.id ? (
             <BuyerInteraction
-              productId={transaction.productId}
+              transaction={transaction}
               cancelClick={onCancelClick}
             />
-          ) : (
+          ) : transaction.status === 'CREATED' ?(
             <SellerInteraction
               cancelHandler={onCancelClick}
               transactionId={transaction.id}
             />
-          )}
+          ) : <p className="text-xs text-center">
+          Cette transaction ne peut plus être modifiée
+        </p>}
         </div>
       </div>
+
+      {/* DELIVERY INFOS */}
       {displayDeliveryInfos && transaction.status === "ACCEPTED" && (
         <DeliveryInfos transaction={transaction}/>
       )}

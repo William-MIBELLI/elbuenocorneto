@@ -114,7 +114,7 @@ const Dashboard = async () => {
           <div className="bg-gray-200 w-40 opacity-70  h-40 rounded-full absolute -bot-10 -left-28 "> </div>
           <div className="flex md:flex-col flex-row justify-center items-center md:items-start gap-3 bg-transparent ml-14">
             <h3>Porte-monnaie</h3>
-            <p>0 €</p>
+            <p>{user?.walletAmout || 0}€</p>
             <p className="font-normal text-sm">Solde disponible</p>
           </div>
         </div>

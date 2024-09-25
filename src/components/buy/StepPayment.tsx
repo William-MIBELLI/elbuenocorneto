@@ -24,6 +24,7 @@ const StepPayment = () => {
     amount: totalPrice! * 100,
     currency: "eur",
     mode: "payment",
+    capture_method: 'manual'
   };
 
   useEffect(() => {
@@ -54,7 +55,7 @@ const StepPayment = () => {
         <h1 className="text-xl font-semibold">Finalisez votre paiement</h1>
         <div className="grid grid-cols-3 gap-3 my-6">
           {/* LEFTSIDE */}
-          <div className="col-span-2">
+          <div className="col-span-2 z-30">
             <div className="bg-white p-4  rounded-lg shadow-small flex flex-col gap-4">
               <h3 className="font-semibold">Carte bancaire</h3>
 
@@ -97,7 +98,7 @@ const StepPayment = () => {
           </div>
 
           {/* RIGHTSIDE */}
-          <div>
+          <div className="z-30">
             <div className="bg-white p-2 rounded-lg shadow-small h-fit">
               <div className="flex justify-between text-md font-semibold">
                 <p>Total</p>
