@@ -18,7 +18,7 @@ interface IProps {
 }
 
 const unEditableKeys: typeof TransactionStatusEnum.enumValues[number][] = [
-  "CANCELED","DECLINED",'DONE','REFUNDED', 
+  "CANCELED",'DONE', 
 ]
 const TransactionItem: FC<IProps> = ({ transaction }) => {
   const session = useSession();
@@ -41,8 +41,8 @@ const TransactionItem: FC<IProps> = ({ transaction }) => {
         <div className="col-span-1 relative flex">
           <Image
             src={
-              transaction.product.images
-                ? transaction.product.images[0].url
+              transaction.product.images.length > 0
+                ? transaction.product.images[0]?.url
                 : "/image_placeholder.svg"
             }
             alt="img_product"

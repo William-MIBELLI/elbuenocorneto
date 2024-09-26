@@ -19,7 +19,7 @@ import {
 import { sendTransactionCreationNotif } from "./pusher.action";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
-import { reserveProduct } from "../requests/product.request";
+import { deleteProductOnDB, reserveProduct } from "../requests/product.request";
 import { Stripe } from 'stripe'
 import { capturePaymentACTION } from "./stripe.action";
 import { updateUserWalletOnDb } from "../requests/user.request";
@@ -161,7 +161,7 @@ export const createTransactionACTION = async (
 
 export const cancelTransactionACTION = async (transactionId: string) => {
   try {
-    //TODOD RECUP TRANSACTION FROM CHECK
+    //ON CHECK L'USER DANS LA TRANSACTION ET ON LA RECUPERE SI C'EST OK
     const transaction = await checkIfUSerISPartOfTransaction(
       transactionId,
       false, false
@@ -171,7 +171,7 @@ export const cancelTransactionACTION = async (transactionId: string) => {
       throw new Error("No transaction with this id.");
     }
     //ON CHECK QU'ELLE N'A PAS ETE VALIDEE
-    if (transaction.status !== "CREATED") {
+    if (transaction.status !== "CREATED" && transaction.status !== 'ACCEPTED') {
       throw new Error("This transaction can not be canceled.");
     }
 
@@ -216,7 +216,14 @@ export const acceptTransactionACTION = async (transactionId: string) => {
       "ACCEPTED"
     );
 
+    //SI DELIVERY METHOD N'EST PAS NULL, ON DELETE LE PRODUCT DIRECT
+    //const deleted = await deleteProductOnDB(transaction.productId);
+
+    //ON CREE UNE ETIQUETTE D'ENVOI
+
     revalidatePath("/mes-transactions", "layout");
+
+    return true;
   } catch (error: any) {
     console.log("ERROR ACCEPT TRANSACTION ACTION : ", error?.message);
     return null;
@@ -275,6 +282,9 @@ export const confirmReceptionTransactionACTION = async (
     if (!updatedWallet) {
       throw new Error('updated wallet null');
     }
+
+    //ON DELETE LE PRODUCT
+    //const deleted = await deleteProductOnDB(transaction.productId);
 
     //ON REVALIDATE LE PATH
     revalidatePath('/mes-transactions', 'page');

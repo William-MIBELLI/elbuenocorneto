@@ -8,7 +8,7 @@ import {
   TransactionStatusEnum,
   transactionTable,
 } from "@/drizzle/schema";
-import { and, count, eq, getTableColumns, ne, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, getTableColumns, ne, or } from "drizzle-orm";
 
 export const createTransactionOnDB = async (transaction: TransactionInsert) => {
   try {
@@ -72,6 +72,7 @@ export const getUserTransactions = async (userId: string) => {
           },
         },
       },
+      orderBy: [desc(transactionTable.createdAt)]
     });
 
     //ON MAP LES INFO DE LA TRANSACTION SELON SON STATUS

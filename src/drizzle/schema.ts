@@ -87,10 +87,8 @@ export const SortEnum = pgEnum("sort_enum", [
 export const TransactionStatusEnum = pgEnum("transaction_status_enum", [
   "CREATED",
   "ACCEPTED",
-  "DECLINED",
   "CANCELED",
   "DONE",
-  "REFUNDED",
 ]);
 
 export type attrNameType = (typeof AttributeNameEnum.enumValues)[number];

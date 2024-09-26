@@ -69,7 +69,7 @@ export const updateUserWalletOnDb = async (userId: string, amount: number) => {
     const db = getDb();
     const updated = await db
       .update(users)
-      .set({ walletAmout: amount })
+      .set({ walletAmout: sql`${users.walletAmout} + ${amount}` })
       .where(eq(users.id, userId))
       .returning();
     return updated;

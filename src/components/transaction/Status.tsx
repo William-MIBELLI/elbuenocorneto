@@ -9,9 +9,7 @@ const statusLabel: Record<(typeof TransactionStatusEnum.enumValues)[number], str
   "ACCEPTED": 'Validée',
   "CANCELED": 'Annulée',
   'CREATED': 'En attente de validation',
-  'DECLINED': 'Refusée',
   "DONE": 'Terminée',
-  "REFUNDED": 'Remboursée'
 }
 
 const Status: FC<IProps> = ({ status }) => {
@@ -22,13 +20,10 @@ const Status: FC<IProps> = ({ status }) => {
       case 'ACCEPTED':
         return 'bg-green-400';
       case 'CANCELED':
-      case 'DECLINED':
         return 'bg-red-400'
       case 'CREATED':
       case 'DONE':
         return 'bg-blue-400';
-      case 'REFUNDED':
-        return 'bg-orange-400';
       default:
         return 'bg-blue-400';
     }

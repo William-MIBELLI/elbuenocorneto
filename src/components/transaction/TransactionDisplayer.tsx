@@ -41,9 +41,7 @@ const TransactionDisplayer: FC<IProps> = ({ transactions, userId }) => {
         case "done": {
           if (
             item.status === "CANCELED" ||
-            item.status === "DECLINED" ||
-            item.status === "DONE" ||
-            item.status === "REFUNDED"
+            item.status === "DONE"
           ) {
             return item;
           }
