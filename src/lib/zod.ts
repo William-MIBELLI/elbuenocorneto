@@ -227,6 +227,7 @@ export const homeDeliverySchema = baseDeliverySchema.extend({
     )
     .optional(),
   country: z.string().default("France"),
+  pickerId: z.string().optional()
 }) satisfies z.ZodType<Omit<TransactionInsert, "id">>;
 
 export type HomdeDeliverySchemaType = z.infer<typeof homeDeliverySchema>;
@@ -248,7 +249,7 @@ export const mergePickerAndFormData = (
   }
 
   //ON SPREAD PICKER
-  const { street, house_number, name, postal_code, city, country } = picker;
+  const { street, house_number, name, postal_code, city, country, id } = picker;
 
   //ON MERGE LE NOUVEL OBJET AVEC LE PICKER
   const pickerData: Record<string, number | string> = {
@@ -258,7 +259,9 @@ export const mergePickerAndFormData = (
     postCode: +postal_code,
     city,
     country,
+    pickerId: id.toString()
   };
+  console.log('PICKER ET PICKER DATA DANS LE MAPPER : ', picker, pickerData);
 
   Object.keys(pickerData).forEach((key) => {
     mergedFD.append(key, pickerData[key].toString());

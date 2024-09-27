@@ -56,6 +56,10 @@ const useBuyProductContextValue = () => {
     setSelectedDeliveryMethod(undefined);
   }
 
+  useEffect(() => {
+    console.log('PICKERS : ', pickers);
+  },[pickers])
+
 
   //CALCUL DU COUT DE LA PROTECTION
   useEffect(() => {

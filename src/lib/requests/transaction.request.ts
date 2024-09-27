@@ -140,16 +140,16 @@ export const getTransaction = async <T extends Partial<transactionKey>>(
 
 type Status = (typeof TransactionStatusEnum.enumValues)[number];
 
-export const updateTransactionStatusOnDb = async (
+export const updateTransactionOnDb = async (
   transactionId: string,
-  status: Status
+  value: Partial<TransactionInsert>
 ) => {
   try {
     const db = getDb();
 
     const updated = await db
       .update(transactionTable)
-      .set({ status: status })
+      .set(value)
       .where(eq(transactionTable.id, transactionId))
       .returning();
     if (updated.length === 0) {

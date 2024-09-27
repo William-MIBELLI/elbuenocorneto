@@ -1,4 +1,5 @@
 import { transactionConversationACTION } from "@/lib/actions/conversation.action";
+import { createParcel, getParcel } from "@/lib/requests/sendCloud.request";
 import { UserTransactionItem } from "@/lib/requests/transaction.request";
 import { Button } from "@nextui-org/react";
 import { Mail, Phone, PhoneOutgoing } from "lucide-react";
@@ -46,7 +47,7 @@ const DeliveryInfo: FC<IProps> = ({ transaction }) => {
     return (
       <div className="my-6">
         <p className="text-sm font-semibold text-blue-800">
-          Mettez vous d'accord avec l'acheteur afin de réaliser la transaction
+          Mettez vous d'accord avec {transaction.sellerId === session.data?.user?.id ? "l'acheteur" : "le vendeur"} afin de réaliser la transaction
           en personne
         </p>
         <div className="mt-3 flex items-center justify-center gap-3">

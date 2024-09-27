@@ -509,6 +509,9 @@ export const transactionTable = pgTable("transaction", {
   paymentIntentId: text("payment_intent_id"),
   status: TransactionStatusEnum("status").notNull().default("CREATED"),
   createdAt: timestamp("created_at").defaultNow(),
+  pickerId: text('picker_id'),
+  parcelId: text('parcel_id'),
+  trackingUrl: text('tracking_url')
 });
 
 export const transactionRelations = relations(transactionTable, ({ one }) => ({

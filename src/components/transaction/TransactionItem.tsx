@@ -17,9 +17,10 @@ interface IProps {
   transaction: UserTransactionItem;
 }
 
-const unEditableKeys: typeof TransactionStatusEnum.enumValues[number][] = [
-  "CANCELED",'DONE', 
-]
+export const unEditableKeys: (typeof TransactionStatusEnum.enumValues)[number][] = [
+  "CANCELED",
+  "DONE",
+];
 const TransactionItem: FC<IProps> = ({ transaction }) => {
   const session = useSession();
   const [displayDeliveryInfos, setDisplayDeliveryInfos] =
@@ -114,29 +115,23 @@ const TransactionItem: FC<IProps> = ({ transaction }) => {
         {/* INTERACTION */}
         <div className="col-span-1 flex items-center justify-center">
           <Divider orientation="vertical" className="mx-4" />
-          {unEditableKeys.includes(transaction.status) ? (
-            <p className="text-xs text-center">
-              Cette transaction ne peut plus être modifiée
-            </p>
-          ) : transaction.userId === session.data?.user?.id ? (
+          {transaction.userId === session.data?.user?.id ? (
             <BuyerInteraction
               transaction={transaction}
               cancelClick={onCancelClick}
             />
-          ) : transaction.status === 'CREATED' ?(
+          ) : (
             <SellerInteraction
               cancelHandler={onCancelClick}
-              transactionId={transaction.id}
+              transaction={transaction}
             />
-          ) : <p className="text-xs text-center">
-          Cette transaction ne peut plus être modifiée
-        </p>}
+          )}
         </div>
       </div>
 
       {/* DELIVERY INFOS */}
       {displayDeliveryInfos && transaction.status === "ACCEPTED" && (
-        <DeliveryInfos transaction={transaction}/>
+        <DeliveryInfos transaction={transaction} />
       )}
       <Divider className="my-3" />
     </div>

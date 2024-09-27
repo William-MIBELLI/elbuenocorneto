@@ -33,7 +33,7 @@ const DeliveryRightSide = () => {
         />
         <div className="flex justify-between flex-grow font-semibold">
           <p>{product.title}</p>
-          <p className=" text-red-400">{product.price}€</p>
+          <p className=" text-red-400">{product.price.toFixed(2)}€</p>
         </div>
       </div>
       <Divider className="my-4" />

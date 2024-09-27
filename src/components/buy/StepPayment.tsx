@@ -122,7 +122,7 @@ const StepPayment = () => {
                 <div className="my-3 flex flex-col gap-1 font-thin ">
                   <div className="text-xs flex justify-between ">
                     <p>Montant de l'achat</p>
-                    <p>{product?.price}€</p>
+                    <p>{product?.price.toFixed(2)}€</p>
                   </div>
                   <div className="text-xs flex justify-between">
                     <p>Protection Elbuenocorneto</p>

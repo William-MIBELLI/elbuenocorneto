@@ -35,16 +35,16 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
 
   //CONFIRM DE LA TRANSACTION
   const onConfirm = async () => {
-    setLoading(true)
+    setLoading(true);
     const res = await confirmReceptionTransactionACTION(transaction.id);
-    setLoading(false)
+    setLoading(false);
   };
 
   //CANCEL DE LA TRANSACTION
   const onCancel = async () => {
-    setLoading(true)
+    setLoading(true);
     const res = await cancelTransactionACTION(transaction.id);
-    setLoading(false)
+    setLoading(false);
   };
 
   //GESTION DU CLICK SUR LES BOUTONS, ON DISPLAY LA MODAL AVEC LE CONTENU ADAPTE
@@ -53,7 +53,7 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
     onOpen();
   };
 
-  //CONTENU DE LA MODAL
+  //CONTENU DES MODALS DISPONIBLE
   const modalContent = useRef<
     Record<"confirm" | "cancel" | "refuse", IModalContent>
   >({
@@ -88,46 +88,9 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
     },
   });
 
-  if (loading) {
-    return <div className="h-full w-full flex items-center justify-center">
-      <Spinner/>
-    </div>
-  }
-
-  return (
-    <div className="flex flex-col h-full w-3/4 justify-between">
-      {transaction.status === "CREATED" ? (
-        <Button
-          as={Link}
-          href={`/conversation/${transaction.productId}`}
-          variant="bordered"
-          size="sm"
-        >
-          Contacter le vendeur
-        </Button>
-      ) : (
-        <Button
-          onClick={() => onClickForModal("confirm")}
-          variant="bordered"
-          color="success"
-          size="sm"
-          endContent={<Check size={15} />}
-        >
-          Confirmer la vente
-        </Button>
-      )}
-      <p
-        onClick={() =>
-          onClickForModal(
-            transaction.status === "ACCEPTED" ? "refuse" : "cancel"
-          )
-        }
-        className="text-xs text-red-500 font-semibold text-right underline cursor-pointer"
-      >
-        Annuler la vente
-      </p>
-
-      {/* MODAL ANNULATION */}
+  //LE SKELETON DE LA MODAL
+  const modal = () => {
+    return (
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
@@ -153,8 +116,120 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
           )}
         </ModalContent>
       </Modal>
-    </div>
-  );
+    );
+  };
+
+  //SPINNER SI LOADING
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  //SI LA TRANSACTION EST CREATED
+  if (transaction.status === "CREATED") {
+    return (
+      <div className="flex flex-col h-full w-3/4 justify-between">
+        <Button
+          as={Link}
+          href={`/conversation/${transaction.productId}`}
+          variant="bordered"
+          size="sm"
+        >
+          Contacter le vendeur
+        </Button>
+        <p
+          onClick={() =>
+            onClickForModal(
+              transaction.status === "ACCEPTED" ? "refuse" : "cancel"
+            )
+          }
+          className="text-xs text-red-500 font-semibold text-right underline cursor-pointer"
+        >
+          Annuler la vente
+        </p>
+        {modal()}
+      </div>
+    );
+  }
+
+  //SI LA TRANSACTION EST ACCEPTED ET REMISE EN MAIN PROPRE
+  if (transaction.status === "ACCEPTED" && !transaction.deliveryMethod) {
+    return (
+      <div className="flex flex-col h-full w-3/4 justify-between">
+        <Button
+          onClick={() => onClickForModal("confirm")}
+          variant="bordered"
+          color="success"
+          size="sm"
+          endContent={<Check size={15} />}
+        >
+          Confirmer la vente
+        </Button>
+        <p
+          onClick={() =>
+            onClickForModal(
+              transaction.status === "ACCEPTED" ? "refuse" : "cancel"
+            )
+          }
+          className="text-xs text-red-500 font-semibold text-right underline cursor-pointer"
+        >
+          Refuser la vente
+        </p>
+        {modal()}
+      </div>
+    );
+  }
+
+  //TRANSACTION ACCEPTED EN LIVRAISON
+  if (transaction.status === "ACCEPTED" && transaction.trackingUrl) {
+    return (
+      <div className="flex flex-col h-full w-3/4 justify-between">
+        <Button
+          variant="bordered"
+          as={Link}
+          href={transaction.trackingUrl}
+          target="_blank"
+          size="sm"
+        >
+          Suivre le colis
+        </Button>
+        <p
+          onClick={() => onClickForModal("confirm")}
+          className="text-xs text-blue-500 font-semibold text-right underline cursor-pointer"
+        >
+          Confirmer la réception
+        </p>
+        {modal()}
+      </div>
+    );
+  }
+
+  //TRANSACTION CANCELED
+  if (transaction.status === "CANCELED") {
+    return (
+      <div className="flex flex-col h-full w-3/4 justify-center items-center">
+        <p className="text-xs tetx-center">
+          Cette transaction ne peut plus être modifiée
+        </p>
+      </div>
+    );
+  }
+
+  //TRANSACTION DONE
+  if (transaction.status === "DONE") {
+    return (
+      <div className="flex flex-col h-full w-3/4 justify-center">
+        <Button size="sm" variant="bordered">
+          Noter le vendeur
+        </Button>
+      </div>
+    );
+  }
+
+  return <p>Oups, petit souci ... 🫠</p>;
 };
 
 export default BuyerInteraction;

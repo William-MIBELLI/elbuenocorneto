@@ -12,7 +12,7 @@ import { TransactionInsert } from "@/drizzle/schema";
 import { v4 } from "uuid";
 import { IPickerShop } from "@/interfaces/ILocation";
 import {
-  updateTransactionStatusOnDb,
+  updateTransactionOnDb,
   createTransactionOnDB,
   getTransaction,
 } from "../requests/transaction.request";
@@ -23,6 +23,7 @@ import { deleteProductOnDB, reserveProduct } from "../requests/product.request";
 import { Stripe } from 'stripe'
 import { capturePaymentACTION } from "./stripe.action";
 import { updateUserWalletOnDb } from "../requests/user.request";
+import { createParcel } from "../requests/sendCloud.request";
 
 const createTransactionObject = (
   value: Omit<TransactionInsert, "id">
@@ -30,6 +31,7 @@ const createTransactionObject = (
   const transaction: TransactionInsert = {
     id: v4(),
     ...value,
+    totalPrice: +value.totalPrice.toFixed(2)
   };
 
   return transaction;
@@ -176,7 +178,7 @@ export const cancelTransactionACTION = async (transactionId: string) => {
     }
 
     //SI OUI ON PASSE LE STATUS DE LA TRANSACTION A CANCEL
-    await updateTransactionStatusOnDb(transactionId, "CANCELED");
+    await updateTransactionOnDb(transactionId, {status: "CANCELED"});
 
     //ON PASSE ISRESERVED DU PRODUCT A FALSE
     await reserveProduct(transaction.productId, false);
@@ -210,16 +212,20 @@ export const acceptTransactionACTION = async (transactionId: string) => {
       throw new Error("This transaction can not be accepted.");
     }
 
-    //SI C'EST OK ON PASSE STATUS A ACCEPTED
-    const updated = await updateTransactionStatusOnDb(
-      transactionId,
-      "ACCEPTED"
-    );
-
+    
     //SI DELIVERY METHOD N'EST PAS NULL, ON DELETE LE PRODUCT DIRECT
     //const deleted = await deleteProductOnDB(transaction.productId);
-
+    
     //ON CREE UNE ETIQUETTE D'ENVOI
+    const { parcel } = await createParcel(transaction);
+    
+    //SI C'EST OK ON UPDATE LA TRANSACTION 
+    const updated = await updateTransactionOnDb(
+      transactionId,
+      { status: 'ACCEPTED', parcelId: parcel?.id ?? null, trackingUrl: parcel?.tracking_url ?? null }
+    );
+
+    console.log('TRANSACTION UPDATED : ', updated, parcel);
 
     revalidatePath("/mes-transactions", "layout");
 
@@ -260,7 +266,7 @@ export const confirmReceptionTransactionACTION = async (
     }
 
     //ON UPDATE LE STATUS DE LA TRANSACTION
-    const updated = updateTransactionStatusOnDb(transactionId, 'DONE');
+    const updated = updateTransactionOnDb(transactionId, { status: 'DONE'});
 
     if (!updated) {
       throw new Error('Update failed');

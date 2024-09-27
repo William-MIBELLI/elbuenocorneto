@@ -23,7 +23,7 @@ const BuyFooter = () => {
           <p className='font-semibold text-lg'>
             Total 
             <span className='text-red-400'>
-              {` ${totalPrice}`}€
+              {` ${totalPrice?.toFixed(2)}`}€
             </span>
           </p>
         </NavbarContent>

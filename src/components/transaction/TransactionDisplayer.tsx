@@ -97,12 +97,16 @@ const TransactionDisplayer: FC<IProps> = ({ transactions, userId }) => {
         <Divider className="my-2" />
       </div>
 
-      {transToDisplay ? (
+      {transToDisplay && transToDisplay?.length > 0 ? (
         transToDisplay.map((t) => (
           <TransactionItem transaction={t} key={t.id} />
         ))
-      ) : (
+      ) : !transToDisplay ? (
         <Spinner />
+        ) : (
+            <div className="font-semibold">
+              Vous n'avez {tab === 'achat' ? 'aucun achat' : 'aucune vente'} à afficher.
+            </div>
       )}
     </div>
   );

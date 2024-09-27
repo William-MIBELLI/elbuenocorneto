@@ -26,6 +26,7 @@ import SearchInput from "../search/SearchInput";
 import { pusherClient } from "@/lib/pusher/client";
 import { getUnreadMessagesByUserId } from "@/lib/requests/message.request";
 import { useNotificationContext } from "@/context/notification.context";
+import { createParcel, getParcel } from "@/lib/requests/sendCloud.request";
 
 export const navItems = [
   {
@@ -59,11 +60,6 @@ const Navbar: FC<IProps> = ({ userId }) => {
   useEffect(() => {
     setUser(data?.user);
   }, [data]);
-
-
-  useEffect(() => {
-    console.log("NEWMESSAGE : ", newMessage);
-  }, [newMessage]);
 
 
   return (
