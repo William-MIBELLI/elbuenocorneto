@@ -12,7 +12,7 @@ interface IProps {
 const MessageItem: FC<IProps> = ({ msg , userId}) => {
 
   const isSender = msg.senderId === userId;
-  const { setNewMessage, newMessage } = useNotificationContext();
+  const { deleteMessageFromNewMessage, state: { newMessage } } = useNotificationContext();
   
   //MISE A JOUR DE ISREAD
   useEffect(() => {
@@ -22,9 +22,8 @@ const MessageItem: FC<IProps> = ({ msg , userId}) => {
     }
     const udpateIsread = async () => {
       const r = await updateIsReadByMsgId(msg.id);
-      console.log('MESSAGE UPDATED : ', r?.id)
       if (r) {
-        setNewMessage((previous) => previous.filter(item => item !== msg.id));
+        deleteMessageFromNewMessage(msg.id);
       }
     }
     udpateIsread();

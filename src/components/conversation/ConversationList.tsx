@@ -35,17 +35,19 @@ const ConversationList: FC<IProps> = ({
   convoIdOnUrl,
 }) => {
   const {
-    selectedConvo,
-    setSelectedConvo,
-    conversations,
-    setConversations,
-    deleteConversationFromState,
+    state: {
+      selectedConvo,
+      conversations,
+    },
+    deleteConversation,
+    updateConversations,
+    updateSelectedConvo
   } = useNotificationContext();
   const [firstMount, setFirstMount] = useState<boolean>(true);
 
   //AU MONTAGE, ON PASSE LES CONVOS AU CONTEXT
   useEffect(() => {
-    setConversations(fetchedConvo);
+    updateConversations(fetchedConvo);
   }, [fetchedConvo]);
   
   //SI UNE CONVOID EST PASSE DANS L'URL, ON LA SELECTIONNE DANS CONVOSELECTED
@@ -53,7 +55,7 @@ const ConversationList: FC<IProps> = ({
 
     //ON CHECK QUE CE SOIT BIEN LE MOUNT, POUR EVITER QUE LA SELECTEDCONVO CHANGE A CHAQUE FOIS 
     //QU'ON RECOIT UN MESSAGE
-    if (!firstMount) {
+    if (!firstMount || !conversations || conversations.length === 0) {
       return;
     }
     //ON CHECK QUE SI ON A  UNE CONVO_ID DANS L'URL 
@@ -77,40 +79,7 @@ const ConversationList: FC<IProps> = ({
 
   //CLICK SUR UNE CONVERSATION
   const onConvoClick = async (convoId: string) => {
-    const convo = conversations.find((convo) => convo.id === convoId);
-
-    if (convo?.id === selectedConvo?.id) {
-      return;
-    }
-    setSelectedConvo(convo);
-
-    if (convo?.messages[0]?.isRead) {
-      return;
-    }
-
-    //ON CHANGE LE ISREAD DU DERNIER MESSAGE DE LA CONVERSATION
-    const newConvos = conversations.map((c) => {
-      //SI LA CONVO EST VIDE, ON RETURN
-      if (c?.messages.length === 0) {
-        return c;
-      }
-      //SI C'EST LA CONVO SUR LAQUELLE VIENT DE CLIQUER L'USER
-      if (c.id === convo?.id && !c.messages[0]?.isRead) {
-        //ON SPREAD LE MESSAGE ET ON PASSE ISREAD A TRUE
-        const newM = { ...c.messages[0], isRead: true };
-
-        //ON SPREAD LA CONVO ET ON LUI PASSE LE MESSAGE MIS A JOUR
-        const newC: ConversationListItemType = { ...c, messages: [newM] };
-
-        return newC;
-      }
-
-      //SINON ON RETURN LA CONVO TELLE QUELLE
-      return c;
-    });
-
-    //ON UPDATE ENSUITE LE STATE DANS LE CONTEXT
-    setConversations(newConvos);
+    updateSelectedConvo(convoId);
   };
 
   //SUPPRIMER LA CONVERSATION
@@ -120,7 +89,7 @@ const ConversationList: FC<IProps> = ({
     //SI LA SUPPRESSION EST REUSSIE, ON PASSE SELECTEDCONVO A UNDEFINED
     // ET ON SUPPRIME LA CONVERSATION DE LA LISTE
     if (deleted) {
-      deleteConversationFromState(convo.id);
+      deleteConversation(convo.id);
     }
   };
 
@@ -222,7 +191,7 @@ const ConversationList: FC<IProps> = ({
               </Popover>
             </div>
 
-            {/* PRODUCT DETTAILS */}
+            {/* PRODUCT DETAILS */}
 
             <section className="flex flex-col items-start gap-2 p-2 justify-start">
               <Image

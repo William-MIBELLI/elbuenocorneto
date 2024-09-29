@@ -14,7 +14,7 @@ const Card: FC<IProps> = ({
 }) => {
 
   const router = useRouter();
-  const { newTransaction } = useNotificationContext();
+  const { state:{ newTransaction }  } = useNotificationContext();
 
   const onClickHandler = () => {
     if (available) {

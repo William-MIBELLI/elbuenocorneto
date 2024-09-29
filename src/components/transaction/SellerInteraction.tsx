@@ -1,3 +1,4 @@
+import { transactionConversationACTION } from "@/lib/actions/conversation.action";
 import { acceptTransactionACTION } from "@/lib/actions/transaction.action";
 import { createParcel, getParcel } from "@/lib/requests/sendCloud.request";
 import { UserTransactionItem } from "@/lib/requests/transaction.request";
@@ -10,6 +11,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import React, { FC } from "react";
 
 interface IProps {
@@ -23,6 +25,7 @@ const SellerInteraction: FC<IProps> = ({
 }) => {
   const { onOpen, isOpen, onOpenChange } = useDisclosure();
   const { parcelId } = transaction;
+  const router = useRouter();
 
 
   //CLICK POUR ACCEPTER LA TRANSACTION
@@ -53,6 +56,14 @@ const SellerInteraction: FC<IProps> = ({
     document.body.removeChild(link);
   };
 
+  const onGoToConversation = async () => {
+    const res = await transactionConversationACTION(transaction);
+    if (!res) {
+      console.log('RES NULL');
+    }
+    router.push(`/messages/${res}`);
+  }
+
   //SI ON A UN PARCEL ID ET QUE LA TRANSACTION EST ACCEPTED
   if (parcelId && transaction.status === 'ACCEPTED') {
     return (
@@ -60,6 +71,12 @@ const SellerInteraction: FC<IProps> = ({
         Imprimer l'étiquette de livraison
       </Button>
     );
+  }
+
+  if (transaction.status === 'ACCEPTED' && !transaction.deliveryMethod) {
+    return (
+      <Button variant="bordered" onClick={onGoToConversation}>Contacter l'acheteur</Button>
+    )
   }
 
   //SI LA TRANSACTION EST CREATED

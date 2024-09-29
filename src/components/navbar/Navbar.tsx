@@ -55,7 +55,7 @@ const Navbar: FC<IProps> = ({ userId }) => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const { data, status } = useSession();
   const [user, setUser] = useState(data?.user);
-  const { newMessage, newTransaction } = useNotificationContext();
+  const { state: { newMessage, newTransaction } } = useNotificationContext();
 
   useEffect(() => {
     setUser(data?.user);

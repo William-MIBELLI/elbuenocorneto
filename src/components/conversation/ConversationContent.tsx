@@ -28,7 +28,7 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
 
   if (!session.data?.user?.id) return null;
 
-  const { messages, addNewMessage, setMessages } = useNotificationContext();
+  const { state: { messages }, addNewMessage, updateAllMessages } = useNotificationContext();
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [value, setValue] = useState<string>();
@@ -51,16 +51,26 @@ const ConversationContent: FC<IProps> = ({ convoId, userId }) => {
     shouldValidate: "onSubmit",
   });
 
-  //AU MONTAGE, ON FETCH LES MESSAGES DE LA CONVERSATION
+  // //AU MONTAGE, ON FETCH LES MESSAGES DE LA CONVERSATION
+  // useEffect(() => {
+  //   const fetchConvoMessage = async () => {
+  //     setLoading(true);
+  //     const fetchedMessages = await getConversationMessages(convoId);
+  //     updateAllMessages(fetchedMessages);
+  //     setLoading(false);
+  //   };
+  //   fetchConvoMessage();
+  // }, [convoId]);
+
   useEffect(() => {
-    const fetchConvoMessage = async () => {
-      setLoading(true);
-      const msg = await getConversationMessages(convoId);
-      setMessages(msg);
+    if (messages.length > 0) {
       setLoading(false);
-    };
-    fetchConvoMessage();
-  }, [convoId]);
+      return;
+    }
+    if (!messages) {
+      setLoading(true);
+    }
+  },[messages])
 
   //SI LE MESSAGE EST ENVOYE, ON RESET L'INPUT ET ON AJOUTE LE NOUVEAU MESSAGE A LA LISTE
   useEffect(() => {
