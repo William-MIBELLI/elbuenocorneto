@@ -9,10 +9,11 @@ import {
   StateEnum,
   TransactionInsert,
   deliveriesEnum,
+  ratingInsert,
 } from "./../drizzle/schema";
 import { DeliveryType, DeliveryTypeList } from "./../interfaces/IDelivery";
 import { GENDER } from "@/interfaces/IUser";
-import { z } from "zod";
+import { z, ZodObject } from "zod";
 import { IPickerShop } from "@/interfaces/ILocation";
 
 export const loginSchema = z.object({
@@ -287,3 +288,10 @@ export const mergeDataAndFormData = (
 
   return newFD;
 };
+
+
+export const ratingSchema = z.object({
+  transactionId: z.string().uuid(),
+  rate: z.number().min(1).max(5),
+  commentary: z.string().optional()
+}) satisfies z.ZodType<Omit<ratingInsert, "id">>

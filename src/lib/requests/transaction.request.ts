@@ -4,11 +4,22 @@ import { getDb } from "@/drizzle/db";
 import {
   images,
   products,
+  ratingTable,
   TransactionInsert,
   TransactionStatusEnum,
   transactionTable,
+  users,
 } from "@/drizzle/schema";
-import { and, asc, count, desc, eq, getTableColumns, ne, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  ne,
+  or,
+} from "drizzle-orm";
 
 export const createTransactionOnDB = async (transaction: TransactionInsert) => {
   try {
@@ -72,23 +83,23 @@ export const getUserTransactions = async (userId: string) => {
           },
         },
       },
-      orderBy: [desc(transactionTable.createdAt)]
+      orderBy: [desc(transactionTable.createdAt)],
     });
 
     //ON MAP LES INFO DE LA TRANSACTION SELON SON STATUS
     //POUR PAS QUE LE VENDEUR AIT ACCES AUX INFOS DE L'ACHETEUR AVANT D'AVOIR ACCEPTE
-    const mapped = transactionsQuery.map(item => {
-      if (item.status === 'ACCEPTED') {
+    const mapped = transactionsQuery.map((item) => {
+      if (item.status === "ACCEPTED") {
         return item;
       }
       const mappedItem = { ...item };
-      sensitiveKeys.forEach(key => {
+      sensitiveKeys.forEach((key) => {
         if (key in mappedItem) {
-          delete(mappedItem)[key]
+          delete mappedItem[key];
         }
-      })
-      return mappedItem
-    })
+      });
+      return mappedItem;
+    });
 
     return mapped;
   } catch (error: any) {
@@ -158,6 +169,24 @@ export const updateTransactionOnDb = async (
     return true;
   } catch (error: any) {
     console.log("ERROR CANCEL TRANSACTION REQUEST : ", error?.message);
+    return null;
+  }
+};
+
+export const getTransactionForRate = async (transactionId: string) => {
+  try {
+    const db = getDb();
+    const data = await db
+      .select()
+      .from(transactionTable)
+      .where(eq(transactionTable.id, transactionId))
+      .leftJoin(users, eq(users.id, transactionTable.sellerId))
+      .leftJoin(ratingTable, eq(ratingTable.transactionId, transactionId))
+      .then(r => r[0]);
+    
+    return data;
+  } catch (error: any) {
+    console.log("ERROR GET TRANSACTION FOR RATE REQUEST : ", error?.message);
     return null;
   }
 };

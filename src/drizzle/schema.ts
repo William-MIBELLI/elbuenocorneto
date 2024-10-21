@@ -127,7 +127,7 @@ export const users = pgTable("user", {
   firstname: text("firstname"),
   gender: genderEnum("gender"),
   birthday: timestamp("birthday"),
-  walletAmout: numericCasted('wallet_amount').default(0)
+  walletAmout: numericCasted("wallet_amount").default(0),
 });
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -387,8 +387,6 @@ type NumericConfig = {
   scale?: number;
 };
 
-
-
 export const searchTable = pgTable("search", {
   id: text("id").primaryKey().notNull(),
   userId: text("user_id")
@@ -484,8 +482,7 @@ export const transactionTable = pgTable("transaction", {
   productId: text("product_id")
     .notNull()
     .references(() => products.id),
-  productTitle: text("product_title")
-    .notNull(),
+  productTitle: text("product_title").notNull(),
   sellerId: text("seller_id")
     .notNull()
     .references(() => users.id),
@@ -509,9 +506,9 @@ export const transactionTable = pgTable("transaction", {
   paymentIntentId: text("payment_intent_id"),
   status: TransactionStatusEnum("status").notNull().default("CREATED"),
   createdAt: timestamp("created_at").defaultNow(),
-  pickerId: text('picker_id'),
-  parcelId: text('parcel_id'),
-  trackingUrl: text('tracking_url')
+  pickerId: text("picker_id"),
+  parcelId: text("parcel_id"),
+  trackingUrl: text("tracking_url"),
 });
 
 export const transactionRelations = relations(transactionTable, ({ one }) => ({
@@ -544,3 +541,23 @@ export type TransactionSelect = typeof transactionTable.$inferSelect;
 
 // export type WalletInsert = typeof WalletTable.$inferInsert;
 // export type WalletSelect = typeof WalletTable.$inferSelect;
+
+export const ratingTable = pgTable("rating", {
+  id: text("id").notNull().primaryKey(),
+  transactionId: text("transaction_id")
+    .unique()
+    .notNull()
+    .references(() => transactionTable.id),
+  rate: numericCasted("rate").notNull(),
+  commentary: text("commentary"),
+});
+
+export const ratingRelations = relations(ratingTable, ({ one }) => ({
+  transaction: one(transactionTable, {
+    fields: [ratingTable.transactionId],
+    references: [transactionTable.id],
+  }),
+}));
+
+export type ratingInsert = typeof ratingTable.$inferInsert;
+export type ratingSelect = typeof ratingTable.$inferSelect;

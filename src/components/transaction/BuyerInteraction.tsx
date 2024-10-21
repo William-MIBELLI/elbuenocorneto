@@ -164,9 +164,8 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
           variant="bordered"
           color="success"
           size="sm"
-          endContent={<Check size={15} />}
         >
-          Confirmer la vente
+          Confirmer la transaction
         </Button>
         <p
           onClick={() =>
@@ -176,7 +175,7 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
           }
           className="text-xs text-red-500 font-semibold text-right underline cursor-pointer"
         >
-          Refuser la vente
+          Refuser la transaction
         </p>
         {modal()}
       </div>
@@ -222,7 +221,7 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
   if (transaction.status === "DONE") {
     return (
       <div className="flex flex-col h-full w-3/4 justify-center">
-        <Button size="sm" variant="bordered">
+        <Button as={Link} href={`/noter-le-vendeur/${transaction.id}`} size="sm" variant="bordered">
           Noter le vendeur
         </Button>
       </div>

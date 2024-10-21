@@ -240,7 +240,7 @@ const useNotificationContextValue = () => {
     const convo = conversations.find((convo) => convo.id === convoId);
 
     //SI LA CONVO CLIQU2 EST DEJA LA SELECTEDCONVO
-    //OU SI PAS DE CONVO AVEC CET ID, ON FAST RETURN
+      //OU SI PAS DE CONVO AVEC CET ID, ON FAST RETURN
     if (convo?.id === selectedConvo?.id || !convo) {
       return;
     }
