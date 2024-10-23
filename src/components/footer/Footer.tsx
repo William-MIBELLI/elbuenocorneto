@@ -19,7 +19,7 @@ const Footer = () => {
         </span>
       </p>
       <p className="my-3 font-semibold">
-        <span className="underline">En ce moment </span>: Rating ⭐
+        <span className="underline">En ce moment </span>: Polish final et ON EST GOOD 😍
       </p>
       <div className="flex gap-3">
         <Button

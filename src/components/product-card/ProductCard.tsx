@@ -6,35 +6,46 @@ import React, { FC, useRef, useState } from "react";
 import { ICard, IProductCard } from "@/interfaces/IProducts";
 import Link from "next/link";
 import Favorite from "../favorite/Favorite";
+import { mapRating } from "@/lib/helpers/rating.helper";
 
 interface IProps {
   productData: ICard;
 }
 
 const ProductCard: FC<IProps> = ({ productData }) => {
-  const { seller, images, createdAt, id, title, price, pdl, location } =
+  const { seller, images, createdAt, id, title, price, pdl, location  } =
     productData;
-  const { name, rating, rateNumber } = seller;
+  const { name } = seller;
   const [open, setOpen] = useState<boolean>(false);
-  //console.log(`PRODUCTDATA ${seller.name}`, productData)
   const cardRef = useRef(null);
+  const rate = mapRating(productData.seller.seller)
 
   return (
     <Link
       href={`/product/${id}`}
       ref={cardRef}
-      className=" py-2 rounded-lg flex flex-col gap-2  min-w-[200px] h-full"
+      className=" py-2  rounded-lg flex flex-col gap-2  min-w-[200px] h-full"
     >
-      <div className="flex gap-1 items-center text-sm w-full">
-        <Avatar className="min-w-6 max-w-6 h-6 text-tiny" />
-        <h3 className="font-semibold text-ellipsis">{name}</h3>
-        <Star
-          size={15}
-          className="text-orange-500 fill-orange-500"
-          strokeWidth={3}
-        />
-        <p className="font-semibold">{rating}</p>
-        <p className="text-xs">({rateNumber})</p>
+      <div className="flex justify-between items-center text-sm w-full">
+        <div className="flex items-center gap-1">
+          <Avatar className="min-w-6 max-w-6 h-6 text-tiny" />
+          <h3 className="font-semibold text-ellipsis">{name}</h3>
+        </div>
+        {
+          rate && (
+            <div className="flex items-center gap-1">
+              <div className="flex items-center">
+                <Star
+                  size={15}
+                  className="text-orange-500 fill-orange-500"
+                  strokeWidth={3}
+                />
+                <p className="font-semibold">{rate.rate}</p>
+              </div>
+              <p className="font-thin">({rate.rateNumber})</p>
+            </div>
+          )
+        }
       </div>
       <div className="flex flex-col w-full  items-start font-semibold text-sm h-80 ">
         <div className="relative h-3/4 w-full mb-3">

@@ -6,6 +6,7 @@ import React, { FC } from 'react'
 import Link from 'next/link'
 import UserHeader from '../user/UserHeader'
 import { getUserById } from '@/lib/requests/user.request'
+import { mapRating, mapRatingFromSelect } from '@/lib/helpers/rating.helper'
 const user = {
   name: 'Jean Michel',
   totalAnnounce: 32,
@@ -21,17 +22,21 @@ interface IProps {
 const Seller: FC<IProps> = async ({ userId, productId, isReserved }) => {
 
   const data = await getUserById(userId);
+
+
   if (!data) {
     return (
       <div>Cant retrieve user 😢</div>
     )
   }
-  console.log('ISRESERVED DANS SELLER : ', isReserved, productId);
+  
   const { id } = data.user;
+  const rate = mapRatingFromSelect(data.ratings);
+
   return (
     <div className='flex flex-col justify-around w-full h-72 p-3 mb-3 rounded-md shadow-medium bg-white'>
       <Link href={`/profile/${id}`} className=' flex items-center gap-6 justify-between'>
-        <UserHeader userData={data.user} count={data.count}/>
+        <UserHeader userData={data.user} count={data.count} rate={rate} />
         <ChevronRight/>
       </Link>
       <Divider />

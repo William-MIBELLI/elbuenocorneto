@@ -198,6 +198,10 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   attributes: many(productAttributeJONC),
   favorites: many(favoritesTable),
   conversations: many(conversationTable),
+  transactions: one(transactionTable, {
+    fields: [products.id],
+    references: [transactionTable.productId]
+  })
 }));
 
 export type ProductInsert = typeof products.$inferInsert;

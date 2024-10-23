@@ -27,7 +27,7 @@
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.2.0",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.32.1",
+    "drizzle-orm": "^0.35.3",
     "fast-shuffle": "^6.1.0",
     "firebase": "^10.12.2",
     "framer-motion": "^11.0.27",

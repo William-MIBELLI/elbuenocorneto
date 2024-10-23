@@ -1,5 +1,13 @@
 import { getDb } from "@/drizzle/db";
-import { products, transactionTable, users } from "@/drizzle/schema";
+import {
+  InsertUser,
+  products,
+  ratingSelect,
+  ratingTable,
+  SelectUser,
+  transactionTable,
+  users,
+} from "@/drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 
 export const getUserForProfile = async (id: string) => {
@@ -17,15 +25,15 @@ export const getUserForProfile = async (id: string) => {
         },
         location: {},
         seller: {
-          columns:{},
+          columns: {},
           with: {
             rating: {
               columns: {
-                rate: true
-              }
-            }
-          }
-        }
+                rate: true,
+              },
+            },
+          },
+        },
       },
       columns: {
         password: false,
@@ -41,19 +49,49 @@ export const getUserForProfile = async (id: string) => {
 export const getUserById = async (id: string) => {
   try {
     const db = getDb();
+
+    //ON RECUPERE LES DATAS DU USER, LE COUNT DE SES PRODUCTS ET SES RATES
     const user = await db
       .select({
-        count: sql<number>`cast(count(${products.userId}) as int)`,
         user: users,
+        count: db.$count(products, eq(products.userId, id)),
+        rating: ratingTable,
       })
-      .from(products)
-      .where(eq(products.userId, id))
-      .rightJoin(users, eq(users.id, id))
-      .groupBy(users.id)
-      .then((res) => res[0]);
-    return user;
-  } catch (error) {
-    console.log("ERROR FETCHING USER : ", error);
+      .from(users)
+      .leftJoin(transactionTable, eq(transactionTable.sellerId, id))
+      .leftJoin(ratingTable, eq(ratingTable.transactionId, transactionTable.id))
+      .where(eq(users.id, id))
+      .groupBy(users.id, ratingTable.id);
+
+    type AccumulatedUser = {
+      user: SelectUser;
+      count: number;
+      ratings: ratingSelect[];
+    };
+
+    //ON MAP LE RESULTAT POUR EN FAIRE UN SEUL OBJET
+    const mappedUser = user.reduce<AccumulatedUser>((acc, current) => {
+      // Si c'est la première itération, on initialise l'accumulateur
+      if (!acc.user) {
+        return {
+          user: current.user,
+          count: current.count,
+          ratings: current.rating ? [current.rating] : [],
+        };
+      }
+
+      // Sinon on ajoute le rating au tableau s'il existe
+      return {
+        ...acc,
+        ratings: current.rating
+          ? [...acc.ratings, current.rating]
+          : acc.ratings,
+      };
+    }, {} as AccumulatedUser);
+
+    return mappedUser;
+  } catch (error: any) {
+    console.log("ERROR FETCHING USER : ", error?.message);
     return null;
   }
 };

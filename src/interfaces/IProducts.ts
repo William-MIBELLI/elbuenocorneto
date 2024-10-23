@@ -15,6 +15,7 @@ import { DeliveryType } from "./IDelivery";
 import { ILocation } from "./ILocation";
 import { v4 as uuidV4 } from "uuid";
 import carBrand from "../../car_brand.json";
+import { fetchProductsForSlider } from "@/lib/requests/product.request";
 
 export const categoriesList: ICategoriesList = {
   immobilier: {
@@ -216,12 +217,15 @@ export type ProductUpdateType = ProductSelect & {
   pdl: DeliveryLinkSelect[];
 };
 
-export type ICard = ProductSelect & {
-  seller: Pick<SelectUser, "name" | "rateNumber" | "rating">;
-} & { pdl: Pick<DeliveryLinkSelect, "deliveryId">[] } & {
-  images: Pick<ImageSelect, "url">[];
-} & { location: Pick<LocationSelect, "city" | "postcode"> } & { favorites: FavoriteSelect[] | null};
+// export type ICard = ProductSelect & {
+//   seller: Pick<SelectUser, "name" | "rateNumber" | "rating">;
+// } & { pdl: Pick<DeliveryLinkSelect, "deliveryId">[] } & {
+//   images: Pick<ImageSelect, "url">[];
+// } & { location: Pick<LocationSelect, "city" | "postcode"> } & { favorites: FavoriteSelect[] | null};
 
+
+export type ICards = Awaited<ReturnType<typeof fetchProductsForSlider>>;
+export type ICard = ICards[number];
 export interface IProductImage {
   file: File;
   url: string;

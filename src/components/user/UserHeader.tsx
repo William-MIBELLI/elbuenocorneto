@@ -9,9 +9,13 @@ interface IProps {
     Pick<SelectUser, "name" | "rateNumber" | "rating" | "image">
   >;
   count?: number;
+  rate?: {
+    rating: number;
+    rateNumber: number;
+  } | null
 }
 
-const UserHeader: FC<IProps> = ({ userData, count }) => {
+const UserHeader: FC<IProps> = ({ userData, count, rate }) => {
   const { name, rating, rateNumber, image } = userData;
   return (
     <div className="flex gap-3">
@@ -25,8 +29,8 @@ const UserHeader: FC<IProps> = ({ userData, count }) => {
       <div className="flex flex-col justify-center items-start">
         <h3 className="font-semibold text-lg">{name}</h3>
         {count && <p className="text-sm">{count} annonces</p>}
-        {rating && rateNumber && (
-          <Rating rating={rating} totalRate={rateNumber} />
+        {rate && (
+          <Rating rating={rate.rating} totalRate={rate.rateNumber} />
         )}
         <div></div>
       </div>

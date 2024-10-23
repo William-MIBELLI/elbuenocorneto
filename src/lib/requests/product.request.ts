@@ -38,6 +38,7 @@ import {
   or,
   sql,
   getTableColumns,
+  desc,
 } from "drizzle-orm";
 import { ProdAttrTypeWithName } from "@/context/newproduct.context";
 import { auth } from "@/auth";
@@ -162,7 +163,7 @@ export const getProductDetails = async (
 
 export const fetchProductsForSlider = async (
   category: CategoriesType
-): Promise<ICard[]> => {
+) => {
   try {
     const db = getDb();
     const cat = await db
@@ -187,7 +188,13 @@ export const fetchProductsForSlider = async (
             rating: true,
             rateNumber: true,
             password: false,
-          },
+          }, with: {
+            seller: {
+              with: {
+                rating: true
+              }
+            }
+          }
         },
         pdl: {
           columns: {
@@ -204,6 +211,7 @@ export const fetchProductsForSlider = async (
         favorites: true,
       },
       limit: 10,
+      orderBy: [desc(products.createdAt)]
     });
     return prods;
   } catch (error) {
