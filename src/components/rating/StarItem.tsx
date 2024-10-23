@@ -4,11 +4,11 @@ import { ValueType } from './Rating'
 
 interface IProps {
   value: ValueType
+  size?: number
 }
 
-const StarItem: FC<IProps> = ({ value }) => {
+const StarItem: FC<IProps> = ({ value, size = 15 }) => {
 
-  const size = 15
 
   return (
     <div className='relative'>

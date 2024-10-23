@@ -16,6 +16,7 @@ import {
 import { Check } from "lucide-react";
 import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
+import Rating from "../rating/Rating";
 
 interface IProps {
   transaction: UserTransactionItem;
@@ -221,9 +222,21 @@ const BuyerInteraction: FC<IProps> = ({ transaction, cancelClick }) => {
   if (transaction.status === "DONE") {
     return (
       <div className="flex flex-col h-full w-3/4 justify-center">
-        <Button as={Link} href={`/noter-le-vendeur/${transaction.id}`} size="sm" variant="bordered">
-          Noter le vendeur
-        </Button>
+        {transaction.rating ? (
+          <div className="flex flex-col justify-center items-center mx-auto gap-1">
+            <p className="text-xs">Votre note</p>
+            <Rating rating={transaction.rating.rate}/>
+          </div>
+        ) : (
+          <Button
+            as={Link}
+            href={`/noter-le-vendeur/${transaction.id}`}
+            size="sm"
+            variant="bordered"
+          >
+            Noter le vendeur
+          </Button>
+        )}
       </div>
     );
   }

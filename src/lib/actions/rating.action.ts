@@ -14,7 +14,7 @@ export const createRatingACTION = async ( state: unknown, fd: FormData) => {
 
     //SI ERROR, ON CATCH
     if (parsed.status !== 'success') {
-      console.log('PARSED ERROR : ', parsed.error);
+      console.log('PARSED ERROR : ', parsed.error, parsed.payload);
       throw new Error('parse failed');
     }
 

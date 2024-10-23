@@ -14,8 +14,10 @@ import {
   AnyPgColumn,
   decimal,
   customType,
+  pgMaterializedView,
+  QueryBuilder,
 } from "drizzle-orm/pg-core";
-import { relations, sql } from "drizzle-orm";
+import { avg, eq, relations, sql, Query, InferSelectModel } from "drizzle-orm";
 
 export const genderEnum = pgEnum("gender", ["0", "1", "2"]);
 export const attributeTypeEnum = pgEnum("attribute_type_enum", [
@@ -139,6 +141,8 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   favorites: many(favoritesTable),
   conversations: many(conversationTable),
   messages: many(messageTable),
+  user: many(transactionTable,{ relationName: 'user'}),
+  seller: many(transactionTable, { relationName: 'seller'})
 }));
 
 export type SelectUser = typeof users.$inferSelect;
@@ -519,28 +523,27 @@ export const transactionRelations = relations(transactionTable, ({ one }) => ({
   user: one(users, {
     fields: [transactionTable.userId],
     references: [users.id],
+    relationName: 'user'
   }),
   seller: one(users, {
     fields: [transactionTable.sellerId],
     references: [users.id],
+    relationName: 'seller'
   }),
   delivery: one(deliveries, {
     fields: [transactionTable.deliveryMethod],
     references: [deliveries.type],
   }),
+  rating: one(ratingTable, {
+    fields: [transactionTable.id],
+    references: [ratingTable.transactionId]
+  })
 }));
 
 export type TransactionInsert = typeof transactionTable.$inferInsert;
 export type TransactionSelect = typeof transactionTable.$inferSelect;
 
-// export const WalletTable = pgTable('wallet', {
-//   id: text('id').notNull().primaryKey(),
-//   userId: text('user_id').unique().notNull().references(() => users.id),
-//   amount: numericCasted('amout').notNull().default(0)
-// })
 
-// export type WalletInsert = typeof WalletTable.$inferInsert;
-// export type WalletSelect = typeof WalletTable.$inferSelect;
 
 export const ratingTable = pgTable("rating", {
   id: text("id").notNull().primaryKey(),
@@ -561,3 +564,5 @@ export const ratingRelations = relations(ratingTable, ({ one }) => ({
 
 export type ratingInsert = typeof ratingTable.$inferInsert;
 export type ratingSelect = typeof ratingTable.$inferSelect;
+
+

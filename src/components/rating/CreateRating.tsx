@@ -56,7 +56,7 @@ const CreateRating: FC<IProps> = ({ transactionId }) => {
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="text" hidden defaultValue={transactionId} name="transactionId" />
-      <input type="number" hidden defaultValue={selectedRating} name="rate" />
+      <input type="number" hidden value={selectedRating + 1} name="rate" />
       <div>
         <h2 className="text-sm">Votre note</h2>
         <div className="flex" onMouseLeave={() => setCurrentHover(undefined)}>

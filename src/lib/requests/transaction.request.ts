@@ -82,6 +82,7 @@ export const getUserTransactions = async (userId: string) => {
             phone: true,
           },
         },
+        rating: true
       },
       orderBy: [desc(transactionTable.createdAt)],
     });

@@ -1,5 +1,5 @@
 import { getDb } from "@/drizzle/db";
-import { products, users } from "@/drizzle/schema";
+import { products, transactionTable, users } from "@/drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 
 export const getUserForProfile = async (id: string) => {
@@ -16,14 +16,24 @@ export const getUserForProfile = async (id: string) => {
           },
         },
         location: {},
+        seller: {
+          columns:{},
+          with: {
+            rating: {
+              columns: {
+                rate: true
+              }
+            }
+          }
+        }
       },
       columns: {
         password: false,
       },
     });
     return user;
-  } catch (error) {
-    console.log("ERROR FETCHING USER DATA FOR PROILE : ", error);
+  } catch (error: any) {
+    console.log("ERROR FETCHING USER DATA FOR PROILE : ", error?.message);
     return undefined;
   }
 };

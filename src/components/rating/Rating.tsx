@@ -3,7 +3,7 @@ import StarItem from "./StarItem";
 
 interface IProps {
   rating: number;
-  totalRate: number;
+  totalRate?: number;
 }
 
 export type ValueType = "FULL" | "HALF" | "EMPTY";
@@ -31,7 +31,10 @@ const Rating: FC<IProps> = ({ rating, totalRate }) => {
           <StarItem value={value} key={Math.random()} />
         ))}
       </div>
-      <p className="text-sm font-semibold">({totalRate})</p>
+      {
+        totalRate &&
+        <p className="text-sm font-semibold">({totalRate})</p>
+      }
     </div>
   );
 };
